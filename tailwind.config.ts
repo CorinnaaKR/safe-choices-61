@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        serif: ['Lora', 'Georgia', 'serif'],
+        sans: ['Source Sans 3', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -56,6 +60,23 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        story: {
+          bg: "hsl(var(--story-bg))",
+          text: "hsl(var(--story-text))",
+          accent: "hsl(var(--story-accent))",
+        },
+        evidence: {
+          bg: "hsl(var(--evidence-bg))",
+          border: "hsl(var(--evidence-border))",
+        },
+        decision: {
+          highlight: "hsl(var(--decision-highlight))",
+        },
+        feedback: {
+          positive: "hsl(var(--positive))",
+          negative: "hsl(var(--negative))",
+          neutral: "hsl(var(--neutral))",
         },
       },
       borderRadius: {
