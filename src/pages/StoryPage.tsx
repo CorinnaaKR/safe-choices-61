@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulation } from '@/hooks/useSimulation';
 import { ProgressHeader } from '@/components/simulation/ProgressHeader';
@@ -7,8 +7,10 @@ import { EvidenceCard } from '@/components/simulation/EvidenceCard';
 import { ChoiceCard } from '@/components/simulation/ChoiceCard';
 import { FeedbackPanel } from '@/components/simulation/FeedbackPanel';
 import { EvidencePanel } from '@/components/simulation/EvidencePanel';
+import { SceneRenderer, getSceneType } from '@/components/3d/SceneRenderer';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Hand } from 'lucide-react';
+import { Search, Hand, Eye } from 'lucide-react';
+import { Evidence } from '@/types/simulation';
 
 export default function StoryPage() {
   const navigate = useNavigate();
@@ -24,16 +26,17 @@ export default function StoryPage() {
     getProgress,
   } = useSimulation();
 
-  // Redirect to results if complete
+  const [inspectedEvidence, setInspectedEvidence] = useState<Evidence | null>(null);
+
   useEffect(() => {
     if (gameState.isComplete) {
       navigate('/results');
     }
   }, [gameState.isComplete, navigate]);
 
-  // Scroll to top on scene change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setInspectedEvidence(null);
   }, [gameState.currentSceneId, showFeedback]);
 
   if (!currentScene) {
@@ -48,6 +51,15 @@ export default function StoryPage() {
     return gameState.collectedEvidence.some(e => e.id === evidenceId);
   };
 
+  const sceneType = getSceneType(currentScene.id);
+  const sceneEvidence = currentScene.evidence || [];
+  const collectedIds = gameState.collectedEvidence.map(e => e.id);
+
+  const handleCollectFrom3D = (evidence: Evidence) => {
+    setInspectedEvidence(evidence);
+    collectEvidence(evidence);
+  };
+
   return (
     <div className="min-h-screen story-atmosphere">
       <ProgressHeader 
@@ -59,7 +71,7 @@ export default function StoryPage() {
         }}
       />
       
-      <main className="container mx-auto px-4 py-10 pb-36">
+      <main className="container mx-auto px-4 py-6 pb-36">
         <AnimatePresence mode="wait">
           {showFeedback && lastChoice ? (
             <motion.div
@@ -81,14 +93,62 @@ export default function StoryPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Narrative */}
+              {/* 3D Scene */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className="max-w-4xl mx-auto mb-8"
+              >
+                <SceneRenderer
+                  sceneType={sceneType}
+                  evidence={sceneEvidence}
+                  collectedIds={collectedIds}
+                  onCollectEvidence={handleCollectFrom3D}
+                />
+              </motion.div>
+
+              {/* Evidence inspection popup */}
+              <AnimatePresence>
+                {inspectedEvidence && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    className="max-w-3xl mx-auto mb-8"
+                  >
+                    <div className="bg-card border-2 border-decision-highlight/50 rounded-xl p-5 shadow-lg shadow-decision-highlight/10">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="p-2 rounded-lg bg-decision-highlight/10">
+                          <Eye className="w-4 h-4 text-decision-highlight" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground">{inspectedEvidence.title}</h4>
+                          <p className="text-xs text-muted-foreground">{inspectedEvidence.timestamp}</p>
+                        </div>
+                        <button
+                          onClick={() => setInspectedEvidence(null)}
+                          className="ml-auto text-muted-foreground hover:text-foreground text-sm"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <p className="text-sm text-foreground/80 leading-relaxed border-l-2 border-decision-highlight/30 pl-3 italic">
+                        {inspectedEvidence.content}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Narrative - condensed */}
               <StoryNarrative 
                 title={currentScene.title}
                 paragraphs={currentScene.narrative}
               />
               
-              {/* Evidence Section */}
-              {currentScene.evidence && currentScene.evidence.length > 0 && (
+              {/* Evidence cards (also accessible below narrative) */}
+              {sceneEvidence.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -100,12 +160,12 @@ export default function StoryPage() {
                       <Search className="w-4 h-4 text-decision-highlight" />
                     </div>
                     <h3 className="font-semibold text-foreground text-sm uppercase tracking-widest">
-                      Evidence Available
+                      Evidence Found
                     </h3>
                     <div className="h-px flex-1 bg-gradient-to-r from-evidence-border to-transparent" />
                   </div>
                   <div className="space-y-4">
-                    {currentScene.evidence.map((evidence, i) => (
+                    {sceneEvidence.map((evidence, i) => (
                       <motion.div
                         key={evidence.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -157,7 +217,6 @@ export default function StoryPage() {
         </AnimatePresence>
       </main>
       
-      {/* Evidence Panel */}
       <EvidencePanel collectedEvidence={gameState.collectedEvidence} />
     </div>
   );
