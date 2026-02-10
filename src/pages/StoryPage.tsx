@@ -7,7 +7,8 @@ import { EvidenceCard } from '@/components/simulation/EvidenceCard';
 import { ChoiceCard } from '@/components/simulation/ChoiceCard';
 import { FeedbackPanel } from '@/components/simulation/FeedbackPanel';
 import { EvidencePanel } from '@/components/simulation/EvidencePanel';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Hand } from 'lucide-react';
 
 export default function StoryPage() {
   const navigate = useNavigate();
@@ -30,6 +31,11 @@ export default function StoryPage() {
     }
   }, [gameState.isComplete, navigate]);
 
+  // Scroll to top on scene change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [gameState.currentSceneId, showFeedback]);
+
   if (!currentScene) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -43,7 +49,7 @@ export default function StoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-story-bg">
+    <div className="min-h-screen story-atmosphere">
       <ProgressHeader 
         progress={getProgress()}
         evidenceCount={gameState.collectedEvidence.length}
@@ -53,76 +59,102 @@ export default function StoryPage() {
         }}
       />
       
-      <main className="container mx-auto px-4 py-8 pb-32">
-        {showFeedback && lastChoice ? (
-          <FeedbackPanel 
-            choice={lastChoice} 
-            onContinue={proceedToNextScene}
-          />
-        ) : (
-          <motion.div
-            key={currentScene.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {/* Narrative */}
-            <StoryNarrative 
-              title={currentScene.title}
-              paragraphs={currentScene.narrative}
-            />
-            
-            {/* Evidence Section */}
-            {currentScene.evidence && currentScene.evidence.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: currentScene.narrative.length * 0.15 + 0.2 }}
-                className="max-w-3xl mx-auto mt-10"
-              >
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-decision-highlight" />
-                  Evidence Available
-                </h3>
-                <div className="space-y-4">
-                  {currentScene.evidence.map(evidence => (
-                    <EvidenceCard
-                      key={evidence.id}
-                      evidence={evidence}
-                      isCollected={isEvidenceCollected(evidence.id)}
-                      onCollect={() => collectEvidence(evidence)}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            )}
-            
-            {/* Choices Section */}
-            {currentScene.isDecisionPoint && currentScene.choices && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: currentScene.narrative.length * 0.15 + 0.4 }}
-                className="max-w-3xl mx-auto mt-10"
-              >
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  What do you do?
-                </h3>
-                <div className="space-y-3">
-                  {currentScene.choices.map((choice, index) => (
-                    <ChoiceCard
-                      key={choice.id}
-                      choice={choice}
-                      index={index}
-                      onSelect={() => makeChoice(choice)}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
+      <main className="container mx-auto px-4 py-10 pb-36">
+        <AnimatePresence mode="wait">
+          {showFeedback && lastChoice ? (
+            <motion.div
+              key="feedback"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <FeedbackPanel 
+                choice={lastChoice} 
+                onContinue={proceedToNextScene}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={currentScene.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Narrative */}
+              <StoryNarrative 
+                title={currentScene.title}
+                paragraphs={currentScene.narrative}
+              />
+              
+              {/* Evidence Section */}
+              {currentScene.evidence && currentScene.evidence.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: currentScene.narrative.length * 0.2 + 0.3 }}
+                  className="max-w-3xl mx-auto mt-6"
+                >
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="p-2 rounded-lg bg-decision-highlight/10">
+                      <Search className="w-4 h-4 text-decision-highlight" />
+                    </div>
+                    <h3 className="font-semibold text-foreground text-sm uppercase tracking-widest">
+                      Evidence Available
+                    </h3>
+                    <div className="h-px flex-1 bg-gradient-to-r from-evidence-border to-transparent" />
+                  </div>
+                  <div className="space-y-4">
+                    {currentScene.evidence.map((evidence, i) => (
+                      <motion.div
+                        key={evidence.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: currentScene.narrative.length * 0.2 + 0.4 + i * 0.1 }}
+                      >
+                        <EvidenceCard
+                          evidence={evidence}
+                          isCollected={isEvidenceCollected(evidence.id)}
+                          onCollect={() => collectEvidence(evidence)}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+              
+              {/* Choices Section */}
+              {currentScene.isDecisionPoint && currentScene.choices && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: currentScene.narrative.length * 0.2 + 0.6 }}
+                  className="max-w-3xl mx-auto mt-10"
+                >
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="p-2 rounded-lg bg-primary/10 glow-pulse">
+                      <Hand className="w-4 h-4 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground text-sm uppercase tracking-widest">
+                      What do you do?
+                    </h3>
+                    <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
+                  </div>
+                  <div className="space-y-3">
+                    {currentScene.choices.map((choice, index) => (
+                      <ChoiceCard
+                        key={choice.id}
+                        choice={choice}
+                        index={index}
+                        onSelect={() => makeChoice(choice)}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
       
       {/* Evidence Panel */}
