@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Evidence, Scene, Choice, GameState } from '@/types/simulation';
-import { ProgressHeader } from './ProgressHeader';
 import { FeedbackPanel } from './FeedbackPanel';
 import {
-  Eye, X, ChevronDown, ChevronUp, Hand,
-  Briefcase, Search, RotateCcw, MessageSquare
+  Eye, X, Hand,
+  Briefcase, Search, RotateCcw, ChevronRight
 } from 'lucide-react';
 
 interface SceneHUDProps {
@@ -37,13 +36,43 @@ export function SceneHUD({
   onDismissEvidence,
   onCollectEvidence,
 }: SceneHUDProps) {
-  const [narrativeExpanded, setNarrativeExpanded] = useState(true);
   const [journalOpen, setJournalOpen] = useState(false);
+  const [visibleParagraph, setVisibleParagraph] = useState(0);
+  const [narrativeComplete, setNarrativeComplete] = useState(false);
+  const prevSceneId = useRef(currentScene.id);
 
   const sceneEvidence = currentScene.evidence || [];
   const uncollected = sceneEvidence.filter(
     e => !gameState.collectedEvidence.some(c => c.id === e.id)
   );
+
+  // Reset paragraph progression on scene change
+  useEffect(() => {
+    if (prevSceneId.current !== currentScene.id) {
+      setVisibleParagraph(0);
+      setNarrativeComplete(false);
+      prevSceneId.current = currentScene.id;
+    }
+  }, [currentScene.id]);
+
+  // Auto-advance first paragraph immediately
+  useEffect(() => {
+    if (visibleParagraph === 0 && currentScene.narrative.length > 0) {
+      setVisibleParagraph(1);
+    }
+  }, [currentScene.id]);
+
+  const advanceNarrative = () => {
+    const next = visibleParagraph + 1;
+    if (next <= currentScene.narrative.length) {
+      setVisibleParagraph(next);
+    }
+    if (next >= currentScene.narrative.length) {
+      setNarrativeComplete(true);
+    }
+  };
+
+  const allRevealed = visibleParagraph >= currentScene.narrative.length;
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10">
@@ -107,69 +136,63 @@ export function SceneHUD({
         </div>
       )}
 
-      {/* Controls hint */}
-      <div className="absolute bottom-4 left-4 pointer-events-none">
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/5">
-          <p className="text-[10px] text-white/40">
-            Drag to look · Scroll to zoom
-          </p>
+      {/* Controls hint - only show when no narrative is active */}
+      {!showFeedback && allRevealed && (
+        <div className="absolute bottom-4 left-4 pointer-events-none">
+          <div className="bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/5">
+            <p className="text-[10px] text-white/40">
+              Drag to look · Scroll to zoom
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Narrative panel — bottom left */}
+      {/* Narrative — progressive reveal, bottom center */}
       {!showFeedback && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-4 md:right-auto md:w-[420px] pointer-events-auto">
-          <motion.div
-            layout
-            className="bg-black/70 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden shadow-2xl"
-          >
-            <button
-              onClick={() => setNarrativeExpanded(!narrativeExpanded)}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-decision-highlight" />
-                <span className="text-sm font-semibold text-white">{currentScene.title}</span>
-              </div>
-              {narrativeExpanded ? (
-                <ChevronDown className="w-4 h-4 text-white/50" />
-              ) : (
-                <ChevronUp className="w-4 h-4 text-white/50" />
-              )}
-            </button>
-
-            <AnimatePresence>
-              {narrativeExpanded && (
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: 'auto' }}
-                  exit={{ height: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="px-4 pb-4 max-h-[40vh] overflow-y-auto scrollbar-thin">
-                    <div className="space-y-3">
-                      {currentScene.narrative.map((p, i) => (
-                        <motion.p
-                          key={i}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: i * 0.15 }}
-                          className="text-sm leading-relaxed text-white/80 font-serif"
-                        >
-                          {p}
-                        </motion.p>
-                      ))}
-                    </div>
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl pointer-events-auto">
+          <AnimatePresence mode="wait">
+            {!allRevealed && visibleParagraph > 0 && (
+              <motion.div
+                key={`p-${visibleParagraph - 1}`}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4 }}
+                onClick={advanceNarrative}
+                className="cursor-pointer"
+              >
+                <div className="bg-black/75 backdrop-blur-md border border-white/10 rounded-xl px-6 py-4 shadow-2xl">
+                  <p className="text-sm md:text-base leading-relaxed text-white/85 font-serif">
+                    {currentScene.narrative[visibleParagraph - 1]}
+                  </p>
+                  <div className="flex items-center justify-end gap-1.5 mt-3">
+                    <span className="text-[10px] text-white/40 uppercase tracking-widest">
+                      {visibleParagraph} / {currentScene.narrative.length}
+                    </span>
+                    <ChevronRight className="w-3 h-3 text-white/30 animate-pulse" />
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* After all paragraphs revealed, show a subtle collapsed summary */}
+          {allRevealed && !currentScene.isDecisionPoint && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-black/50 backdrop-blur-sm border border-white/5 rounded-lg px-4 py-2 text-center"
+            >
+              <p className="text-xs text-white/40 font-serif italic">
+                {currentScene.narrative[currentScene.narrative.length - 1]?.slice(0, 80)}…
+              </p>
+            </motion.div>
+          )}
         </div>
       )}
 
       {/* Choices panel — bottom right */}
-      {!showFeedback && currentScene.isDecisionPoint && currentScene.choices && (
+      {!showFeedback && allRevealed && currentScene.isDecisionPoint && currentScene.choices && (
         <div className="absolute bottom-4 right-4 md:w-[380px] pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
