@@ -4,26 +4,26 @@ import { Evidence } from '@/types/simulation';
 interface OfficeSceneProps {
   evidence: Evidence[];
   collectedIds: string[];
+  focusedEvidenceId: string | null;
   onCollectEvidence: (evidence: Evidence) => void;
+  onFocusEvidence: (evidence: Evidence) => void;
 }
 
-export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: OfficeSceneProps) {
-  const evidencePositions: [number, number, number][] = [
-    [-1.5, 1, -1],
-    [1.5, 1, 0],
-    [0, 1, 1.5],
-    [-1, 1, 2],
-  ];
+export const OFFICE_EVIDENCE_POSITIONS: [number, number, number][] = [
+  [-1.5, 1, -1],
+  [1.5, 1, 0],
+  [0, 1, 1.5],
+  [-1, 1, 2],
+];
 
+export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: OfficeSceneProps) {
   return (
     <group>
-      {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[8, 6]} />
         <meshStandardMaterial color="#7A6652" />
       </mesh>
 
-      {/* Walls */}
       <mesh position={[0, 2, -3]}>
         <planeGeometry args={[8, 4]} />
         <meshStandardMaterial color="#E8E0D4" />
@@ -37,7 +37,6 @@ export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: Offic
         <meshStandardMaterial color="#DDD5C8" />
       </mesh>
 
-      {/* Desk */}
       <mesh position={[0, 0.75, -1.5]}>
         <boxGeometry args={[2, 0.06, 1]} />
         <meshStandardMaterial color="#3D2B1F" />
@@ -49,7 +48,6 @@ export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: Offic
         </mesh>
       ))}
 
-      {/* Computer monitor */}
       <mesh position={[-0.4, 1.15, -1.8]}>
         <boxGeometry args={[0.6, 0.4, 0.04]} />
         <meshStandardMaterial color="#1a1a1a" />
@@ -59,7 +57,6 @@ export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: Offic
         <meshStandardMaterial color="#4488AA" emissive="#4488AA" emissiveIntensity={0.2} />
       </mesh>
 
-      {/* Office chair */}
       <mesh position={[0, 0.5, -0.5]}>
         <boxGeometry args={[0.5, 0.06, 0.5]} />
         <meshStandardMaterial color="#2D2D2D" />
@@ -69,7 +66,6 @@ export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: Offic
         <meshStandardMaterial color="#2D2D2D" />
       </mesh>
 
-      {/* Bookshelf */}
       <mesh position={[-3.8, 1.5, 0]}>
         <boxGeometry args={[0.3, 3, 1.2]} />
         <meshStandardMaterial color="#5C4033" />
@@ -85,7 +81,6 @@ export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: Offic
         </group>
       ))}
 
-      {/* Visitor chairs */}
       {[-0.8, 0.8].map((x, i) => (
         <group key={i} position={[x, 0, 1]}>
           <mesh position={[0, 0.4, 0]}>
@@ -99,13 +94,11 @@ export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: Offic
         </group>
       ))}
 
-      {/* Window */}
       <mesh position={[3.95, 2.2, -0.5]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[1.5, 1.8]} />
         <meshStandardMaterial color="#B0D4F1" emissive="#B0D4F1" emissiveIntensity={0.2} transparent opacity={0.5} />
       </mesh>
 
-      {/* Door */}
       <mesh position={[0, 1.1, 3]}>
         <boxGeometry args={[0.9, 2.2, 0.08]} />
         <meshStandardMaterial color="#5C4033" />
@@ -115,22 +108,24 @@ export function OfficeScene({ evidence, collectedIds, onCollectEvidence }: Offic
         <meshStandardMaterial color="#C0C0C0" metalness={0.8} roughness={0.2} />
       </mesh>
 
-      {/* Interactive evidence objects */}
-      {evidence.map((ev, i) => (
-        <InteractiveObject
-          key={ev.id}
-          position={evidencePositions[i] || [i * 1.2, 1, 0]}
-          geometry={ev.type === 'message' ? 'box' : ev.type === 'visual' ? 'cylinder' : 'sphere'}
-          color={ev.type === 'observation' ? '#3B82F6' : ev.type === 'visual' ? '#EF4444' : '#10B981'}
-          glowColor="#f59e0b"
-          label={ev.title}
-          collected={collectedIds.includes(ev.id)}
-          onClick={() => onCollectEvidence(ev)}
-          size={[0.2, 0.2, 0.2]}
-        />
-      ))}
+      {evidence.map((ev, i) => {
+        const pos = OFFICE_EVIDENCE_POSITIONS[i] || [i * 1.2, 1, 0];
+        return (
+          <InteractiveObject
+            key={ev.id}
+            position={pos}
+            geometry={ev.type === 'message' ? 'box' : ev.type === 'visual' ? 'cylinder' : 'sphere'}
+            color={ev.type === 'observation' ? '#3B82F6' : ev.type === 'visual' ? '#EF4444' : '#10B981'}
+            glowColor="#f59e0b"
+            label={ev.title}
+            collected={collectedIds.includes(ev.id)}
+            focused={focusedEvidenceId === ev.id}
+            onClick={() => onFocusEvidence(ev)}
+            size={[0.2, 0.2, 0.2]}
+          />
+        );
+      })}
 
-      {/* Lighting */}
       <ambientLight intensity={0.35} />
       <directionalLight position={[4, 4, 2]} intensity={0.5} color="#FFF8E7" />
       <pointLight position={[0, 3, -1]} intensity={0.4} color="#FFFAF0" />

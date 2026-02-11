@@ -4,7 +4,9 @@ import { Evidence } from '@/types/simulation';
 interface PlaygroundSceneProps {
   evidence: Evidence[];
   collectedIds: string[];
+  focusedEvidenceId: string | null;
   onCollectEvidence: (evidence: Evidence) => void;
+  onFocusEvidence: (evidence: Evidence) => void;
 }
 
 function Bench({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
@@ -47,29 +49,26 @@ function Tree({ position }: { position: [number, number, number] }) {
   );
 }
 
-export function PlaygroundScene({ evidence, collectedIds, onCollectEvidence }: PlaygroundSceneProps) {
-  const evidencePositions: [number, number, number][] = [
-    [-3, 0.7, -2],
-    [3, 0.7, 1],
-    [0, 0.7, 3],
-    [-2, 0.7, 3],
-  ];
+export const PLAYGROUND_EVIDENCE_POSITIONS: [number, number, number][] = [
+  [-3, 0.7, -2],
+  [3, 0.7, 1],
+  [0, 0.7, 3],
+  [-2, 0.7, 3],
+];
 
+export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: PlaygroundSceneProps) {
   return (
     <group>
-      {/* Ground - grass */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[20, 16]} />
         <meshStandardMaterial color="#4A7C2E" />
       </mesh>
 
-      {/* Tarmac area */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
         <planeGeometry args={[8, 6]} />
         <meshStandardMaterial color="#6B6B6B" />
       </mesh>
 
-      {/* Football pitch lines */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3, 0.02, -1]}>
         <planeGeometry args={[4, 0.05]} />
         <meshStandardMaterial color="#FFFFFF" />
@@ -79,7 +78,6 @@ export function PlaygroundScene({ evidence, collectedIds, onCollectEvidence }: P
         <meshStandardMaterial color="#FFFFFF" />
       </mesh>
 
-      {/* Fence */}
       {Array.from({ length: 15 }).map((_, i) => (
         <group key={i}>
           <mesh position={[-7 + i, 0.6, -5]}>
@@ -95,11 +93,9 @@ export function PlaygroundScene({ evidence, collectedIds, onCollectEvidence }: P
         </group>
       ))}
 
-      {/* Benches */}
       <Bench position={[-4, 0, -3.5]} />
       <Bench position={[4.5, 0, -3.5]} />
 
-      {/* Jamie's bench - highlighted */}
       <group>
         <Bench position={[-4, 0, 3]} rotation={Math.PI} />
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-4, 0.01, 3]}>
@@ -108,46 +104,44 @@ export function PlaygroundScene({ evidence, collectedIds, onCollectEvidence }: P
         </mesh>
       </group>
 
-      {/* Trees */}
       <Tree position={[-7, 0, 4]} />
       <Tree position={[7, 0, 3]} />
       <Tree position={[-8, 0, -2]} />
       <Tree position={[8, 0, -3]} />
 
-      {/* School building backdrop */}
       <mesh position={[0, 2, -7]}>
         <boxGeometry args={[14, 4, 0.5]} />
         <meshStandardMaterial color="#C4A882" />
       </mesh>
-      {/* Windows on building */}
       {[-4, -2, 0, 2, 4].map((x, i) => (
         <mesh key={i} position={[x, 2.5, -6.7]}>
           <boxGeometry args={[0.8, 0.8, 0.1]} />
           <meshStandardMaterial color="#6BAED6" emissive="#6BAED6" emissiveIntensity={0.1} />
         </mesh>
       ))}
-      {/* Door */}
       <mesh position={[0, 1.2, -6.7]}>
         <boxGeometry args={[1, 2.2, 0.1]} />
         <meshStandardMaterial color="#5C4033" />
       </mesh>
 
-      {/* Interactive evidence objects */}
-      {evidence.map((ev, i) => (
-        <InteractiveObject
-          key={ev.id}
-          position={evidencePositions[i] || [i * 2, 0.7, 0]}
-          geometry={ev.type === 'observation' ? 'sphere' : ev.type === 'visual' ? 'cylinder' : 'box'}
-          color={ev.type === 'observation' ? '#3B82F6' : ev.type === 'visual' ? '#EF4444' : '#10B981'}
-          glowColor="#f59e0b"
-          label={ev.title}
-          collected={collectedIds.includes(ev.id)}
-          onClick={() => onCollectEvidence(ev)}
-          size={[0.25, 0.25, 0.25]}
-        />
-      ))}
+      {evidence.map((ev, i) => {
+        const pos = PLAYGROUND_EVIDENCE_POSITIONS[i] || [i * 2, 0.7, 0];
+        return (
+          <InteractiveObject
+            key={ev.id}
+            position={pos}
+            geometry={ev.type === 'observation' ? 'sphere' : ev.type === 'visual' ? 'cylinder' : 'box'}
+            color={ev.type === 'observation' ? '#3B82F6' : ev.type === 'visual' ? '#EF4444' : '#10B981'}
+            glowColor="#f59e0b"
+            label={ev.title}
+            collected={collectedIds.includes(ev.id)}
+            focused={focusedEvidenceId === ev.id}
+            onClick={() => onFocusEvidence(ev)}
+            size={[0.25, 0.25, 0.25]}
+          />
+        );
+      })}
 
-      {/* Sky lighting */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 8, 3]} intensity={0.8} color="#FFF5E0" castShadow />
       <hemisphereLight args={['#87CEEB', '#4A7C2E', 0.3]} />
