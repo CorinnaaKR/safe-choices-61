@@ -11,6 +11,7 @@ interface InteractiveObjectProps {
   glowColor?: string;
   label: string;
   collected?: boolean;
+  focused?: boolean;
   onClick: () => void;
 }
 
@@ -22,6 +23,7 @@ export function InteractiveObject({
   glowColor = '#f59e0b',
   label,
   collected = false,
+  focused = false,
   onClick,
 }: InteractiveObjectProps) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -34,7 +36,10 @@ export function InteractiveObject({
       meshRef.current.rotation.y += 0.01;
     }
     if (glowRef.current && !collected) {
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.15;
+      const pulse = focused ? 0.25 : 0.15;
+      const speed = focused ? 4 : 3;
+      const baseScale = focused ? 1.3 : 1;
+      const scale = baseScale + Math.sin(state.clock.elapsedTime * speed) * pulse;
       glowRef.current.scale.set(scale, scale, scale);
     }
   });
@@ -55,12 +60,20 @@ export function InteractiveObject({
       {/* Glow effect */}
       {!collected && (
         <mesh ref={glowRef} position={[0, 0, 0]}>
-          <sphereGeometry args={[0.5, 16, 16]} />
+          <sphereGeometry args={[focused ? 0.7 : 0.5, 16, 16]} />
           <meshBasicMaterial
             color={glowColor}
             transparent
-            opacity={hovered ? 0.2 : 0.08}
+            opacity={focused ? 0.25 : hovered ? 0.2 : 0.08}
           />
+        </mesh>
+      )}
+
+      {/* Ground ring indicator */}
+      {!collected && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -position[1] + 0.02, 0]}>
+          <ringGeometry args={[0.3, 0.45, 32]} />
+          <meshBasicMaterial color={glowColor} transparent opacity={focused ? 0.4 : 0.15} />
         </mesh>
       )}
 
@@ -84,8 +97,8 @@ export function InteractiveObject({
         <GeometryComponent />
         <meshStandardMaterial
           color={collected ? '#6b7280' : color}
-          emissive={hovered && !collected ? glowColor : '#000000'}
-          emissiveIntensity={hovered ? 0.4 : 0}
+          emissive={hovered && !collected ? glowColor : focused ? glowColor : '#000000'}
+          emissiveIntensity={focused ? 0.6 : hovered ? 0.4 : 0}
           transparent={collected}
           opacity={collected ? 0.4 : 1}
         />
