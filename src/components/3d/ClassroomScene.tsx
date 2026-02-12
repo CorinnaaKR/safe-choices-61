@@ -1,4 +1,5 @@
 import { InteractiveObject } from './InteractiveObject';
+import { NPCCharacter, NPCHotspot } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
 
 interface ClassroomSceneProps {
@@ -47,14 +48,51 @@ function Chair({ position }: { position: [number, number, number] }) {
   );
 }
 
+// NPC child sitting at a desk
+function StudentNPC({ position, color, name }: { position: [number, number, number]; color: string; name: string }) {
+  return (
+    <NPCCharacter
+      position={position}
+      bodyColor={color}
+      pose="sitting"
+      name={name}
+      fidget={0.3}
+    />
+  );
+}
+
 export const CLASSROOM_EVIDENCE_POSITIONS: [number, number, number][] = [
-  [-2, 0.9, -1],
-  [2.5, 0.9, 0.5],
+  [3.7, 0.9, 2.3],   // Near Jamie — crumpled uniform observation
+  [3.2, 0.75, 2.8],  // Dropped note on floor near Jamie's desk
   [0, 0.9, 2],
   [-1.5, 0.9, 2.5],
 ];
 
 export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: ClassroomSceneProps) {
+  // Build hotspots from evidence that are character-attached
+  const jamieHotspots: NPCHotspot[] = [];
+  const freeEvidence: { ev: Evidence; idx: number }[] = [];
+
+  evidence.forEach((ev, i) => {
+    if (ev.id === 'obs-1') {
+      // Crumpled uniform — hotspot on Jamie's body
+      jamieHotspots.push({
+        id: ev.id,
+        label: ev.title,
+        offset: [0.0, 0.45, 0.18],
+        hint: 'Click to observe appearance',
+        collected: collectedIds.includes(ev.id),
+      });
+    } else {
+      freeEvidence.push({ ev, idx: i });
+    }
+  });
+
+  const handleJamieHotspot = (hotspotId: string) => {
+    const ev = evidence.find(e => e.id === hotspotId);
+    if (ev) onFocusEvidence(ev);
+  };
+
   return (
     <group>
       {/* Floor */}
@@ -113,7 +151,7 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         </mesh>
       ))}
 
-      {/* Student desks */}
+      {/* Student desks with NPC students */}
       {[-2, 0, 2].map((x) =>
         [-1, 0.5, 2].map((z, i) => (
           <group key={`${x}-${i}`}>
@@ -123,19 +161,42 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         ))
       )}
 
-      {/* Jamie's desk */}
+      {/* Background student NPCs for atmosphere */}
+      <StudentNPC position={[-2, 0.45, -0.55]} color="#e74c3c" name="Student" />
+      <StudentNPC position={[0, 0.45, -0.55]} color="#2ecc71" name="Student" />
+      <StudentNPC position={[2, 0.45, -0.55]} color="#9b59b6" name="Student" />
+      <StudentNPC position={[-2, 0.45, 0.95]} color="#e67e22" name="Student" />
+      <StudentNPC position={[0, 0.45, 0.95]} color="#1abc9c" name="Student" />
+
+      {/* Jamie's desk — back corner, isolated */}
       <group>
         <Desk position={[3.5, 0, 2.5]} />
         <Chair position={[3.5, 0, 2.95]} />
+        {/* Subtle highlight ring */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3.5, 0.01, 2.5]}>
           <circleGeometry args={[0.8, 32]} />
           <meshBasicMaterial color="#f59e0b" transparent opacity={0.08} />
         </mesh>
       </group>
 
-      {/* Evidence */}
-      {evidence.map((ev, i) => {
-        const pos = CLASSROOM_EVIDENCE_POSITIONS[i] || [i * 1.5, 0.9, 0];
+      {/* Jamie NPC — sitting withdrawn at their desk */}
+      <NPCCharacter
+        position={[3.5, 0.45, 2.5]}
+        rotation={Math.PI}
+        bodyColor="#6B8CA8"
+        skinColor="#e8c4a0"
+        pose="withdrawn"
+        name="Jamie"
+        behaviorHint="Hunched over, pulling at sleeves..."
+        pullsSleeves={true}
+        fidget={0.8}
+        hotspots={jamieHotspots}
+        onHotspotClick={handleJamieHotspot}
+      />
+
+      {/* Free-standing evidence items (not on NPCs) */}
+      {freeEvidence.map(({ ev, idx }) => {
+        const pos = CLASSROOM_EVIDENCE_POSITIONS[idx] || [idx * 1.5, 0.9, 0];
         return (
           <InteractiveObject
             key={ev.id}

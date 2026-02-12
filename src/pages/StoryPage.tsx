@@ -41,6 +41,20 @@ export default function StoryPage() {
   const sceneEvidence = currentScene?.evidence || [];
   const collectedIds = gameState.collectedEvidence.map(e => e.id);
 
+  // NPC-attached evidence positions (character-relative world coords)
+  const NPC_EVIDENCE_POSITIONS: Record<string, [number, number, number]> = {
+    // Classroom: Jamie at [3.5, 0.45, 2.5]
+    'obs-1': [3.5, 0.9, 2.7],
+    // Playground: Jamie at [-4, 0.45, 2.8]
+    'obs-2': [-4, 1.1, 2.95],
+    'vis-1': [-3.78, 0.6, 2.85],
+    // Scene 3a: bruise confirmation
+    'vis-2': [3.5, 0.6, 2.85],
+    'obs-3': [3.5, 1.1, 2.7],
+    // Scene 3b: drawing
+    'vis-3': [3.5, 0.8, 2.8],
+  };
+
   // Build evidence position map
   const evidencePositions = useMemo(() => {
     const posMap = new Map<string, [number, number, number]>();
@@ -49,7 +63,12 @@ export default function StoryPage() {
       sceneType === 'playground' ? PLAYGROUND_EVIDENCE_POSITIONS :
       OFFICE_EVIDENCE_POSITIONS;
     sceneEvidence.forEach((ev, i) => {
-      posMap.set(ev.id, positions[i] || [i * 1.5, 1, 0]);
+      // Use NPC position if this evidence is character-attached
+      if (NPC_EVIDENCE_POSITIONS[ev.id]) {
+        posMap.set(ev.id, NPC_EVIDENCE_POSITIONS[ev.id]);
+      } else {
+        posMap.set(ev.id, positions[i] || [i * 1.5, 1, 0]);
+      }
     });
     return posMap;
   }, [sceneEvidence, sceneType]);

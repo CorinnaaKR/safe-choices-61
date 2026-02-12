@@ -130,7 +130,7 @@ export function SceneHUD({
           >
             <Search className="w-3.5 h-3.5 text-decision-highlight" />
             <span className="text-xs text-white/80">
-              {uncollected.length} clue{uncollected.length !== 1 ? 's' : ''} to find — click glowing objects
+              {uncollected.length} clue{uncollected.length !== 1 ? 's' : ''} to find — observe characters &amp; objects
             </span>
           </motion.div>
         </div>

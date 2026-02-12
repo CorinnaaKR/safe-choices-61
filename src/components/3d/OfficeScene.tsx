@@ -1,4 +1,5 @@
 import { InteractiveObject } from './InteractiveObject';
+import { NPCCharacter } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
 
 interface OfficeSceneProps {
@@ -19,11 +20,13 @@ export const OFFICE_EVIDENCE_POSITIONS: [number, number, number][] = [
 export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: OfficeSceneProps) {
   return (
     <group>
+      {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[8, 6]} />
         <meshStandardMaterial color="#7A6652" />
       </mesh>
 
+      {/* Walls */}
       <mesh position={[0, 2, -3]}>
         <planeGeometry args={[8, 4]} />
         <meshStandardMaterial color="#E8E0D4" />
@@ -37,6 +40,7 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         <meshStandardMaterial color="#DDD5C8" />
       </mesh>
 
+      {/* Desk */}
       <mesh position={[0, 0.75, -1.5]}>
         <boxGeometry args={[2, 0.06, 1]} />
         <meshStandardMaterial color="#3D2B1F" />
@@ -48,6 +52,7 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         </mesh>
       ))}
 
+      {/* Monitor */}
       <mesh position={[-0.4, 1.15, -1.8]}>
         <boxGeometry args={[0.6, 0.4, 0.04]} />
         <meshStandardMaterial color="#1a1a1a" />
@@ -57,6 +62,7 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         <meshStandardMaterial color="#4488AA" emissive="#4488AA" emissiveIntensity={0.2} />
       </mesh>
 
+      {/* Office chair */}
       <mesh position={[0, 0.5, -0.5]}>
         <boxGeometry args={[0.5, 0.06, 0.5]} />
         <meshStandardMaterial color="#2D2D2D" />
@@ -66,6 +72,7 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         <meshStandardMaterial color="#2D2D2D" />
       </mesh>
 
+      {/* Bookshelf */}
       <mesh position={[-3.8, 1.5, 0]}>
         <boxGeometry args={[0.3, 3, 1.2]} />
         <meshStandardMaterial color="#5C4033" />
@@ -81,6 +88,7 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         </group>
       ))}
 
+      {/* Visitor chairs */}
       {[-0.8, 0.8].map((x, i) => (
         <group key={i} position={[x, 0, 1]}>
           <mesh position={[0, 0.4, 0]}>
@@ -94,11 +102,13 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         </group>
       ))}
 
+      {/* Window */}
       <mesh position={[3.95, 2.2, -0.5]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[1.5, 1.8]} />
         <meshStandardMaterial color="#B0D4F1" emissive="#B0D4F1" emissiveIntensity={0.2} transparent opacity={0.5} />
       </mesh>
 
+      {/* Door */}
       <mesh position={[0, 1.1, 3]}>
         <boxGeometry args={[0.9, 2.2, 0.08]} />
         <meshStandardMaterial color="#5C4033" />
@@ -108,6 +118,19 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         <meshStandardMaterial color="#C0C0C0" metalness={0.8} roughness={0.2} />
       </mesh>
 
+      {/* ===== NPC: Ms. Patterson (DSL) sitting behind desk ===== */}
+      <NPCCharacter
+        position={[0, 0.5, -1]}
+        rotation={Math.PI}
+        bodyColor="#4a4a6a"
+        skinColor="#d4a574"
+        pose="sitting"
+        name="Ms. Patterson"
+        behaviorHint="DSL — listening carefully, taking notes"
+        fidget={0.2}
+      />
+
+      {/* Evidence items */}
       {evidence.map((ev, i) => {
         const pos = OFFICE_EVIDENCE_POSITIONS[i] || [i * 1.2, 1, 0];
         return (
@@ -126,6 +149,7 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         );
       })}
 
+      {/* Lighting */}
       <ambientLight intensity={0.35} />
       <directionalLight position={[4, 4, 2]} intensity={0.5} color="#FFF8E7" />
       <pointLight position={[0, 3, -1]} intensity={0.4} color="#FFFAF0" />
