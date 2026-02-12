@@ -136,12 +136,12 @@ export function SceneHUD({
         </div>
       )}
 
-      {/* Controls hint - only show when no narrative is active */}
+      {/* Controls hint */}
       {!showFeedback && allRevealed && (
         <div className="absolute bottom-4 left-4 pointer-events-none">
           <div className="bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/5">
             <p className="text-[10px] text-white/40">
-              Drag to look · Scroll to zoom
+              WASD / Arrow keys to move · Click objects to investigate
             </p>
           </div>
         </div>

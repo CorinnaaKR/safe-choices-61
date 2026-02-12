@@ -1,11 +1,13 @@
-import { Suspense, useState, useCallback } from 'react';
+import { Suspense, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { ClassroomScene } from './ClassroomScene';
 import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
 import { CameraController } from './CameraController';
+import { PlayerCharacter } from './PlayerCharacter';
 import { Evidence } from '@/types/simulation';
+import * as THREE from 'three';
 
 export type SceneType = 'classroom' | 'playground' | 'office';
 
@@ -41,6 +43,11 @@ export function SceneRenderer({
   onCameraReset,
 }: SceneRendererProps) {
   const focusTarget = focusedEvidenceId ? evidencePositions.get(focusedEvidenceId) ?? null : null;
+  const playerPosRef = useRef(new THREE.Vector3(0, 0, 3));
+
+  const handlePlayerMove = useCallback((pos: THREE.Vector3) => {
+    playerPosRef.current.copy(pos);
+  }, []);
 
   return (
     <div className="absolute inset-0">
@@ -51,8 +58,11 @@ export function SceneRenderer({
         <Suspense fallback={null}>
           <CameraController
             target={focusTarget}
+            playerPosition={focusTarget ? null : playerPosRef.current}
             onArrived={() => {}}
           />
+
+          <PlayerCharacter onPositionChange={handlePlayerMove} />
 
           {sceneType === 'classroom' && (
             <ClassroomScene
