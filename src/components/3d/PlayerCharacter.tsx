@@ -1,16 +1,25 @@
 import { useRef, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { SceneType } from './SceneRenderer';
+
+// Room boundaries per scene type: [minX, maxX, minZ, maxZ]
+const SCENE_BOUNDS: Record<SceneType, [number, number, number, number]> = {
+  classroom: [-5.5, 5.5, -4.5, 4.5],
+  playground: [-7, 7, -5, 5],
+  office: [-3.5, 3.5, -2.5, 2.5],
+};
 
 interface PlayerCharacterProps {
   onPositionChange: (position: THREE.Vector3) => void;
-  boundaryRadius?: number;
+  sceneType?: SceneType;
 }
 
 const SPEED = 3;
 const ROTATION_SPEED = 3;
+const WALL_MARGIN = 0.3; // character radius buffer
 
-export function PlayerCharacter({ onPositionChange, boundaryRadius = 8 }: PlayerCharacterProps) {
+export function PlayerCharacter({ onPositionChange, sceneType = 'classroom' }: PlayerCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const keys = useRef<Record<string, boolean>>({});
   const rotationY = useRef(0);
@@ -47,15 +56,19 @@ export function PlayerCharacter({ onPositionChange, boundaryRadius = 8 }: Player
       const dx = Math.sin(rotationY.current) * SPEED * delta;
       const dz = Math.cos(rotationY.current) * SPEED * delta;
       
-      const newX = groupRef.current.position.x + dx;
-      const newZ = groupRef.current.position.z + dz;
-      
-      // Boundary clamping
-      const dist = Math.sqrt(newX * newX + newZ * newZ);
-      if (dist < boundaryRadius) {
-        groupRef.current.position.x = newX;
-        groupRef.current.position.z = newZ;
-      }
+      const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType];
+      const newX = THREE.MathUtils.clamp(
+        groupRef.current.position.x + dx,
+        minX + WALL_MARGIN,
+        maxX - WALL_MARGIN
+      );
+      const newZ = THREE.MathUtils.clamp(
+        groupRef.current.position.z + dz,
+        minZ + WALL_MARGIN,
+        maxZ - WALL_MARGIN
+      );
+      groupRef.current.position.x = newX;
+      groupRef.current.position.z = newZ;
 
       groupRef.current.rotation.y = rotationY.current;
     }
