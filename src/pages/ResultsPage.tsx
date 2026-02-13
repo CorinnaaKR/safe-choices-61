@@ -142,35 +142,30 @@ export default function ResultsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {gameState.decisions.map((decision, index) => (
-                  <motion.div 
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    className={cn(
-                      "flex items-center gap-3 p-4 rounded-xl border",
-                      decision.isOptimal ? "bg-feedback-positive/5 border-feedback-positive/20" : "bg-feedback-negative/5 border-feedback-negative/20"
-                    )}
-                  >
-                    {decision.isOptimal ? (
-                      <CheckCircle className="w-5 h-5 text-feedback-positive flex-shrink-0" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-feedback-negative flex-shrink-0" />
-                    )}
-                    <div className="flex-1">
-                      <span className="text-sm font-medium text-foreground">
-                        Decision {index + 1}
-                      </span>
-                      <span className={cn(
-                        "ml-2 text-sm font-semibold",
-                        decision.isOptimal ? "text-feedback-positive" : "text-feedback-negative"
-                      )}>
-                        +{decision.points} points
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
+                {gameState.decisions.map((decision, index) => {
+                  const scene = scenario.scenes.find(s => s.id === decision.sceneId);
+                  const choiceData = scene?.choices?.find(c => c.id === decision.choiceId);
+                  return (
+                    <motion.div 
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      className="p-4 rounded-xl border bg-muted/50 border-border"
+                    >
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-foreground block">
+                          {scene?.title || `Decision ${index + 1}`}
+                        </span>
+                        {choiceData && (
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                            {choiceData.text}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
