@@ -62,7 +62,7 @@ export function SceneRenderer({
             onArrived={() => {}}
           />
 
-          <PlayerCharacter onPositionChange={handlePlayerMove} />
+          <PlayerCharacter onPositionChange={handlePlayerMove} sceneType={sceneType} />
 
           {sceneType === 'classroom' && (
             <ClassroomScene
