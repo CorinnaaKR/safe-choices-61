@@ -15,7 +15,7 @@ interface CameraControllerProps {
 export function CameraController({
   target,
   playerPosition = null,
-  offset = [0, 0.8, 2],
+  offset = [0, 0.15, 0.6],
   followOffset = [0, 3, 4],
   defaultPosition = [0, 3, 6],
   defaultTarget = [0, 0.5, 0],
