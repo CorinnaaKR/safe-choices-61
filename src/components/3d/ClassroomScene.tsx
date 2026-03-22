@@ -14,14 +14,14 @@ interface ClassroomSceneProps {
 function Desk({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      <mesh position={[0, 0.7, 0]}>
+      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.8, 0.05, 0.5]} />
-        <meshStandardMaterial color="#8B7355" />
+        <meshStandardMaterial color="#8B7355" roughness={0.65} metalness={0.05} />
       </mesh>
       {[[-0.35, 0.35, -0.2], [0.35, 0.35, -0.2], [-0.35, 0.35, 0.2], [0.35, 0.35, 0.2]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]}>
-          <boxGeometry args={[0.04, 0.7, 0.04]} />
-          <meshStandardMaterial color="#6B5B45" />
+        <mesh key={i} position={pos as [number, number, number]} castShadow>
+          <cylinderGeometry args={[0.02, 0.02, 0.7, 8]} />
+          <meshStandardMaterial color="#5A5A5A" roughness={0.3} metalness={0.6} />
         </mesh>
       ))}
     </group>
@@ -31,18 +31,18 @@ function Desk({ position }: { position: [number, number, number] }) {
 function Chair({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      <mesh position={[0, 0.45, 0]}>
-        <boxGeometry args={[0.35, 0.04, 0.35]} />
-        <meshStandardMaterial color="#4A90D9" />
+      <mesh position={[0, 0.45, 0]} castShadow>
+        <boxGeometry args={[0.35, 0.035, 0.35]} />
+        <meshStandardMaterial color="#3A7BD5" roughness={0.5} metalness={0.1} />
       </mesh>
-      <mesh position={[0, 0.7, -0.15]}>
-        <boxGeometry args={[0.35, 0.5, 0.04]} />
-        <meshStandardMaterial color="#4A90D9" />
+      <mesh position={[0, 0.7, -0.15]} castShadow>
+        <boxGeometry args={[0.35, 0.5, 0.035]} />
+        <meshStandardMaterial color="#3A7BD5" roughness={0.5} metalness={0.1} />
       </mesh>
       {[[-0.15, 0.22, -0.15], [0.15, 0.22, -0.15], [-0.15, 0.22, 0.15], [0.15, 0.22, 0.15]].map((pos, i) => (
         <mesh key={i} position={pos as [number, number, number]}>
-          <boxGeometry args={[0.03, 0.45, 0.03]} />
-          <meshStandardMaterial color="#3A3A3A" />
+          <cylinderGeometry args={[0.015, 0.015, 0.45, 8]} />
+          <meshStandardMaterial color="#4A4A4A" roughness={0.3} metalness={0.7} />
         </mesh>
       ))}
     </group>
