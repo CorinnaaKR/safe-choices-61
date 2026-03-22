@@ -92,7 +92,7 @@ export function CameraController({
       currentLookAt.lerp(lookTarget, followLerp);
       camera.lookAt(currentLookAt);
     } else {
-      camera.position.lerp(targetPos.current, lerpFactor);
+      camera.position.lerp(targetPos.current, defaultLerp);
     }
   });
 
