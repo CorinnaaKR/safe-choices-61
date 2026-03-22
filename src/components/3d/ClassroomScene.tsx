@@ -122,13 +122,13 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
       </mesh>
 
       {/* Whiteboard */}
-      <mesh position={[0, 2.2, -4.95]}>
+      <mesh position={[0, 2.2, -4.95]} castShadow>
         <boxGeometry args={[3, 1.5, 0.05]} />
-        <meshStandardMaterial color="#FFFFFF" />
+        <meshStandardMaterial color="#F8F8F0" roughness={0.1} metalness={0.05} />
       </mesh>
       <mesh position={[0, 2.2, -4.93]}>
         <boxGeometry args={[3.1, 1.6, 0.02]} />
-        <meshStandardMaterial color="#808080" />
+        <meshStandardMaterial color="#6B6B6B" roughness={0.4} metalness={0.3} />
       </mesh>
 
       {/* Windows */}
