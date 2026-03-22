@@ -200,11 +200,28 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         );
       })}
 
-      {/* Lighting */}
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[4, 4, 2]} intensity={0.5} color="#FFF8E7" />
-      <pointLight position={[0, 3, -1]} intensity={0.4} color="#FFFAF0" />
-      <pointLight position={[4, 2, -0.5]} intensity={0.3} color="#B0D4F1" distance={5} />
+      {/* Realistic office lighting */}
+      <ambientLight intensity={0.2} color="#E0D8D0" />
+      <directionalLight
+        position={[4, 5, 2]}
+        intensity={0.6}
+        color="#FFF5E0"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={15}
+        shadow-camera-left={-6}
+        shadow-camera-right={6}
+        shadow-camera-top={6}
+        shadow-camera-bottom={-6}
+        shadow-bias={-0.001}
+      />
+      {/* Desk lamp feel */}
+      <pointLight position={[-0.4, 1.5, -1.5]} intensity={0.4} color="#FFFAF0" distance={4} decay={2} />
+      {/* Window light */}
+      <pointLight position={[3.5, 2.5, -0.5]} intensity={0.4} color="#D4E8F5" distance={6} decay={2} />
+      {/* Overhead */}
+      <rectAreaLight position={[0, 3.5, 0]} width={4} height={3} intensity={0.5} color="#F5F0E8" rotation={[-Math.PI / 2, 0, 0]} />
     </group>
   );
 }

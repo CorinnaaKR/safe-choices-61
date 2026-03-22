@@ -260,10 +260,23 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         );
       })}
 
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 8, 3]} intensity={0.8} color="#FFF5E0" castShadow />
-      <hemisphereLight args={['#87CEEB', '#4A7C2E', 0.3]} />
+      {/* Realistic outdoor lighting */}
+      <ambientLight intensity={0.3} color="#E0E8F0" />
+      <directionalLight
+        position={[5, 10, 3]}
+        intensity={1.2}
+        color="#FFF5E0"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={25}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={10}
+        shadow-camera-bottom={-10}
+        shadow-bias={-0.001}
+      />
+      <hemisphereLight args={['#87CEEB', '#4A7C2E', 0.35]} />
     </group>
   );
 }
