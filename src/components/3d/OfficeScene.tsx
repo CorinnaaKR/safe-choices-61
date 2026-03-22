@@ -98,16 +98,20 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
       })}
 
       {/* Bookshelf */}
-      <mesh position={[-3.8, 1.5, 0]}>
+      <mesh position={[-3.8, 1.5, 0]} castShadow>
         <boxGeometry args={[0.3, 3, 1.2]} />
-        <meshStandardMaterial color="#5C4033" />
+        <meshStandardMaterial color="#5C4033" roughness={0.7} metalness={0.05} />
       </mesh>
       {[0.5, 1.2, 1.9].map((y, i) => (
         <group key={i}>
           {[-0.3, 0, 0.3].map((z, j) => (
-            <mesh key={j} position={[-3.6, y, z]}>
-              <boxGeometry args={[0.15, 0.3, 0.18]} />
-              <meshStandardMaterial color={['#8B4513', '#2E4057', '#6B2E2E'][j]} />
+            <mesh key={j} position={[-3.6, y, z]} castShadow>
+              <boxGeometry args={[0.12, 0.28, 0.16]} />
+              <meshStandardMaterial
+                color={['#7A3D10', '#263848', '#5A2525'][j]}
+                roughness={0.75}
+                metalness={0.02}
+              />
             </mesh>
           ))}
         </group>
