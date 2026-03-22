@@ -19,6 +19,10 @@ export const OFFICE_EVIDENCE_POSITIONS: [number, number, number][] = [
 ];
 
 export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: OfficeSceneProps) {
+  const floorTex = useTileTexture('#7A6652', '#6B5B45', 32, [2, 2]);
+  const wallTex = useWallTexture('#E8E0D4');
+  const sideWallTex = useWallTexture('#DDD5C8');
+  const deskTex = useWoodTexture('#3D2B1F');
   return (
     <group>
       {/* Floor */}
