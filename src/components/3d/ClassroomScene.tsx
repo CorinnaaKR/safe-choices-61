@@ -159,14 +159,14 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
       ))}
 
       {/* Teacher's desk */}
-      <mesh position={[0, 0.75, -3.5]}>
+      <mesh position={[0, 0.75, -3.5]} castShadow receiveShadow>
         <boxGeometry args={[1.8, 0.06, 0.8]} />
-        <meshStandardMaterial color="#5C4033" />
+        <meshStandardMaterial map={teacherDeskTex} roughness={0.6} metalness={0.05} />
       </mesh>
       {[[-0.8, 0.37, -3.8], [0.8, 0.37, -3.8], [-0.8, 0.37, -3.2], [0.8, 0.37, -3.2]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]}>
+        <mesh key={i} position={pos as [number, number, number]} castShadow>
           <boxGeometry args={[0.06, 0.75, 0.06]} />
-          <meshStandardMaterial color="#4A3428" />
+          <meshStandardMaterial color="#4A3428" roughness={0.7} metalness={0.05} />
         </mesh>
       ))}
 
