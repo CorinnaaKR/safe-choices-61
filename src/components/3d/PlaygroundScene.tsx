@@ -155,7 +155,7 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       {/* School building backdrop */}
       <mesh position={[0, 2, -7]}>
         <boxGeometry args={[14, 4, 0.5]} />
-        <meshStandardMaterial color="#C4A882" />
+        <meshStandardMaterial map={buildingTex} />
       </mesh>
       {[-4, -2, 0, 2, 4].map((x, i) => (
         <mesh key={i} position={[x, 2.5, -6.7]}>
