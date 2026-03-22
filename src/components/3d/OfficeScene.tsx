@@ -1,6 +1,7 @@
 import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
+import { useWoodTexture, useWallTexture, useTileTexture } from './TexturedMaterials';
 
 interface OfficeSceneProps {
   evidence: Evidence[];
