@@ -171,19 +171,19 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       <Tree position={[8, 0, -3]} />
 
       {/* School building backdrop */}
-      <mesh position={[0, 2, -7]}>
+      <mesh position={[0, 2, -7]} receiveShadow castShadow>
         <boxGeometry args={[14, 4, 0.5]} />
-        <meshStandardMaterial map={buildingTex} />
+        <meshStandardMaterial map={buildingTex} roughness={0.85} metalness={0.02} />
       </mesh>
       {[-4, -2, 0, 2, 4].map((x, i) => (
         <mesh key={i} position={[x, 2.5, -6.7]}>
           <boxGeometry args={[0.8, 0.8, 0.1]} />
-          <meshStandardMaterial color="#6BAED6" emissive="#6BAED6" emissiveIntensity={0.1} />
+          <meshPhysicalMaterial color="#8BBDE0" transmission={0.3} roughness={0.15} metalness={0} />
         </mesh>
       ))}
-      <mesh position={[0, 1.2, -6.7]}>
+      <mesh position={[0, 1.2, -6.7]} castShadow>
         <boxGeometry args={[1, 2.2, 0.1]} />
-        <meshStandardMaterial color="#5C4033" />
+        <meshStandardMaterial color="#5C4033" roughness={0.7} metalness={0.05} />
       </mesh>
 
       {/* ===== NPC Characters ===== */}
