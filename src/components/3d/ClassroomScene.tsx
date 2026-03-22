@@ -104,7 +104,7 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[12, 10]} />
-        <meshStandardMaterial color="#C4A882" />
+        <meshStandardMaterial map={floorTex} />
       </mesh>
 
       {/* Walls */}
