@@ -131,16 +131,29 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         <meshStandardMaterial color="#6B6B6B" roughness={0.4} metalness={0.3} />
       </mesh>
 
-      {/* Windows */}
+      {/* Windows — frosted glass look */}
       {[-2, 0, 2].map((z, i) => (
         <group key={i} position={[-5.95, 2.5, z]}>
           <mesh rotation={[0, Math.PI / 2, 0]}>
             <planeGeometry args={[1.2, 1.5]} />
-            <meshStandardMaterial color="#B0D4F1" emissive="#B0D4F1" emissiveIntensity={0.3} transparent opacity={0.6} />
+            <meshPhysicalMaterial
+              color="#D4E8F5"
+              transmission={0.6}
+              roughness={0.2}
+              metalness={0}
+              transparent
+              opacity={0.7}
+            />
           </mesh>
+          {/* Window frame */}
           <mesh rotation={[0, Math.PI / 2, 0]}>
-            <boxGeometry args={[1.3, 1.6, 0.02]} />
-            <meshStandardMaterial color="#FFFFFF" />
+            <boxGeometry args={[1.3, 1.6, 0.03]} />
+            <meshStandardMaterial color="#E8E0D4" roughness={0.6} metalness={0.1} />
+          </mesh>
+          {/* Window sill */}
+          <mesh rotation={[0, Math.PI / 2, 0]} position={[0, -0.8, 0.04]}>
+            <boxGeometry args={[1.3, 0.06, 0.12]} />
+            <meshStandardMaterial color="#D8D0C4" roughness={0.7} />
           </mesh>
         </group>
       ))}
