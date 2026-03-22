@@ -70,6 +70,11 @@ export const CLASSROOM_EVIDENCE_POSITIONS: [number, number, number][] = [
 ];
 
 export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: ClassroomSceneProps) {
+  const floorTex = useTileTexture('#C4A882', '#B09A72', 32, [3, 2]);
+  const wallTex = useWallTexture('#F5F0E8', [2, 1]);
+  const sideWallTex = useWallTexture('#EDE8DC', [2, 1]);
+  const deskTex = useWoodTexture('#8B7355');
+  const teacherDeskTex = useWoodTexture('#5C4033', [2, 1]);
   // Build hotspots from evidence that are character-attached
   const jamieHotspots: NPCHotspot[] = [];
   const freeEvidence: { ev: Evidence; idx: number }[] = [];
