@@ -59,6 +59,9 @@ export const PLAYGROUND_EVIDENCE_POSITIONS: [number, number, number][] = [
 ];
 
 export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: PlaygroundSceneProps) {
+  const grassTex = useGrassTexture();
+  const tarmacTex = useNoiseTexture('#6B6B6B', 0.08);
+  const buildingTex = useNoiseTexture('#C4A882', 0.04);
   // Attach evidence to NPC hotspots
   const jamieHotspots: NPCHotspot[] = [];
   const freeEvidence: { ev: Evidence; idx: number }[] = [];
