@@ -116,13 +116,13 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
   return (
     <group>
       {/* Ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[20, 16]} />
-        <meshStandardMaterial map={grassTex} />
+        <meshStandardMaterial map={grassTex} roughness={0.95} metalness={0} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
         <planeGeometry args={[8, 6]} />
-        <meshStandardMaterial map={tarmacTex} />
+        <meshStandardMaterial map={tarmacTex} roughness={0.9} metalness={0.05} />
       </mesh>
 
       {/* Football pitch lines */}
