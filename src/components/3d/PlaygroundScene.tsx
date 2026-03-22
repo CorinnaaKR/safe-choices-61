@@ -1,6 +1,7 @@
 import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter, NPCHotspot } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
+import { useGrassTexture, useNoiseTexture, useWoodTexture } from './TexturedMaterials';
 
 interface PlaygroundSceneProps {
   evidence: Evidence[];
