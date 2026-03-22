@@ -108,17 +108,17 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
       </mesh>
 
       {/* Walls */}
-      <mesh position={[0, 2, -5]}>
+      <mesh position={[0, 2, -5]} receiveShadow>
         <planeGeometry args={[12, 4]} />
-        <meshStandardMaterial map={wallTex} />
+        <meshStandardMaterial map={wallTex} roughness={0.92} metalness={0} />
       </mesh>
-      <mesh position={[-6, 2, 0]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh position={[-6, 2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
         <planeGeometry args={[10, 4]} />
-        <meshStandardMaterial map={sideWallTex} />
+        <meshStandardMaterial map={sideWallTex} roughness={0.92} metalness={0} />
       </mesh>
-      <mesh position={[6, 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
+      <mesh position={[6, 2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
         <planeGeometry args={[10, 4]} />
-        <meshStandardMaterial map={sideWallTex} />
+        <meshStandardMaterial map={sideWallTex} roughness={0.92} metalness={0} />
       </mesh>
 
       {/* Whiteboard */}
