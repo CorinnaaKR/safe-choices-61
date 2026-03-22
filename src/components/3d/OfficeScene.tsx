@@ -117,34 +117,56 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         </group>
       ))}
 
-      {/* Visitor chairs */}
+      {/* Visitor chairs — more detailed */}
       {[-0.8, 0.8].map((x, i) => (
         <group key={i} position={[x, 0, 1]}>
-          <mesh position={[0, 0.4, 0]}>
-            <boxGeometry args={[0.4, 0.04, 0.4]} />
-            <meshStandardMaterial color="#6B4226" />
+          <mesh position={[0, 0.4, 0]} castShadow>
+            <boxGeometry args={[0.4, 0.035, 0.4]} />
+            <meshStandardMaterial color="#6B4226" roughness={0.65} />
           </mesh>
-          <mesh position={[0, 0.65, 0.18]}>
-            <boxGeometry args={[0.4, 0.45, 0.04]} />
-            <meshStandardMaterial color="#6B4226" />
+          <mesh position={[0, 0.65, 0.18]} castShadow>
+            <boxGeometry args={[0.4, 0.42, 0.035]} />
+            <meshStandardMaterial color="#6B4226" roughness={0.65} />
           </mesh>
+          {[[-0.17, 0.2, -0.17], [0.17, 0.2, -0.17], [-0.17, 0.2, 0.17], [0.17, 0.2, 0.17]].map((pos, j) => (
+            <mesh key={j} position={pos as [number, number, number]}>
+              <cylinderGeometry args={[0.015, 0.015, 0.4, 8]} />
+              <meshStandardMaterial color="#4A4A4A" roughness={0.3} metalness={0.6} />
+            </mesh>
+          ))}
         </group>
       ))}
 
-      {/* Window */}
+      {/* Window — frosted glass */}
       <mesh position={[3.95, 2.2, -0.5]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[1.5, 1.8]} />
-        <meshStandardMaterial color="#B0D4F1" emissive="#B0D4F1" emissiveIntensity={0.2} transparent opacity={0.5} />
+        <meshPhysicalMaterial
+          color="#D4E8F5"
+          transmission={0.5}
+          roughness={0.2}
+          transparent
+          opacity={0.65}
+        />
+      </mesh>
+      {/* Window frame */}
+      <mesh position={[3.97, 2.2, -0.5]} rotation={[0, -Math.PI / 2, 0]}>
+        <boxGeometry args={[1.6, 1.9, 0.03]} />
+        <meshStandardMaterial color="#D8D0C4" roughness={0.6} metalness={0.1} />
       </mesh>
 
-      {/* Door */}
-      <mesh position={[0, 1.1, 3]}>
-        <boxGeometry args={[0.9, 2.2, 0.08]} />
-        <meshStandardMaterial color="#5C4033" />
+      {/* Door — wood grain */}
+      <mesh position={[0, 1.1, 3]} castShadow>
+        <boxGeometry args={[0.9, 2.2, 0.06]} />
+        <meshStandardMaterial color="#5C4033" roughness={0.7} metalness={0.05} />
       </mesh>
+      {/* Door handle */}
       <mesh position={[0.3, 1.1, 2.95]}>
-        <sphereGeometry args={[0.04, 8, 8]} />
-        <meshStandardMaterial color="#C0C0C0" metalness={0.8} roughness={0.2} />
+        <cylinderGeometry args={[0.02, 0.02, 0.1, 8]} rotation={[Math.PI / 2, 0, 0]} />
+        <meshStandardMaterial color="#C0C0C0" metalness={0.85} roughness={0.15} />
+      </mesh>
+      <mesh position={[0.3, 1.1, 2.92]}>
+        <sphereGeometry args={[0.025, 12, 12]} />
+        <meshStandardMaterial color="#C0C0C0" metalness={0.85} roughness={0.15} />
       </mesh>
 
       {/* ===== NPC: Ms. Patterson (DSL) sitting behind desk ===== */}
