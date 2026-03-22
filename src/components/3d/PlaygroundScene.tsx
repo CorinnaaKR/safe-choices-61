@@ -100,11 +100,11 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       {/* Ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[20, 16]} />
-        <meshStandardMaterial color="#4A7C2E" />
+        <meshStandardMaterial map={grassTex} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
         <planeGeometry args={[8, 6]} />
-        <meshStandardMaterial color="#6B6B6B" />
+        <meshStandardMaterial map={tarmacTex} />
       </mesh>
 
       {/* Football pitch lines */}
