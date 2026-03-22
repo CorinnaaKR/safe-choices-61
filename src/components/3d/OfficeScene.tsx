@@ -1,6 +1,7 @@
 import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
+import { useWoodTexture, useWallTexture, useTileTexture } from './TexturedMaterials';
 
 interface OfficeSceneProps {
   evidence: Evidence[];
@@ -18,32 +19,36 @@ export const OFFICE_EVIDENCE_POSITIONS: [number, number, number][] = [
 ];
 
 export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: OfficeSceneProps) {
+  const floorTex = useTileTexture('#7A6652', '#6B5B45', 32, [2, 2]);
+  const wallTex = useWallTexture('#E8E0D4');
+  const sideWallTex = useWallTexture('#DDD5C8');
+  const deskTex = useWoodTexture('#3D2B1F');
   return (
     <group>
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[8, 6]} />
-        <meshStandardMaterial color="#7A6652" />
+        <meshStandardMaterial map={floorTex} />
       </mesh>
 
       {/* Walls */}
       <mesh position={[0, 2, -3]}>
         <planeGeometry args={[8, 4]} />
-        <meshStandardMaterial color="#E8E0D4" />
+        <meshStandardMaterial map={wallTex} />
       </mesh>
       <mesh position={[-4, 2, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[6, 4]} />
-        <meshStandardMaterial color="#DDD5C8" />
+        <meshStandardMaterial map={sideWallTex} />
       </mesh>
       <mesh position={[4, 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[6, 4]} />
-        <meshStandardMaterial color="#DDD5C8" />
+        <meshStandardMaterial map={sideWallTex} />
       </mesh>
 
       {/* Desk */}
       <mesh position={[0, 0.75, -1.5]}>
         <boxGeometry args={[2, 0.06, 1]} />
-        <meshStandardMaterial color="#3D2B1F" />
+        <meshStandardMaterial map={deskTex} />
       </mesh>
       {[[-0.9, 0.37, -1.9], [0.9, 0.37, -1.9], [-0.9, 0.37, -1.1], [0.9, 0.37, -1.1]].map((pos, i) => (
         <mesh key={i} position={pos as [number, number, number]}>

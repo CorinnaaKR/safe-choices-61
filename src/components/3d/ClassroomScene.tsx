@@ -1,6 +1,7 @@
 import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter, NPCHotspot } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
+import { useWoodTexture, useWallTexture, useTileTexture } from './TexturedMaterials';
 
 interface ClassroomSceneProps {
   evidence: Evidence[];
@@ -69,6 +70,11 @@ export const CLASSROOM_EVIDENCE_POSITIONS: [number, number, number][] = [
 ];
 
 export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: ClassroomSceneProps) {
+  const floorTex = useTileTexture('#C4A882', '#B09A72', 32, [3, 2]);
+  const wallTex = useWallTexture('#F5F0E8', [2, 1]);
+  const sideWallTex = useWallTexture('#EDE8DC', [2, 1]);
+  const deskTex = useWoodTexture('#8B7355');
+  const teacherDeskTex = useWoodTexture('#5C4033', [2, 1]);
   // Build hotspots from evidence that are character-attached
   const jamieHotspots: NPCHotspot[] = [];
   const freeEvidence: { ev: Evidence; idx: number }[] = [];
@@ -98,21 +104,21 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[12, 10]} />
-        <meshStandardMaterial color="#C4A882" />
+        <meshStandardMaterial map={floorTex} />
       </mesh>
 
       {/* Walls */}
       <mesh position={[0, 2, -5]}>
         <planeGeometry args={[12, 4]} />
-        <meshStandardMaterial color="#F5F0E8" />
+        <meshStandardMaterial map={wallTex} />
       </mesh>
       <mesh position={[-6, 2, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[10, 4]} />
-        <meshStandardMaterial color="#EDE8DC" />
+        <meshStandardMaterial map={sideWallTex} />
       </mesh>
       <mesh position={[6, 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[10, 4]} />
-        <meshStandardMaterial color="#EDE8DC" />
+        <meshStandardMaterial map={sideWallTex} />
       </mesh>
 
       {/* Whiteboard */}

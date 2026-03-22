@@ -23,8 +23,10 @@ export function CameraController({
 }: CameraControllerProps) {
   const { camera } = useThree();
   const arrivedRef = useRef(false);
-  const lerpFactor = 0.04;
+  const inspectLerp = 0.015; // Slow cinematic zoom for evidence
   const followLerp = 0.06;
+  const defaultLerp = 0.04;
+  const timeRef = useRef(0);
   const targetPos = useRef(new THREE.Vector3(...defaultPosition));
   const lookAtPos = useRef(new THREE.Vector3(...defaultTarget));
 
@@ -40,22 +42,35 @@ export function CameraController({
     }
   }, [target, offset]);
 
-  useFrame(() => {
-    // If inspecting evidence, zoom to it
+  useFrame((_, delta) => {
+    timeRef.current += delta;
+
+    // If inspecting evidence — slow cinematic zoom
     if (target) {
-      camera.position.lerp(targetPos.current, lerpFactor);
+      // Ease-in: start very slow, gradually speed up
+      const dist = camera.position.distanceTo(targetPos.current);
+      const t = Math.max(inspectLerp, Math.min(0.04, 1 / (dist * 12 + 5)));
+      camera.position.lerp(targetPos.current, t);
+
       const currentLookAt = new THREE.Vector3();
       camera.getWorldDirection(currentLookAt);
       currentLookAt.multiplyScalar(5).add(camera.position);
-      currentLookAt.lerp(lookAtPos.current, lerpFactor);
+      currentLookAt.lerp(lookAtPos.current, t);
       camera.lookAt(currentLookAt);
 
       if (!arrivedRef.current) {
-        const dist = camera.position.distanceTo(targetPos.current);
-        if (dist < 0.1) {
+        if (dist < 0.15) {
           arrivedRef.current = true;
           onArrived?.();
         }
+      }
+
+      // Subtle breathing sway when arrived
+      if (arrivedRef.current) {
+        const sway = Math.sin(timeRef.current * 1.2) * 0.003;
+        const bob = Math.sin(timeRef.current * 2) * 0.002;
+        camera.position.x += sway;
+        camera.position.y += bob;
       }
     } else if (playerPosition) {
       // Follow the player character
@@ -77,7 +92,7 @@ export function CameraController({
       currentLookAt.lerp(lookTarget, followLerp);
       camera.lookAt(currentLookAt);
     } else {
-      camera.position.lerp(targetPos.current, lerpFactor);
+      camera.position.lerp(targetPos.current, defaultLerp);
     }
   });
 

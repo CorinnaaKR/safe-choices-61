@@ -1,6 +1,7 @@
 import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter, NPCHotspot } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
+import { useGrassTexture, useNoiseTexture, useWoodTexture } from './TexturedMaterials';
 
 interface PlaygroundSceneProps {
   evidence: Evidence[];
@@ -58,6 +59,9 @@ export const PLAYGROUND_EVIDENCE_POSITIONS: [number, number, number][] = [
 ];
 
 export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: PlaygroundSceneProps) {
+  const grassTex = useGrassTexture();
+  const tarmacTex = useNoiseTexture('#6B6B6B', 0.08);
+  const buildingTex = useNoiseTexture('#C4A882', 0.04);
   // Attach evidence to NPC hotspots
   const jamieHotspots: NPCHotspot[] = [];
   const freeEvidence: { ev: Evidence; idx: number }[] = [];
@@ -96,11 +100,11 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       {/* Ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[20, 16]} />
-        <meshStandardMaterial color="#4A7C2E" />
+        <meshStandardMaterial map={grassTex} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
         <planeGeometry args={[8, 6]} />
-        <meshStandardMaterial color="#6B6B6B" />
+        <meshStandardMaterial map={tarmacTex} />
       </mesh>
 
       {/* Football pitch lines */}
@@ -151,7 +155,7 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       {/* School building backdrop */}
       <mesh position={[0, 2, -7]}>
         <boxGeometry args={[14, 4, 0.5]} />
-        <meshStandardMaterial color="#C4A882" />
+        <meshStandardMaterial map={buildingTex} />
       </mesh>
       {[-4, -2, 0, 2, 4].map((x, i) => (
         <mesh key={i} position={[x, 2.5, -6.7]}>
