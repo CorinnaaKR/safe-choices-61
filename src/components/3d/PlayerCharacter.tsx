@@ -86,32 +86,77 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom' }: P
 
   return (
     <group ref={groupRef} position={[0, 0, 3]}>
-      {/* Body */}
-      <mesh position={[0, 0.55, 0]} castShadow>
-        <capsuleGeometry args={[0.18, 0.35, 8, 16]} />
-        <meshStandardMaterial color="#4a90d9" roughness={0.6} />
-      </mesh>
-      
-      {/* Head */}
-      <mesh position={[0, 1.05, 0]} castShadow>
-        <sphereGeometry args={[0.16, 16, 16]} />
-        <meshStandardMaterial color="#f5c6a0" roughness={0.5} />
+      {/* Body — torso */}
+      <mesh position={[0, 0.6, 0]} castShadow>
+        <capsuleGeometry args={[0.16, 0.35, 8, 16]} />
+        <meshStandardMaterial color="#3A6B9F" roughness={0.7} metalness={0.05} />
       </mesh>
 
-      {/* Eyes direction indicator */}
-      <mesh position={[0.05, 1.08, 0.14]}>
-        <sphereGeometry args={[0.03, 8, 8]} />
-        <meshBasicMaterial color="#333" />
+      {/* Head */}
+      <mesh position={[0, 1.08, 0]} castShadow>
+        <sphereGeometry args={[0.15, 20, 20]} />
+        <meshStandardMaterial color="#E8C4A0" roughness={0.6} metalness={0} />
       </mesh>
-      <mesh position={[-0.05, 1.08, 0.14]}>
-        <sphereGeometry args={[0.03, 8, 8]} />
-        <meshBasicMaterial color="#333" />
+
+      {/* Hair */}
+      <mesh position={[0, 1.18, -0.02]}>
+        <sphereGeometry args={[0.152, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
+        <meshStandardMaterial color="#3A2815" roughness={0.85} />
+      </mesh>
+
+      {/* Eyes */}
+      <mesh position={[0.045, 1.1, 0.13]}>
+        <sphereGeometry args={[0.022, 10, 10]} />
+        <meshStandardMaterial color="#2A2A2A" roughness={0.3} />
+      </mesh>
+      <mesh position={[-0.045, 1.1, 0.13]}>
+        <sphereGeometry args={[0.022, 10, 10]} />
+        <meshStandardMaterial color="#2A2A2A" roughness={0.3} />
+      </mesh>
+
+      {/* Arms */}
+      <mesh position={[0.22, 0.55, 0]} castShadow>
+        <capsuleGeometry args={[0.04, 0.3, 8, 8]} />
+        <meshStandardMaterial color="#3A6B9F" roughness={0.7} metalness={0.05} />
+      </mesh>
+      <mesh position={[-0.22, 0.55, 0]} castShadow>
+        <capsuleGeometry args={[0.04, 0.3, 8, 8]} />
+        <meshStandardMaterial color="#3A6B9F" roughness={0.7} metalness={0.05} />
+      </mesh>
+      {/* Hands */}
+      <mesh position={[0.22, 0.35, 0]}>
+        <sphereGeometry args={[0.035, 8, 8]} />
+        <meshStandardMaterial color="#E8C4A0" roughness={0.6} />
+      </mesh>
+      <mesh position={[-0.22, 0.35, 0]}>
+        <sphereGeometry args={[0.035, 8, 8]} />
+        <meshStandardMaterial color="#E8C4A0" roughness={0.6} />
+      </mesh>
+
+      {/* Legs */}
+      <mesh position={[0.07, 0.2, 0]} castShadow>
+        <capsuleGeometry args={[0.05, 0.25, 8, 8]} />
+        <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
+      </mesh>
+      <mesh position={[-0.07, 0.2, 0]} castShadow>
+        <capsuleGeometry args={[0.05, 0.25, 8, 8]} />
+        <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
+      </mesh>
+
+      {/* Shoes */}
+      <mesh position={[0.07, 0.04, 0.02]} castShadow>
+        <boxGeometry args={[0.065, 0.04, 0.12]} />
+        <meshStandardMaterial color="#1A1A1A" roughness={0.5} metalness={0.1} />
+      </mesh>
+      <mesh position={[-0.07, 0.04, 0.02]} castShadow>
+        <boxGeometry args={[0.065, 0.04, 0.12]} />
+        <meshStandardMaterial color="#1A1A1A" roughness={0.5} metalness={0.1} />
       </mesh>
 
       {/* Shadow disc */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <circleGeometry args={[0.25, 16]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.2} />
+        <circleGeometry args={[0.22, 20]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.18} />
       </mesh>
     </group>
   );

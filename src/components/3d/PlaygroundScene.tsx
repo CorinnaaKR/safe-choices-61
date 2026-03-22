@@ -14,18 +14,25 @@ interface PlaygroundSceneProps {
 function Bench({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
   return (
     <group position={position} rotation={[0, rotation, 0]}>
-      <mesh position={[0, 0.45, 0]}>
-        <boxGeometry args={[1.2, 0.06, 0.35]} />
-        <meshStandardMaterial color="#8B6914" />
-      </mesh>
-      <mesh position={[0, 0.7, -0.15]}>
-        <boxGeometry args={[1.2, 0.5, 0.04]} />
-        <meshStandardMaterial color="#8B6914" />
-      </mesh>
+      {/* Planks */}
+      {[-0.12, 0, 0.12].map((z, i) => (
+        <mesh key={`plank-${i}`} position={[0, 0.45, z]} castShadow>
+          <boxGeometry args={[1.2, 0.03, 0.1]} />
+          <meshStandardMaterial color="#9B7B2E" roughness={0.75} metalness={0} />
+        </mesh>
+      ))}
+      {/* Back planks */}
+      {[0.55, 0.7].map((y, i) => (
+        <mesh key={`back-${i}`} position={[0, y, -0.15]} castShadow>
+          <boxGeometry args={[1.2, 0.08, 0.025]} />
+          <meshStandardMaterial color="#8B6B14" roughness={0.75} />
+        </mesh>
+      ))}
+      {/* Cast iron legs */}
       {[[-0.5, 0.22, 0], [0.5, 0.22, 0]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]}>
-          <boxGeometry args={[0.06, 0.45, 0.35]} />
-          <meshStandardMaterial color="#5C4033" />
+        <mesh key={i} position={pos as [number, number, number]} castShadow>
+          <boxGeometry args={[0.04, 0.45, 0.35]} />
+          <meshStandardMaterial color="#3A3A3A" roughness={0.4} metalness={0.7} />
         </mesh>
       ))}
     </group>
@@ -35,17 +42,28 @@ function Bench({ position, rotation = 0 }: { position: [number, number, number];
 function Tree({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      <mesh position={[0, 1, 0]}>
-        <cylinderGeometry args={[0.15, 0.2, 2, 8]} />
-        <meshStandardMaterial color="#5C4033" />
+      {/* Trunk with bark texture */}
+      <mesh position={[0, 1, 0]} castShadow>
+        <cylinderGeometry args={[0.12, 0.22, 2, 12]} />
+        <meshStandardMaterial color="#4A3520" roughness={0.95} metalness={0} />
       </mesh>
-      <mesh position={[0, 2.5, 0]}>
-        <sphereGeometry args={[1, 8, 8]} />
-        <meshStandardMaterial color="#2D5016" />
+      {/* Multiple foliage clusters for realism */}
+      <mesh position={[0, 2.6, 0]} castShadow>
+        <sphereGeometry args={[1.1, 12, 12]} />
+        <meshStandardMaterial color="#2A5014" roughness={0.9} />
       </mesh>
-      <mesh position={[0.5, 2, 0.3]}>
-        <sphereGeometry args={[0.7, 8, 8]} />
-        <meshStandardMaterial color="#3A6B1E" />
+      <mesh position={[0.6, 2.2, 0.3]} castShadow>
+        <sphereGeometry args={[0.75, 10, 10]} />
+        <meshStandardMaterial color="#35631C" roughness={0.9} />
+      </mesh>
+      <mesh position={[-0.4, 2.3, -0.3]} castShadow>
+        <sphereGeometry args={[0.65, 10, 10]} />
+        <meshStandardMaterial color="#2E5518" roughness={0.9} />
+      </mesh>
+      {/* Shadow on ground */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.2, 0.01, 0.3]}>
+        <circleGeometry args={[1.5, 16]} />
+        <meshBasicMaterial color="#1a3a0a" transparent opacity={0.12} />
       </mesh>
     </group>
   );
@@ -98,13 +116,13 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
   return (
     <group>
       {/* Ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[20, 16]} />
-        <meshStandardMaterial map={grassTex} />
+        <meshStandardMaterial map={grassTex} roughness={0.95} metalness={0} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
         <planeGeometry args={[8, 6]} />
-        <meshStandardMaterial map={tarmacTex} />
+        <meshStandardMaterial map={tarmacTex} roughness={0.9} metalness={0.05} />
       </mesh>
 
       {/* Football pitch lines */}
@@ -153,19 +171,19 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       <Tree position={[8, 0, -3]} />
 
       {/* School building backdrop */}
-      <mesh position={[0, 2, -7]}>
+      <mesh position={[0, 2, -7]} receiveShadow castShadow>
         <boxGeometry args={[14, 4, 0.5]} />
-        <meshStandardMaterial map={buildingTex} />
+        <meshStandardMaterial map={buildingTex} roughness={0.85} metalness={0.02} />
       </mesh>
       {[-4, -2, 0, 2, 4].map((x, i) => (
         <mesh key={i} position={[x, 2.5, -6.7]}>
           <boxGeometry args={[0.8, 0.8, 0.1]} />
-          <meshStandardMaterial color="#6BAED6" emissive="#6BAED6" emissiveIntensity={0.1} />
+          <meshPhysicalMaterial color="#8BBDE0" transmission={0.3} roughness={0.15} metalness={0} />
         </mesh>
       ))}
-      <mesh position={[0, 1.2, -6.7]}>
+      <mesh position={[0, 1.2, -6.7]} castShadow>
         <boxGeometry args={[1, 2.2, 0.1]} />
-        <meshStandardMaterial color="#5C4033" />
+        <meshStandardMaterial color="#5C4033" roughness={0.7} metalness={0.05} />
       </mesh>
 
       {/* ===== NPC Characters ===== */}
@@ -242,10 +260,23 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         );
       })}
 
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 8, 3]} intensity={0.8} color="#FFF5E0" castShadow />
-      <hemisphereLight args={['#87CEEB', '#4A7C2E', 0.3]} />
+      {/* Realistic outdoor lighting */}
+      <ambientLight intensity={0.3} color="#E0E8F0" />
+      <directionalLight
+        position={[5, 10, 3]}
+        intensity={1.2}
+        color="#FFF5E0"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={25}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={10}
+        shadow-camera-bottom={-10}
+        shadow-bias={-0.001}
+      />
+      <hemisphereLight args={['#87CEEB', '#4A7C2E', 0.35]} />
     </group>
   );
 }

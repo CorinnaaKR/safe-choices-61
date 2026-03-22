@@ -1,6 +1,6 @@
 import { Suspense, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment } from '@react-three/drei';
+import { Environment, ContactShadows, SoftShadows } from '@react-three/drei';
 import { ClassroomScene } from './ClassroomScene';
 import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
@@ -52,10 +52,18 @@ export function SceneRenderer({
   return (
     <div className="absolute inset-0">
       <Canvas
-        camera={{ position: [0, 3, 6], fov: 55 }}
+        camera={{ position: [0, 3, 6], fov: 50 }}
+        shadows
+        gl={{
+          antialias: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: sceneType === 'playground' ? 1.2 : 0.9,
+        }}
         style={{ background: sceneType === 'playground' ? '#87CEEB' : '#1a1a2e' }}
       >
         <Suspense fallback={null}>
+          <SoftShadows size={25} samples={16} focus={0.5} />
+
           <CameraController
             target={focusTarget}
             playerPosition={focusTarget ? null : playerPosRef.current}
@@ -92,7 +100,19 @@ export function SceneRenderer({
             />
           )}
 
-          <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : '#1a1a2e', 10, 25]} />
+          {/* Environment-based lighting for realistic reflections */}
+          <Environment preset={sceneType === 'playground' ? 'park' : 'apartment'} />
+
+          {/* Contact shadows for grounding objects */}
+          <ContactShadows
+            position={[0, 0.01, 0]}
+            opacity={0.4}
+            scale={sceneType === 'playground' ? 20 : 12}
+            blur={2}
+            far={4}
+          />
+
+          <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : '#1a1a2e', 12, 30]} />
         </Suspense>
       </Canvas>
     </div>
