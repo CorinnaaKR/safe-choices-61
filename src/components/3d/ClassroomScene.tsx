@@ -232,11 +232,28 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         );
       })}
 
-      {/* Lighting */}
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[-5, 5, 3]} intensity={0.6} color="#FFF8E7" castShadow />
-      <pointLight position={[0, 3.5, -3]} intensity={0.3} color="#FFFFFF" />
-      <pointLight position={[-5, 2.5, 0]} intensity={0.4} color="#B0D4F1" distance={8} />
+      {/* Realistic lighting */}
+      <ambientLight intensity={0.25} color="#E8E0D8" />
+      <directionalLight
+        position={[-5, 6, 3]}
+        intensity={0.8}
+        color="#FFF5E0"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={20}
+        shadow-camera-left={-8}
+        shadow-camera-right={8}
+        shadow-camera-top={8}
+        shadow-camera-bottom={-8}
+        shadow-bias={-0.001}
+      />
+      {/* Warm fill from windows */}
+      <pointLight position={[-5, 2.5, 0]} intensity={0.5} color="#D4E8F5" distance={10} decay={2} />
+      {/* Overhead fluorescent feel */}
+      <rectAreaLight position={[0, 3.8, 0]} width={6} height={3} intensity={0.6} color="#F5F0E8" rotation={[-Math.PI / 2, 0, 0]} />
+      {/* Subtle warm bounce from floor */}
+      <pointLight position={[0, 0.3, 0]} intensity={0.15} color="#C4A882" distance={8} decay={2} />
     </group>
   );
 }
