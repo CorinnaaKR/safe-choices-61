@@ -1,6 +1,7 @@
 import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter, NPCHotspot } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
+import { useWoodTexture, useWallTexture, useTileTexture } from './TexturedMaterials';
 
 interface ClassroomSceneProps {
   evidence: Evidence[];
