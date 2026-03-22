@@ -160,8 +160,8 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         <meshStandardMaterial color="#5C4033" roughness={0.7} metalness={0.05} />
       </mesh>
       {/* Door handle */}
-      <mesh position={[0.3, 1.1, 2.95]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.1, 8]} rotation={[Math.PI / 2, 0, 0]} />
+      <mesh position={[0.3, 1.1, 2.95]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, 0.1, 8]} />
         <meshStandardMaterial color="#C0C0C0" metalness={0.85} roughness={0.15} />
       </mesh>
       <mesh position={[0.3, 1.1, 2.92]}>
