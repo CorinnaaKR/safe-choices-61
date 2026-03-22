@@ -23,8 +23,10 @@ export function CameraController({
 }: CameraControllerProps) {
   const { camera } = useThree();
   const arrivedRef = useRef(false);
-  const lerpFactor = 0.04;
+  const inspectLerp = 0.015; // Slow cinematic zoom for evidence
   const followLerp = 0.06;
+  const defaultLerp = 0.04;
+  const timeRef = useRef(0);
   const targetPos = useRef(new THREE.Vector3(...defaultPosition));
   const lookAtPos = useRef(new THREE.Vector3(...defaultTarget));
 
