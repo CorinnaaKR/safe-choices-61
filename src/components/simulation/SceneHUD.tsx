@@ -53,6 +53,7 @@ export function SceneHUD({
     if (prevSceneId.current !== currentScene.id) {
       setVisibleParagraph(0);
       setNarrativeComplete(false);
+      setPendingChoice(null);
       prevSceneId.current = currentScene.id;
     }
   }, [currentScene.id]);
