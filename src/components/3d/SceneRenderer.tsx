@@ -113,6 +113,19 @@ export function SceneRenderer({
             far={4}
           />
 
+          {/* Cinematic depth-of-field during evidence inspection */}
+          {focusTarget && (
+            <EffectComposer>
+              <DepthOfField
+                target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])}
+                focalLength={0.02}
+                bokehScale={4}
+                height={480}
+              />
+              <Vignette eskil={false} offset={0.2} darkness={0.55} />
+            </EffectComposer>
+          )}
+
           <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : '#1a1a2e', 12, 30]} />
         </Suspense>
       </Canvas>
