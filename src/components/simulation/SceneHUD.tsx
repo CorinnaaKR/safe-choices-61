@@ -40,6 +40,7 @@ export function SceneHUD({
   const [journalOpen, setJournalOpen] = useState(false);
   const [visibleParagraph, setVisibleParagraph] = useState(0);
   const [narrativeComplete, setNarrativeComplete] = useState(false);
+  const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
   const prevSceneId = useRef(currentScene.id);
 
   const sceneEvidence = currentScene.evidence || [];
