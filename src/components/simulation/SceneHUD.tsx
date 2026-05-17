@@ -211,7 +211,7 @@ export function SceneHUD({
               {currentScene.choices.map((choice, i) => (
                 <button
                   key={choice.id}
-                  onClick={() => onMakeChoice(choice)}
+                  onClick={() => setPendingChoice(choice)}
                   className="w-full text-left px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-decision-highlight/30 transition-all group"
                 >
                   <div className="flex items-start gap-3">
