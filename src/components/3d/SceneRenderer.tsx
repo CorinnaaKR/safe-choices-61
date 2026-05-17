@@ -1,6 +1,7 @@
 import { Suspense, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, ContactShadows, SoftShadows } from '@react-three/drei';
+import { EffectComposer, DepthOfField, Vignette } from '@react-three/postprocessing';
 import { ClassroomScene } from './ClassroomScene';
 import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
