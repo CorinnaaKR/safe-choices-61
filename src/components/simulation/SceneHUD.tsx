@@ -268,6 +268,20 @@ export function SceneHUD({
         )}
       </AnimatePresence>
 
+      {/* Choice confirmation — evidence rationale */}
+      {pendingChoice && !showFeedback && (
+        <ChoiceConfirmModal
+          choice={pendingChoice}
+          evidence={gameState.collectedEvidence}
+          onCancel={() => setPendingChoice(null)}
+          onConfirm={(ids) => {
+            const c = pendingChoice;
+            setPendingChoice(null);
+            onMakeChoice(c, ids);
+          }}
+        />
+      )}
+
       {/* Feedback overlay */}
       {showFeedback && lastChoice && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
