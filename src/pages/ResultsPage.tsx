@@ -145,6 +145,10 @@ export default function ResultsPage() {
                 {gameState.decisions.map((decision, index) => {
                   const scene = scenario.scenes.find(s => s.id === decision.sceneId);
                   const choiceData = scene?.choices?.find(c => c.id === decision.choiceId);
+                  const citedIds = decision.supportingEvidenceIds ?? [];
+                  const citedEvidence = citedIds
+                    .map(id => gameState.collectedEvidence.find(e => e.id === id))
+                    .filter((e): e is NonNullable<typeof e> => Boolean(e));
                   return (
                     <motion.div 
                       key={index}
@@ -161,6 +165,23 @@ export default function ResultsPage() {
                           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                             {choiceData.text}
                           </p>
+                        )}
+                        {citedEvidence.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-border/60">
+                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground/80 font-semibold mb-1.5">
+                              Evidence you cited
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {citedEvidence.map(ev => (
+                                <span
+                                  key={ev.id}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-evidence-bg border border-evidence-border text-[11px] text-foreground"
+                                >
+                                  {ev.title}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
                         )}
                       </div>
                     </motion.div>
