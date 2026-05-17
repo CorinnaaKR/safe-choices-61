@@ -63,7 +63,7 @@ export function useSimulation() {
     });
   }, []);
 
-  const makeChoice = useCallback((choice: Choice) => {
+  const makeChoice = useCallback((choice: Choice, supportingEvidenceIds: string[] = []) => {
     setLastChoice(choice);
     setShowFeedback(true);
     
@@ -76,6 +76,7 @@ export function useSimulation() {
           choiceId: choice.id,
           isOptimal: choice.isOptimal,
           points: choice.points,
+          supportingEvidenceIds,
         },
       ],
       totalPoints: prev.totalPoints + choice.points,
