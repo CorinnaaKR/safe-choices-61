@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Evidence, Scene, Choice, GameState } from '@/types/simulation';
 import { FeedbackPanel } from './FeedbackPanel';
+import { ChoiceConfirmModal } from './ChoiceConfirmModal';
 import {
   Eye, X, Hand,
   Briefcase, Search, RotateCcw, ChevronRight
