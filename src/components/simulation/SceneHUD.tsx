@@ -16,7 +16,7 @@ interface SceneHUDProps {
   inspectedEvidence: Evidence | null;
   focusedEvidenceId: string | null;
   progress: number;
-  onMakeChoice: (choice: Choice) => void;
+  onMakeChoice: (choice: Choice, supportingEvidenceIds?: string[]) => void;
   onProceed: () => void;
   onReset: () => void;
   onDismissEvidence: () => void;
