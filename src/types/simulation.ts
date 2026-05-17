@@ -38,6 +38,7 @@ export interface GameState {
     choiceId: string;
     isOptimal: boolean;
     points: number;
+    supportingEvidenceIds?: string[];
   }[];
   totalPoints: number;
   maxPossiblePoints: number;

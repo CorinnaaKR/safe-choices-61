@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Evidence, Scene, Choice, GameState } from '@/types/simulation';
 import { FeedbackPanel } from './FeedbackPanel';
+import { ChoiceConfirmModal } from './ChoiceConfirmModal';
 import {
   Eye, X, Hand,
   Briefcase, Search, RotateCcw, ChevronRight
@@ -15,7 +16,7 @@ interface SceneHUDProps {
   inspectedEvidence: Evidence | null;
   focusedEvidenceId: string | null;
   progress: number;
-  onMakeChoice: (choice: Choice) => void;
+  onMakeChoice: (choice: Choice, supportingEvidenceIds?: string[]) => void;
   onProceed: () => void;
   onReset: () => void;
   onDismissEvidence: () => void;
@@ -39,6 +40,7 @@ export function SceneHUD({
   const [journalOpen, setJournalOpen] = useState(false);
   const [visibleParagraph, setVisibleParagraph] = useState(0);
   const [narrativeComplete, setNarrativeComplete] = useState(false);
+  const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
   const prevSceneId = useRef(currentScene.id);
 
   const sceneEvidence = currentScene.evidence || [];
@@ -51,6 +53,7 @@ export function SceneHUD({
     if (prevSceneId.current !== currentScene.id) {
       setVisibleParagraph(0);
       setNarrativeComplete(false);
+      setPendingChoice(null);
       prevSceneId.current = currentScene.id;
     }
   }, [currentScene.id]);
@@ -208,7 +211,7 @@ export function SceneHUD({
               {currentScene.choices.map((choice, i) => (
                 <button
                   key={choice.id}
-                  onClick={() => onMakeChoice(choice)}
+                  onClick={() => setPendingChoice(choice)}
                   className="w-full text-left px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-decision-highlight/30 transition-all group"
                 >
                   <div className="flex items-start gap-3">
@@ -264,6 +267,20 @@ export function SceneHUD({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Choice confirmation — evidence rationale */}
+      {pendingChoice && !showFeedback && (
+        <ChoiceConfirmModal
+          choice={pendingChoice}
+          evidence={gameState.collectedEvidence}
+          onCancel={() => setPendingChoice(null)}
+          onConfirm={(ids) => {
+            const c = pendingChoice;
+            setPendingChoice(null);
+            onMakeChoice(c, ids);
+          }}
+        />
+      )}
 
       {/* Feedback overlay */}
       {showFeedback && lastChoice && (
