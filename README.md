@@ -1,73 +1,43 @@
-# Welcome to your Lovable project
+# Heli — Safeguarding Simulation
 
-## Project info
+**Heli** (Helping Everyone Learn Interactively) is a web-based 3D interactive simulation for learning to recognise safeguarding risks — abuse, radicalisation, exploitation — and act on them. Players explore story-driven scenarios as the *helper*: noticing signs, gathering evidence, and making decisions whose consequences play out in the story.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Built with React 18, TypeScript, Vite, Tailwind/shadcn and [react-three-fiber](https://docs.pmnd.rs/react-three-fiber).
 
-## How can I edit this code?
+## Getting started
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requires Node.js 20+ (see `.nvmrc`).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev        # dev server on http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+> ⚠️ **Windows + Google Drive**: do not clone or `npm install` inside a Google Drive folder (`G:\My Drive\...`). The Drive filesystem rejects npm's writes. Work from a local path (e.g. `C:\Users\<you>\Projects\`).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Scripts
 
-**Use GitHub Codespaces**
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Dev server (port 8080) |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Serve the production build |
+| `npm test` | Run vitest suite once |
+| `npm run lint` | ESLint |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project structure
 
-## What technologies are used for this project?
+```
+src/
+  components/3d/         R3F scenes, player, NPCs, evidence objects
+  components/simulation/ HUD, evidence panel, choices, feedback
+  components/ui/         shadcn primitives
+  data/                  scenario definitions
+  hooks/useSimulation.ts game-state engine (evidence, decisions, scoring, persistence)
+  pages/                 Welcome / Story / Results
+  types/simulation.ts    core domain types
+```
 
-This project is built with:
+## Roadmap
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+See `BUILD_SPEC.md` (kept alongside the project) for the phased build plan: multi-scenario architecture, dual Learning/Training modes, scoring + certificates, Supabase trial telemetry, and the basement.studio-inspired UX reskin.
