@@ -2,63 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Heli design system — basement.studio-derived monochrome editorial language.
-   Near-black ground, off-white type, ONE accent (signal orange), 1px rules,
-   sharp corners. All colors HSL. Pillar 4 tiebreaker: clarity beats style. */
+/* Heli design system — warm, cinematic case-file language.
+   The basement.studio reference is about INTERACTION (inspection, movement,
+   detail, realism), not stark styling — so: warm charcoal ground, cream type,
+   amber accent, soft corners. All colors HSL. Pillar 4: clarity beats style. */
 
 @layer base {
   :root {
-    --background: 0 0% 4%;
-    --foreground: 40 7% 91%;
+    --background: 24 14% 10%;
+    --foreground: 36 28% 92%;
 
-    --card: 0 0% 6%;
-    --card-foreground: 40 7% 91%;
+    --card: 24 12% 13%;
+    --card-foreground: 36 28% 92%;
 
-    --popover: 0 0% 5%;
-    --popover-foreground: 40 7% 91%;
+    --popover: 24 13% 11%;
+    --popover-foreground: 36 28% 92%;
 
-    /* The one accent */
-    --primary: 19 100% 53%;
-    --primary-foreground: 0 0% 4%;
+    /* Warm amber accent */
+    --primary: 32 88% 56%;
+    --primary-foreground: 24 14% 10%;
 
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 40 7% 91%;
+    --secondary: 26 10% 18%;
+    --secondary-foreground: 36 28% 92%;
 
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 25 10% 16%;
+    --muted-foreground: 32 12% 66%;
 
-    --accent: 19 100% 53%;
-    --accent-foreground: 0 0% 4%;
+    --accent: 32 88% 56%;
+    --accent-foreground: 24 14% 10%;
 
-    --destructive: 0 62% 45%;
-    --destructive-foreground: 40 7% 91%;
+    --destructive: 0 55% 50%;
+    --destructive-foreground: 36 28% 92%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 19 100% 53%;
+    --border: 28 10% 26%;
+    --input: 28 10% 26%;
+    --ring: 32 88% 56%;
 
-    --radius: 0rem;
+    --radius: 0.375rem;
 
-    /* Story-specific tokens (mapped into the monochrome system) */
-    --story-bg: 0 0% 4%;
-    --story-text: 40 7% 91%;
-    --story-accent: 19 100% 53%;
-    --evidence-bg: 0 0% 8%;
-    --evidence-border: 0 0% 22%;
-    --decision-highlight: 19 100% 53%;
-    /* Semantic feedback keeps hue for clarity (pillar 4) but desaturated */
-    --positive: 145 25% 55%;
-    --negative: 0 50% 58%;
-    --neutral: 0 0% 60%;
+    /* Story-specific tokens */
+    --story-bg: 24 14% 10%;
+    --story-text: 36 28% 92%;
+    --story-accent: 32 88% 56%;
+    --evidence-bg: 25 12% 14%;
+    --evidence-border: 28 12% 30%;
+    --decision-highlight: 32 88% 56%;
+    /* Semantic feedback keeps hue for clarity (pillar 4) */
+    --positive: 145 35% 52%;
+    --negative: 0 55% 60%;
+    --neutral: 32 12% 66%;
 
-    --sidebar-background: 0 0% 5%;
-    --sidebar-foreground: 40 7% 91%;
-    --sidebar-primary: 19 100% 53%;
-    --sidebar-primary-foreground: 0 0% 4%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 40 7% 91%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 19 100% 53%;
+    --sidebar-background: 24 13% 11%;
+    --sidebar-foreground: 36 28% 92%;
+    --sidebar-primary: 32 88% 56%;
+    --sidebar-primary-foreground: 24 14% 10%;
+    --sidebar-accent: 25 10% 16%;
+    --sidebar-accent-foreground: 36 28% 92%;
+    --sidebar-border: 28 10% 26%;
+    --sidebar-ring: 32 88% 56%;
   }
 }
 
@@ -78,14 +79,14 @@
 }
 
 @layer components {
-  /* Monospace HUD label: uppercase, letter-spaced */
+  /* Monospace HUD label: uppercase, gently letter-spaced */
   .hud-label {
-    @apply font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground;
+    @apply font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground;
   }
 
   /* Bracketed keyboard affordance: [E] EXAMINE */
   .key-hint {
-    @apply font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/60;
+    @apply font-mono text-[11px] uppercase tracking-[0.12em] text-foreground/65;
   }
   .key-hint b {
     @apply font-medium text-foreground/90;
@@ -102,6 +103,7 @@
     background: hsl(var(--background) / 0.88);
     backdrop-filter: blur(8px);
     border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
   }
 }
 
@@ -112,7 +114,7 @@
   z-index: 80;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  opacity: 0.05;
+  opacity: 0.03;
   animation: grain-shift 0.8s steps(4) infinite;
 }
 
@@ -137,7 +139,7 @@
 }
 
 .crosshair-area.crosshair-active {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg stroke='%23ff5c10' stroke-width='1.5'%3E%3Cline x1='16' y1='2' x2='16' y2='10'/%3E%3Cline x1='16' y1='22' x2='16' y2='30'/%3E%3Cline x1='2' y1='16' x2='10' y2='16'/%3E%3Cline x1='22' y1='16' x2='30' y2='16'/%3E%3C/g%3E%3Cg stroke='%23ff5c10' stroke-width='1'%3E%3Cpath d='M4 8 V4 H8' fill='none'/%3E%3Cpath d='M24 4 H28 V8' fill='none'/%3E%3Cpath d='M28 24 V28 H24' fill='none'/%3E%3Cpath d='M8 28 H4 V24' fill='none'/%3E%3C/g%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%23ff5c10'/%3E%3C/svg%3E") 16 16, pointer;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg stroke='%23f0a242' stroke-width='1.5'%3E%3Cline x1='16' y1='2' x2='16' y2='10'/%3E%3Cline x1='16' y1='22' x2='16' y2='30'/%3E%3Cline x1='2' y1='16' x2='10' y2='16'/%3E%3Cline x1='22' y1='16' x2='30' y2='16'/%3E%3C/g%3E%3Cg stroke='%23f0a242' stroke-width='1'%3E%3Cpath d='M4 8 V4 H8' fill='none'/%3E%3Cpath d='M24 4 H28 V8' fill='none'/%3E%3Cpath d='M28 24 V28 H24' fill='none'/%3E%3Cpath d='M8 28 H4 V24' fill='none'/%3E%3C/g%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%23f0a242'/%3E%3C/svg%3E") 16 16, pointer;
 }
 
 /* ---------- Blinking caret for typewriter text ---------- */
