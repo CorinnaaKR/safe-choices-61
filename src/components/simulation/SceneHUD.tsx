@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Evidence, Scene, Choice, GameState } from '@/types/simulation';
+import { Evidence, Scene, Choice, GameState, Mode } from '@/types/simulation';
 import { FeedbackPanel } from './FeedbackPanel';
 import { ChoiceConfirmModal } from './ChoiceConfirmModal';
 import {
@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 
 interface SceneHUDProps {
+  scenarioTitle: string;
+  mode: Mode;
   currentScene: Scene;
   gameState: GameState;
   showFeedback: boolean;
@@ -24,6 +26,8 @@ interface SceneHUDProps {
 }
 
 export function SceneHUD({
+  scenarioTitle,
+  mode,
   currentScene,
   gameState,
   showFeedback,
@@ -90,22 +94,24 @@ export function SceneHUD({
               <RotateCcw className="w-4 h-4 text-white/70" />
             </button>
             <div>
-              <h1 className="text-sm font-semibold text-white">Jamie's Story</h1>
+              <h1 className="text-sm font-semibold text-white">{scenarioTitle}</h1>
               <p className="text-xs text-white/50">{currentScene.title}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Progress */}
-            <div className="flex items-center gap-2">
-              <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-decision-highlight rounded-full transition-all duration-500"
-                  style={{ width: `${progress}%` }}
-                />
+            {/* Progress - training mode only (learning mode shows no metrics) */}
+            {mode === 'training' && (
+              <div className="flex items-center gap-2">
+                <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-decision-highlight rounded-full transition-all duration-500"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <span className="text-xs text-white/50">{progress}%</span>
               </div>
-              <span className="text-xs text-white/50">{progress}%</span>
-            </div>
+            )}
 
             {/* Evidence journal */}
             <button
@@ -291,7 +297,7 @@ export function SceneHUD({
             animate={{ opacity: 1, scale: 1 }}
             className="relative z-10 w-[90vw] max-w-lg"
           >
-            <FeedbackPanel choice={lastChoice} onContinue={onProceed} />
+            <FeedbackPanel choice={lastChoice} onContinue={onProceed} mode={mode} />
           </motion.div>
         </div>
       )}

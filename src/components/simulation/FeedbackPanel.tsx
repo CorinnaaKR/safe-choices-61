@@ -1,14 +1,16 @@
 import { motion } from 'framer-motion';
-import { Choice } from '@/types/simulation';
+import { Choice, Mode } from '@/types/simulation';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Quote, Lightbulb } from 'lucide-react';
 
 interface FeedbackPanelProps {
   choice: Choice;
   onContinue: () => void;
+  /** In learning mode the story consequence IS the feedback - no professional commentary. */
+  mode?: Mode;
 }
 
-export function FeedbackPanel({ choice, onContinue }: FeedbackPanelProps) {
+export function FeedbackPanel({ choice, onContinue, mode = 'training' }: FeedbackPanelProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -28,8 +30,10 @@ export function FeedbackPanel({ choice, onContinue }: FeedbackPanelProps) {
         </p>
       </motion.div>
       
-      {/* Reflection note — no judgment */}
-      <motion.div 
+      {/* Reflection note — no judgment. Training mode only: in learning
+          mode the consequence carries the lesson (cause and effect). */}
+      {mode === 'training' && (
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
@@ -53,7 +57,8 @@ export function FeedbackPanel({ choice, onContinue }: FeedbackPanelProps) {
           </div>
         </div>
       </motion.div>
-      
+      )}
+
       {/* Continue Button */}
       <motion.div 
         initial={{ opacity: 0 }}

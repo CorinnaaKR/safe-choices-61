@@ -28,7 +28,7 @@ const App = () => (
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<WelcomePage />} />
-            <Route path="/story" element={<StoryPage />} />
+            <Route path="/story/:scenarioId?" element={<StoryPage />} />
             <Route path="/results" element={<ResultsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

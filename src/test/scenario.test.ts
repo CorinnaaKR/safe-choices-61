@@ -1,44 +1,76 @@
 import { describe, it, expect } from 'vitest';
-import { safeguardingScenario } from '@/data/scenario';
+import { listScenarios } from '@/data/scenarios';
 
 /**
- * Scenario graph integrity: every branch must lead somewhere real,
- * and the story must always be able to end.
+ * Scenario graph integrity, run over every registered scenario:
+ * every branch must lead somewhere real and every story must end.
  */
-describe('scenario data integrity', () => {
-  const sceneIds = new Set(safeguardingScenario.scenes.map((s) => s.id));
+describe('scenario registry integrity', () => {
+  const playable = listScenarios().filter((s) => s.status !== 'in-development');
 
-  it('has at least one scene and one final scene', () => {
-    expect(safeguardingScenario.scenes.length).toBeGreaterThan(0);
-    expect(safeguardingScenario.scenes.some((s) => s.isFinalScene)).toBe(true);
+  it('registry has at least one playable scenario', () => {
+    expect(playable.length).toBeGreaterThan(0);
   });
 
-  it('every choice points to an existing scene', () => {
-    for (const scene of safeguardingScenario.scenes) {
-      for (const choice of scene.choices ?? []) {
-        expect(
-          sceneIds.has(choice.nextSceneId),
-          `choice ${choice.id} in ${scene.id} → missing scene "${choice.nextSceneId}"`
-        ).toBe(true);
-      }
-    }
-  });
+  for (const scenario of playable) {
+    describe(scenario.title, () => {
+      const sceneIds = new Set(scenario.scenes.map((s) => s.id));
 
-  it('every non-final decision scene has choices', () => {
-    for (const scene of safeguardingScenario.scenes) {
-      if (scene.isDecisionPoint && !scene.isFinalScene) {
-        expect(
-          (scene.choices ?? []).length,
-          `decision scene ${scene.id} has no choices`
-        ).toBeGreaterThan(0);
-      }
-    }
-  });
+      it('has at least one scene and one final scene', () => {
+        expect(scenario.scenes.length).toBeGreaterThan(0);
+        expect(scenario.scenes.some((s) => s.isFinalScene)).toBe(true);
+      });
 
-  it('evidence ids are unique across the scenario', () => {
-    const ids = safeguardingScenario.scenes.flatMap(
-      (s) => s.evidence?.map((e) => e.id) ?? []
-    );
-    expect(new Set(ids).size).toBe(ids.length);
-  });
+      it('every choice points to an existing scene', () => {
+        for (const scene of scenario.scenes) {
+          for (const choice of scene.choices ?? []) {
+            expect(
+              sceneIds.has(choice.nextSceneId),
+              `choice ${choice.id} in ${scene.id} -> missing scene "${choice.nextSceneId}"`
+            ).toBe(true);
+          }
+        }
+      });
+
+      it('every non-final decision scene has choices', () => {
+        for (const scene of scenario.scenes) {
+          if (scene.isDecisionPoint && !scene.isFinalScene) {
+            expect(
+              (scene.choices ?? []).length,
+              `decision scene ${scene.id} has no choices`
+            ).toBeGreaterThan(0);
+          }
+        }
+      });
+
+      it('evidence ids are unique', () => {
+        const ids = scenario.scenes.flatMap((s) => s.evidence?.map((e) => e.id) ?? []);
+        expect(new Set(ids).size).toBe(ids.length);
+      });
+
+      it('every scene declares an environment', () => {
+        for (const scene of scenario.scenes) {
+          expect(scene.environment, `scene ${scene.id} has no environment`).toBeTruthy();
+        }
+      });
+
+      it('all evidence carries category, importance and points', () => {
+        for (const scene of scenario.scenes) {
+          for (const ev of scene.evidence ?? []) {
+            expect(ev.category, `evidence ${ev.id} missing category`).toBeTruthy();
+            expect(ev.importance, `evidence ${ev.id} missing importance`).toBeTruthy();
+            expect(ev.points, `evidence ${ev.id} missing points`).toBeGreaterThan(0);
+          }
+        }
+      });
+
+      it('all choices carry a skill area', () => {
+        for (const scene of scenario.scenes) {
+          for (const choice of scene.choices ?? []) {
+            expect(choice.skillArea, `choice ${choice.id} missing skillArea`).toBeTruthy();
+          }
+        }
+      });
+    });
+  }
 });

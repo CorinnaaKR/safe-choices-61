@@ -1,7 +1,9 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useSimulation } from '@/hooks/useSimulation';
-import { SceneRenderer, getSceneType } from '@/components/3d/SceneRenderer';
+import { DEFAULT_SCENARIO_ID } from '@/data/scenarios';
+import { Mode, SceneEnvironment } from '@/types/simulation';
+import { SceneRenderer, SceneType } from '@/components/3d/SceneRenderer';
 import { CLASSROOM_EVIDENCE_POSITIONS } from '@/components/3d/ClassroomScene';
 import { PLAYGROUND_EVIDENCE_POSITIONS } from '@/components/3d/PlaygroundScene';
 import { OFFICE_EVIDENCE_POSITIONS } from '@/components/3d/OfficeScene';
@@ -9,11 +11,23 @@ import { Evidence } from '@/types/simulation';
 import { SceneHUD } from '@/components/simulation/SceneHUD';
 import { motion, AnimatePresence } from 'framer-motion';
 
+/** Until every environment has a dedicated 3D scene, unknown ones render as office. */
+function environmentToSceneType(env?: SceneEnvironment): SceneType {
+  if (env === 'classroom' || env === 'playground' || env === 'office') return env;
+  return 'office';
+}
+
 export default function StoryPage() {
   const navigate = useNavigate();
+  const { scenarioId = DEFAULT_SCENARIO_ID } = useParams();
+  const [searchParams] = useSearchParams();
+  const modeParam = searchParams.get('mode');
+  const mode: Mode = modeParam === 'training' ? 'training' : 'learning';
+
   const {
     gameState,
     currentScene,
+    scenario,
     showFeedback,
     lastChoice,
     collectEvidence,
@@ -21,23 +35,23 @@ export default function StoryPage() {
     proceedToNextScene,
     resetSimulation,
     getProgress,
-  } = useSimulation();
+  } = useSimulation(scenarioId, mode);
 
   const [focusedEvidenceId, setFocusedEvidenceId] = useState<string | null>(null);
   const [inspectedEvidence, setInspectedEvidence] = useState<Evidence | null>(null);
 
   useEffect(() => {
     if (gameState.isComplete) {
-      navigate('/results');
+      navigate(`/results?scenario=${gameState.scenarioId}&mode=${gameState.mode}`);
     }
-  }, [gameState.isComplete, navigate]);
+  }, [gameState.isComplete, gameState.scenarioId, gameState.mode, navigate]);
 
   useEffect(() => {
     setFocusedEvidenceId(null);
     setInspectedEvidence(null);
   }, [gameState.currentSceneId, showFeedback]);
 
-  const sceneType = currentScene ? getSceneType(currentScene.id) : 'classroom';
+  const sceneType = environmentToSceneType(currentScene?.environment);
   const sceneEvidence = currentScene?.evidence || [];
   const collectedIds = gameState.collectedEvidence.map(e => e.id);
 
@@ -108,6 +122,8 @@ export default function StoryPage() {
 
       {/* HUD overlay */}
       <SceneHUD
+        scenarioTitle={scenario.title}
+        mode={mode}
         currentScene={currentScene}
         gameState={gameState}
         showFeedback={showFeedback}

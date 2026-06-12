@@ -1,27 +1,39 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSimulation } from '@/hooks/useSimulation';
+import { DEFAULT_SCENARIO_ID } from '@/data/scenarios';
+import { Mode } from '@/types/simulation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
-import { 
-  Trophy, 
-  RotateCcw, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Trophy,
+  RotateCcw,
+  CheckCircle,
   Briefcase,
   Target,
   Award,
   Printer,
-  Star
+  Star,
+  BookOpen,
+  Lightbulb,
+  ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function ResultsPage() {
   const navigate = useNavigate();
-  const { gameState, resetSimulation, getOptimalDecisionsCount, scenario } = useSimulation();
+  const [searchParams] = useSearchParams();
+  const scenarioId = searchParams.get('scenario') ?? DEFAULT_SCENARIO_ID;
+  const mode: Mode = searchParams.get('mode') === 'training' ? 'training' : 'learning';
 
-  const scorePercentage = Math.round((gameState.totalPoints / gameState.maxPossiblePoints) * 100);
+  const { gameState, resetSimulation, getOptimalDecisionsCount, scenario } =
+    useSimulation(scenarioId, mode);
+
+  const scorePercentage =
+    gameState.maxPossiblePoints > 0
+      ? Math.round((gameState.totalPoints / gameState.maxPossiblePoints) * 100)
+      : 0;
   const optimalCount = getOptimalDecisionsCount();
   const totalDecisions = gameState.decisions.length;
 
@@ -36,8 +48,15 @@ export default function ResultsPage() {
 
   const handleReplay = () => {
     resetSimulation();
-    navigate('/story');
+    navigate(`/story/${scenario.id}?mode=${mode}`);
   };
+
+  /** Decision rows: in learning mode each shows choice + what happened because of it. */
+  const decisionRows = gameState.decisions.map((decision, index) => {
+    const scene = scenario.scenes.find((s) => s.id === decision.sceneId);
+    const choiceData = scene?.choices?.find((c) => c.id === decision.choiceId);
+    return { decision, scene, choiceData, index };
+  });
 
   return (
     <div className="min-h-screen hero-gradient relative py-12">
@@ -55,102 +74,114 @@ export default function ResultsPage() {
               transition={{ type: 'spring', delay: 0.2, stiffness: 100 }}
               className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-primary/10 mb-6 shadow-lg shadow-primary/10"
             >
-              <Trophy className="w-12 h-12 text-primary" />
+              {mode === 'training' ? (
+                <Trophy className="w-12 h-12 text-primary" />
+              ) : (
+                <BookOpen className="w-12 h-12 text-primary" />
+              )}
             </motion.div>
-            
+
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Simulation Complete
+              {mode === 'training' ? 'Simulation Complete' : 'The End of the Story'}
             </h1>
             <p className="text-muted-foreground">
               {scenario.title} — {scenario.role}
             </p>
-            
-            {/* Stars */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex items-center justify-center gap-1 mt-4"
-            >
-              {[1, 2, 3, 4, 5].map(i => (
-                <motion.div
-                  key={i}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
-                >
-                  <Star className={cn(
-                    "w-6 h-6",
-                    i <= stars ? "text-decision-highlight fill-decision-highlight" : "text-border"
-                  )} />
-                </motion.div>
-              ))}
-            </motion.div>
+
+            {/* Stars - training only */}
+            {mode === 'training' && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="flex items-center justify-center gap-1 mt-4"
+              >
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
+                  >
+                    <Star
+                      className={cn(
+                        'w-6 h-6',
+                        i <= stars
+                          ? 'text-decision-highlight fill-decision-highlight'
+                          : 'text-border'
+                      )}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
           </div>
-          
-          {/* Score Card */}
-          <Card className="mb-8 border-2 overflow-hidden">
-            <CardHeader className="text-center pb-2 bg-muted/30">
-              <CardTitle className="flex items-center justify-center gap-2">
-                <Award className="w-5 h-5 text-primary" />
-                Your Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="text-center mb-6">
-                <motion.span 
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, type: 'spring' }}
-                  className={cn("text-7xl font-bold", color)}
-                >
-                  {scorePercentage}%
-                </motion.span>
-                <p className={cn("text-xl font-semibold mt-2", color)}>{grade}</p>
-              </div>
-              
-              <Progress value={scorePercentage} className="h-3 mb-4" />
-              
-              <div className="grid grid-cols-2 gap-4 mt-6">
-                <div className="text-center p-5 rounded-xl bg-muted border border-border">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Target className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-muted-foreground">Points Earned</span>
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {gameState.totalPoints} / {gameState.maxPossiblePoints}
-                  </p>
+
+          {/* Score Card - training only */}
+          {mode === 'training' && (
+            <Card className="mb-8 border-2 overflow-hidden">
+              <CardHeader className="text-center pb-2 bg-muted/30">
+                <CardTitle className="flex items-center justify-center gap-2">
+                  <Award className="w-5 h-5 text-primary" />
+                  Your Score
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="text-center mb-6">
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3, type: 'spring' }}
+                    className={cn('text-7xl font-bold', color)}
+                  >
+                    {scorePercentage}%
+                  </motion.span>
+                  <p className={cn('text-xl font-semibold mt-2', color)}>{grade}</p>
                 </div>
-                
-                <div className="text-center p-5 rounded-xl bg-muted border border-border">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <CheckCircle className="w-4 h-4 text-feedback-positive" />
-                    <span className="text-sm font-medium text-muted-foreground">Optimal Decisions</span>
+
+                <Progress value={scorePercentage} className="h-3 mb-4" />
+
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                  <div className="text-center p-5 rounded-xl bg-muted border border-border">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Target className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium text-muted-foreground">Points Earned</span>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">
+                      {gameState.totalPoints} / {gameState.maxPossiblePoints}
+                    </p>
                   </div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {optimalCount} / {totalDecisions}
-                  </p>
+
+                  <div className="text-center p-5 rounded-xl bg-muted border border-border">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <CheckCircle className="w-4 h-4 text-feedback-positive" />
+                      <span className="text-sm font-medium text-muted-foreground">Optimal Decisions</span>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">
+                      {optimalCount} / {totalDecisions}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Decision Summary */}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Decision recap. Learning mode: cause and effect, no judgement. */}
           <Card className="mb-8 border-2">
             <CardHeader>
-              <CardTitle className="text-lg">Decision Summary</CardTitle>
+              <CardTitle className="text-lg">
+                {mode === 'training' ? 'Decision Summary' : 'What you did - and what happened'}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {gameState.decisions.map((decision, index) => {
-                  const scene = scenario.scenes.find(s => s.id === decision.sceneId);
-                  const choiceData = scene?.choices?.find(c => c.id === decision.choiceId);
+                {decisionRows.map(({ decision, scene, choiceData, index }) => {
                   const citedIds = decision.supportingEvidenceIds ?? [];
                   const citedEvidence = citedIds
-                    .map(id => gameState.collectedEvidence.find(e => e.id === id))
+                    .map((id) => gameState.collectedEvidence.find((e) => e.id === id))
                     .filter((e): e is NonNullable<typeof e> => Boolean(e));
                   return (
-                    <motion.div 
+                    <motion.div
                       key={index}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -163,16 +194,21 @@ export default function ResultsPage() {
                         </span>
                         {choiceData && (
                           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                            {choiceData.text}
+                            You chose: {choiceData.text}
+                          </p>
+                        )}
+                        {mode === 'learning' && choiceData && (
+                          <p className="text-xs text-foreground/80 mt-2 leading-relaxed border-l-2 border-primary/30 pl-3 italic">
+                            Because of this: {choiceData.consequence}
                           </p>
                         )}
                         {citedEvidence.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-border/60">
                             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/80 font-semibold mb-1.5">
-                              Evidence you cited
+                              {mode === 'training' ? 'Evidence you cited' : 'Clues you used'}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
-                              {citedEvidence.map(ev => (
+                              {citedEvidence.map((ev) => (
                                 <span
                                   key={ev.id}
                                   className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-evidence-bg border border-evidence-border text-[11px] text-foreground"
@@ -190,23 +226,27 @@ export default function ResultsPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           {/* Evidence Collected */}
           <Card className="mb-8 border-2">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Briefcase className="w-5 h-5" />
-                Evidence Collected
+                {mode === 'training' ? 'Evidence Collected' : 'Clues you found'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                You collected {gameState.collectedEvidence.length} piece{gameState.collectedEvidence.length !== 1 ? 's' : ''} of evidence during the scenario.
+                You {mode === 'training' ? 'collected' : 'found'} {gameState.collectedEvidence.length}{' '}
+                {mode === 'training'
+                  ? `piece${gameState.collectedEvidence.length !== 1 ? 's' : ''} of evidence`
+                  : `clue${gameState.collectedEvidence.length !== 1 ? 's' : ''}`}{' '}
+                during the {mode === 'training' ? 'scenario' : 'story'}.
               </p>
               {gameState.collectedEvidence.length > 0 && (
                 <div className="space-y-2">
-                  {gameState.collectedEvidence.map(evidence => (
-                    <div 
+                  {gameState.collectedEvidence.map((evidence) => (
+                    <div
                       key={evidence.id}
                       className="p-4 rounded-xl bg-evidence-bg border border-evidence-border"
                     >
@@ -218,30 +258,76 @@ export default function ResultsPage() {
               )}
             </CardContent>
           </Card>
-          
+
+          {/* Key takeaway - learning mode */}
+          {mode === 'learning' && scenario.keyTakeaway && (
+            <Card className="mb-8 border-2 border-primary/30 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-primary" />
+                  Remember this
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-foreground leading-relaxed">{scenario.keyTakeaway}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Resources */}
+          {scenario.resources && scenario.resources.length > 0 && (
+            <Card className="mb-8 border-2">
+              <CardHeader>
+                <CardTitle className="text-lg">Find out more / get help</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {scenario.resources.map((resource) => (
+                    <li key={resource.url}>
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        {resource.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button onClick={handleReplay} className="gap-2 rounded-xl h-12 px-8">
               <RotateCcw className="w-4 h-4" />
-              Try Again
+              {mode === 'training' ? 'Try Again' : 'Play Again'}
             </Button>
-            <Button onClick={() => window.print()} variant="outline" className="gap-2 rounded-xl h-12">
-              <Printer className="w-4 h-4" />
-              Print Certificate
-            </Button>
+            {mode === 'training' && (
+              <Button onClick={() => window.print()} variant="outline" className="gap-2 rounded-xl h-12">
+                <Printer className="w-4 h-4" />
+                Print Certificate
+              </Button>
+            )}
             <Button onClick={() => navigate('/')} variant="ghost" className="rounded-xl h-12">
               Return Home
             </Button>
           </div>
-          
+
           <p className="text-center text-sm text-muted-foreground mt-10">
-            Completed on {gameState.completedAt ? new Date(gameState.completedAt).toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            }) : 'N/A'}
+            Completed on{' '}
+            {gameState.completedAt
+              ? new Date(gameState.completedAt).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : 'N/A'}
           </p>
         </motion.div>
       </div>

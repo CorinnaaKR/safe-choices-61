@@ -1,198 +1,279 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
-import { safeguardingScenario } from '@/data/scenario';
-import { useSimulation } from '@/hooks/useSimulation';
-import { BookOpen, Target, Play, RotateCcw, Shield, Eye, GitBranch, MessageCircle } from 'lucide-react';
+import { listScenarios } from '@/data/scenarios';
+import { Mode, Scenario } from '@/types/simulation';
+import {
+  Play,
+  Shield,
+  Gamepad2,
+  GraduationCap,
+  Lock,
+  Clock,
+  RotateCcw,
+  AlertTriangle,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
+
+const MODE_STORAGE_KEY = 'heli-mode';
+
+const modeOptions: {
+  id: Mode;
+  icon: typeof Gamepad2;
+  title: string;
+  description: string;
+}[] = [
+  {
+    id: 'learning',
+    icon: Gamepad2,
+    title: 'Story Mode',
+    description:
+      'Play through the story. Find clues, make choices, and see what happens because of them.',
+  },
+  {
+    id: 'training',
+    icon: GraduationCap,
+    title: 'Training Mode',
+    description:
+      'For people training in safeguarding. Includes scores, areas to improve, and a certificate.',
+  },
+];
+
+function savedStateKey(scenarioId: string, mode: Mode) {
+  return `heli-state:${scenarioId}:${mode}`;
+}
+
+function hasProgress(scenarioId: string, mode: Mode): boolean {
+  try {
+    const saved = localStorage.getItem(savedStateKey(scenarioId, mode));
+    if (!saved) return false;
+    const state = JSON.parse(saved);
+    return state.decisions?.length > 0 && !state.isComplete;
+  } catch {
+    return false;
+  }
+}
 
 export default function WelcomePage() {
   const navigate = useNavigate();
-  const { hasSavedProgress, resetSimulation } = useSimulation();
-  const hasProgress = hasSavedProgress();
+  const scenarios = listScenarios();
 
-  const handleStart = () => navigate('/story');
-  const handleContinue = () => navigate('/story');
-  const handleRestart = () => {
-    resetSimulation();
-    navigate('/story');
+  const [mode, setMode] = useState<Mode>(() => {
+    const saved = localStorage.getItem(MODE_STORAGE_KEY);
+    return saved === 'learning' || saved === 'training' ? saved : 'learning';
+  });
+  const [pendingScenario, setPendingScenario] = useState<Scenario | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem(MODE_STORAGE_KEY, mode);
+  }, [mode]);
+
+  const startScenario = (scenario: Scenario, fresh = false) => {
+    if (fresh) localStorage.removeItem(savedStateKey(scenario.id, mode));
+    navigate(`/story/${scenario.id}?mode=${mode}`);
   };
-
-  const features = [
-    {
-      icon: Eye,
-      title: 'Evidence Collection',
-      description: 'Gather and analyze messages, observations, and visual evidence as the story unfolds',
-    },
-    {
-      icon: GitBranch,
-      title: 'Branching Decisions',
-      description: 'Your choices shape the narrative and determine the outcome for the child',
-    },
-    {
-      icon: MessageCircle,
-      title: 'Immediate Feedback',
-      description: 'Learn best practices with expert guidance after each decision point',
-    },
-  ];
 
   return (
     <div className="min-h-screen relative">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-32 hero-gradient overflow-hidden">
+      {/* Hero */}
+      <section className="relative py-16 md:py-24 hero-gradient overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             className="max-w-3xl mx-auto text-center"
           >
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-primary/10 text-primary border border-primary/20"
-            >
+            <div className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-primary/10 text-primary border border-primary/20">
               <Shield className="w-4 h-4" />
-              <span className="text-sm font-semibold tracking-wide">Professional Training Simulation</span>
-            </motion.div>
-            
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.15]">
-              Child Protection<br />
-              <span className="text-primary">Safeguarding Simulation</span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
-              An immersive, story-driven training experience where your decisions 
-              shape the outcome. Practice recognizing signs, gathering evidence, 
-              and making critical safeguarding decisions.
-            </p>
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              {hasProgress ? (
-                <>
-                  <Button size="lg" onClick={handleContinue} className="gap-2 text-lg px-10 h-14 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow">
-                    <Play className="w-5 h-5" />
-                    Continue
-                  </Button>
-                  <Button size="lg" variant="outline" onClick={handleRestart} className="gap-2 rounded-xl h-14">
-                    <RotateCcw className="w-5 h-5" />
-                    Start Over
-                  </Button>
-                </>
-              ) : (
-                <Button size="lg" onClick={handleStart} className="gap-2 text-lg px-10 h-14 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow">
-                  <Play className="w-5 h-5" />
-                  Begin Simulation
-                </Button>
-              )}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-      
-      {/* Scenario Overview */}
-      <section className="py-14 bg-muted/30 border-y border-border">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="max-w-3xl mx-auto overflow-hidden border-2">
-              <CardContent className="p-0">
-                <div className="p-8">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="p-3 rounded-xl bg-primary/10">
-                      <BookOpen className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
-                        {safeguardingScenario.title}
-                      </h2>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {safeguardingScenario.description}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 rounded-xl bg-story-bg border border-border mb-6">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Your Role</p>
-                    <p className="font-semibold text-foreground text-lg">{safeguardingScenario.role}</p>
-                  </div>
-                </div>
-                
-                <div className="bg-muted/40 px-8 py-6 border-t border-border">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Target className="w-5 h-5 text-primary" />
-                    <h3 className="font-semibold text-foreground">Learning Objectives</h3>
-                  </div>
-                  <ul className="space-y-3">
-                    {safeguardingScenario.learningObjectives.map((objective, index) => (
-                      <motion.li 
-                        key={index}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 + index * 0.08 }}
-                        className="flex items-start gap-3"
-                      >
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
-                          {index + 1}
-                        </span>
-                        <span className="text-foreground">{objective}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-      
-      {/* Features */}
-      <section className="py-14">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                >
-                  <Card className="h-full border-2 hover:border-primary/30 transition-colors duration-300 group">
-                    <CardContent className="p-6 text-center">
-                      <div className="inline-flex p-3 rounded-xl bg-primary/10 mb-4 group-hover:bg-primary/15 transition-colors">
-                        <feature.icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+              <span className="text-sm font-semibold tracking-wide">
+                Helping Everyone Learn Interactively
+              </span>
             </div>
+
+            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-[1.1]">
+              Heli
+            </h1>
+
+            <p className="text-lg md:text-xl text-muted-foreground mb-4 leading-relaxed max-w-2xl mx-auto">
+              Step into a story. Notice the signs. Help someone.
+            </p>
+            <p className="text-base text-muted-foreground mb-2 max-w-2xl mx-auto">
+              Heli teaches you to recognise when someone is at risk - and what
+              to do about it - through stories you play, not slides you read.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Mode selection */}
+      <section className="py-10 bg-muted/30 border-y border-border">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <h2 className="font-serif text-xl font-bold text-foreground mb-4 text-center">
+            How do you want to play?
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-4" role="radiogroup" aria-label="Choose a mode">
+            {modeOptions.map((option) => (
+              <button
+                key={option.id}
+                role="radio"
+                aria-checked={mode === option.id}
+                onClick={() => setMode(option.id)}
+                className={`text-left rounded-xl border-2 p-5 transition-colors ${
+                  mode === option.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border bg-card hover:border-primary/40'
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`p-2 rounded-lg ${mode === option.id ? 'bg-primary/15' : 'bg-muted'}`}>
+                    <option.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-semibold text-foreground">{option.title}</span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {option.description}
+                </p>
+              </button>
+            ))}
           </div>
         </div>
       </section>
-      
-      {/* Footer Note */}
+
+      {/* Scenario cards */}
+      <section className="py-12">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h2 className="font-serif text-xl font-bold text-foreground mb-6 text-center">
+            Choose a story
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {scenarios.map((scenario, index) => {
+              const locked = scenario.status === 'in-development';
+              const inProgress = !locked && hasProgress(scenario.id, mode);
+              return (
+                <motion.div
+                  key={scenario.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 + index * 0.1 }}
+                >
+                  <Card
+                    className={`h-full border-2 transition-colors ${
+                      locked ? 'opacity-60' : 'hover:border-primary/40'
+                    }`}
+                  >
+                    <CardContent className="p-6 flex flex-col h-full">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                          {scenario.domain?.replace(/-/g, ' ')}
+                        </span>
+                        {locked ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                            <Lock className="w-3.5 h-3.5" /> In development
+                          </span>
+                        ) : (
+                          scenario.durationMinutes && (
+                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="w-3.5 h-3.5" /> ~{scenario.durationMinutes} min
+                            </span>
+                          )
+                        )}
+                      </div>
+                      <h3 className="font-serif text-2xl font-bold text-foreground mb-1">
+                        {scenario.title}
+                      </h3>
+                      <p className="text-sm font-medium text-primary mb-3">
+                        You play: {scenario.role}
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-grow">
+                        {scenario.description}
+                      </p>
+                      {!locked && (
+                        <div className="flex items-center gap-3">
+                          <Button
+                            onClick={() => setPendingScenario(scenario)}
+                            className="gap-2"
+                          >
+                            <Play className="w-4 h-4" />
+                            {inProgress ? 'Continue' : 'Begin Simulation'}
+                          </Button>
+                          {inProgress && (
+                            <Button
+                              variant="outline"
+                              onClick={() => startScenario(scenario, true)}
+                              className="gap-2"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                              Start Over
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer note */}
       <section className="py-8 border-t border-border">
         <div className="container mx-auto px-4">
           <p className="text-center text-sm text-muted-foreground max-w-2xl mx-auto">
-            This simulation contains fictional scenarios designed for training purposes. 
-            All characters and situations are illustrative. If you have real safeguarding concerns, 
-            please follow your organization's procedures.
+            The people in these stories are not real. They are here to help you
+            learn. If you are worried about a real person, tell someone you
+            trust, or contact the NSPCC on 0808 800 5000. If someone is in
+            danger right now, call 999.
           </p>
         </div>
       </section>
+
+      {/* Content warning dialog */}
+      <Dialog
+        open={pendingScenario !== null}
+        onOpenChange={(open) => !open && setPendingScenario(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-primary" />
+              Before you start
+            </DialogTitle>
+            <DialogDescription asChild>
+              <div className="pt-2 space-y-2 text-left">
+                {pendingScenario?.contentWarnings?.map((warning, i) => (
+                  <p key={i} className="text-sm leading-relaxed">
+                    {warning}
+                  </p>
+                ))}
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setPendingScenario(null)}>
+              Go back
+            </Button>
+            <Button
+              onClick={() => pendingScenario && startScenario(pendingScenario)}
+              className="gap-2"
+            >
+              <Play className="w-4 h-4" />
+              I understand - start
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
