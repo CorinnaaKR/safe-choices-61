@@ -3,10 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Evidence, Scene, Choice, GameState, Mode } from '@/types/simulation';
 import { FeedbackPanel } from './FeedbackPanel';
 import { ChoiceConfirmModal } from './ChoiceConfirmModal';
-import {
-  Eye, X, Hand,
-  Briefcase, Search, RotateCcw, ChevronRight
-} from 'lucide-react';
+import { useTypewriter } from '@/hooks/useTypewriter';
+import { playUiTick } from '@/lib/sfx';
 
 interface SceneHUDProps {
   scenarioTitle: string;
@@ -20,9 +18,74 @@ interface SceneHUDProps {
   progress: number;
   onMakeChoice: (choice: Choice, supportingEvidenceIds?: string[]) => void;
   onProceed: () => void;
-  onReset: () => void;
+  onExit: () => void;
   onDismissEvidence: () => void;
-  onCollectEvidence: (evidence: Evidence) => void;
+}
+
+/** Case-file inspect panel: mono type, typewriter reveal, category stamps. */
+function CaseFilePanel({
+  evidence,
+  evidenceNumber,
+  onDismiss,
+}: {
+  evidence: Evidence;
+  evidenceNumber: number;
+  onDismiss: () => void;
+}) {
+  const { text, done } = useTypewriter(evidence.content);
+
+  return (
+    <div className="case-panel">
+      {/* Stamp header */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+        <span className="hud-label text-primary">
+          Case file — Evidence {String(evidenceNumber).padStart(2, '0')}
+        </span>
+        <button
+          onClick={onDismiss}
+          className="key-hint hover:text-foreground transition-colors"
+          aria-label="Close evidence panel"
+        >
+          <b>[ESC]</b> Close
+        </button>
+      </div>
+
+      <div className="px-5 py-4">
+        <h4 className="font-mono text-sm uppercase tracking-[0.15em] text-foreground mb-1">
+          {evidence.title}
+        </h4>
+        <p className="hud-label mb-4">{evidence.timestamp}</p>
+
+        <p
+          className={`text-sm text-foreground/85 leading-relaxed min-h-[3.5rem] ${done ? '' : 'type-caret'}`}
+          aria-label={evidence.content}
+        >
+          {text}
+        </p>
+
+        {/* Category / importance stamps */}
+        <div className="flex flex-wrap items-center gap-2 mt-5">
+          {evidence.category && (
+            <span className="hud-label border border-border px-2 py-1">
+              {evidence.category}
+            </span>
+          )}
+          {evidence.importance && (
+            <span
+              className={`hud-label border px-2 py-1 ${
+                evidence.importance === 'critical'
+                  ? 'border-primary text-primary'
+                  : 'border-border'
+              }`}
+            >
+              {evidence.importance}
+            </span>
+          )}
+          <span className="hud-label text-primary ml-auto">Logged ✓</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function SceneHUD({
@@ -37,13 +100,13 @@ export function SceneHUD({
   progress,
   onMakeChoice,
   onProceed,
-  onReset,
+  onExit,
   onDismissEvidence,
-  onCollectEvidence,
 }: SceneHUDProps) {
   const [journalOpen, setJournalOpen] = useState(false);
-  const [visibleParagraph, setVisibleParagraph] = useState(0);
-  const [narrativeComplete, setNarrativeComplete] = useState(false);
+  const [visibleParagraph, setVisibleParagraph] = useState(() =>
+    currentScene.narrative.length > 0 ? 1 : 0
+  );
   const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
   const prevSceneId = useRef(currentScene.id);
 
@@ -52,147 +115,163 @@ export function SceneHUD({
     e => !gameState.collectedEvidence.some(c => c.id === e.id)
   );
 
-  // Reset paragraph progression on scene change
+  // Restart paragraph progression on scene change (first paragraph shows immediately)
   useEffect(() => {
     if (prevSceneId.current !== currentScene.id) {
-      setVisibleParagraph(0);
-      setNarrativeComplete(false);
-      setPendingChoice(null);
       prevSceneId.current = currentScene.id;
+      setPendingChoice(null);
+      setVisibleParagraph(currentScene.narrative.length > 0 ? 1 : 0);
     }
-  }, [currentScene.id]);
-
-  // Auto-advance first paragraph immediately
-  useEffect(() => {
-    if (visibleParagraph === 0 && currentScene.narrative.length > 0) {
-      setVisibleParagraph(1);
-    }
-  }, [currentScene.id]);
+  }, [currentScene.id, currentScene.narrative.length]);
 
   const advanceNarrative = () => {
     const next = visibleParagraph + 1;
     if (next <= currentScene.narrative.length) {
       setVisibleParagraph(next);
     }
-    if (next >= currentScene.narrative.length) {
-      setNarrativeComplete(true);
-    }
   };
 
   const allRevealed = visibleParagraph >= currentScene.narrative.length;
 
+  // [TAB] EVIDENCE / [ESC] close-or-menu
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (showFeedback) return;
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        setJournalOpen(open => !open);
+      } else if (e.key === 'Escape') {
+        if (pendingChoice) setPendingChoice(null);
+        else if (journalOpen) setJournalOpen(false);
+        else if (focusedEvidenceId) onDismissEvidence();
+        else onExit();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showFeedback, pendingChoice, journalOpen, focusedEvidenceId, onDismissEvidence, onExit]);
+
+  const evidenceNumber = inspectedEvidence
+    ? Math.max(
+        1,
+        gameState.collectedEvidence.findIndex(e => e.id === inspectedEvidence.id) + 1
+      )
+    : 1;
+
   return (
     <div className="absolute inset-0 pointer-events-none z-10">
-      {/* Top bar */}
-      <div className="pointer-events-auto">
-        <div className="flex items-center justify-between px-4 py-3 bg-black/60 backdrop-blur-md border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onReset}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-            >
-              <RotateCcw className="w-4 h-4 text-white/70" />
-            </button>
-            <div>
-              <h1 className="text-sm font-semibold text-white">{scenarioTitle}</h1>
-              <p className="text-xs text-white/50">{currentScene.title}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Progress - training mode only (learning mode shows no metrics) */}
-            {mode === 'training' && (
-              <div className="flex items-center gap-2">
-                <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-decision-highlight rounded-full transition-all duration-500"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <span className="text-xs text-white/50">{progress}%</span>
-              </div>
-            )}
-
-            {/* Evidence journal */}
-            <button
-              onClick={() => setJournalOpen(!journalOpen)}
-              className="relative p-2 rounded-lg hover:bg-white/10 transition-colors"
-            >
-              <Briefcase className="w-4 h-4 text-white/70" />
-              {gameState.collectedEvidence.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-decision-highlight rounded-full text-[9px] font-bold text-white flex items-center justify-center">
-                  {gameState.collectedEvidence.length}
-                </span>
-              )}
-            </button>
-          </div>
+      {/* ---- Corner HUD: top-left — exit + identity ---- */}
+      <div className="absolute top-0 left-0 p-4 pointer-events-auto">
+        <div className="case-panel px-4 py-3">
+          <button
+            onClick={onExit}
+            className="key-hint hover:text-foreground transition-colors block mb-2"
+          >
+            <b>[ESC]</b> Menu
+          </button>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-foreground">
+            {scenarioTitle}
+          </p>
+          <p className="hud-label mt-0.5">{currentScene.title}</p>
         </div>
       </div>
 
-      {/* Scene hints */}
-      {!showFeedback && uncollected.length > 0 && !focusedEvidenceId && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 pointer-events-none">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"
+      {/* ---- Corner HUD: top-right — progress + evidence ---- */}
+      <div className="absolute top-0 right-0 p-4 pointer-events-auto">
+        <div className="case-panel px-4 py-3 text-right">
+          {/* Progress: training mode only (learning shows no metrics) */}
+          {mode === 'training' && (
+            <div className="mb-2">
+              <span className="hud-label">
+                Progress {String(progress).padStart(3, '0')}%
+              </span>
+              <div className="w-28 h-px bg-border mt-1.5 ml-auto relative">
+                <div
+                  className="absolute inset-y-0 left-0 bg-primary transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          )}
+          <button
+            onClick={() => setJournalOpen(!journalOpen)}
+            className="key-hint hover:text-foreground transition-colors"
           >
-            <Search className="w-3.5 h-3.5 text-decision-highlight" />
-            <span className="text-xs text-white/80">
-              {uncollected.length} clue{uncollected.length !== 1 ? 's' : ''} to find — observe characters &amp; objects
+            <b>[TAB]</b> Evidence —{' '}
+            <span className="text-primary">
+              {String(gameState.collectedEvidence.length).padStart(2, '0')}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* ---- Clues-remaining hint, top centre ---- */}
+      {!showFeedback && uncollected.length > 0 && !focusedEvidenceId && (
+        <div className="absolute top-4 inset-x-0 flex justify-center pointer-events-none hidden md:flex">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="case-panel px-4 py-2"
+          >
+            <span className="hud-label">
+              {String(uncollected.length).padStart(2, '0')} clue
+              {uncollected.length !== 1 ? 's' : ''} in this scene — look at people and objects
             </span>
           </motion.div>
         </div>
       )}
 
-      {/* Controls hint */}
-      {!showFeedback && allRevealed && (
-        <div className="absolute bottom-4 left-4 pointer-events-none">
-          <div className="bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/5">
-            <p className="text-[10px] text-white/40">
-              WASD / Arrow keys to move · Click objects to investigate
-            </p>
-          </div>
+      {/* ---- Key hints, bottom-left corner ---- */}
+      {!showFeedback && (
+        <div className="absolute bottom-4 left-4 pointer-events-none hidden sm:block">
+          <p className="key-hint space-x-3">
+            <span><b>[WASD]</b> Move</span>
+            <span><b>[CLICK]</b> Examine</span>
+            <span><b>[TAB]</b> Evidence</span>
+          </p>
         </div>
       )}
 
-      {/* Narrative — progressive reveal, bottom center */}
+      {/* ---- Narrative: progressive reveal, bottom centre ---- */}
       {!showFeedback && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl pointer-events-auto">
           <AnimatePresence mode="wait">
             {!allRevealed && visibleParagraph > 0 && (
               <motion.div
                 key={`p-${visibleParagraph - 1}`}
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
                 onClick={advanceNarrative}
                 className="cursor-pointer"
               >
-                <div className="bg-black/75 backdrop-blur-md border border-white/10 rounded-xl px-6 py-4 shadow-2xl">
-                  <p className="text-sm md:text-base leading-relaxed text-white/85 font-serif">
+                <div className="case-panel px-6 py-4">
+                  <p className="text-sm md:text-base leading-relaxed text-foreground/90">
                     {currentScene.narrative[visibleParagraph - 1]}
                   </p>
-                  <div className="flex items-center justify-end gap-1.5 mt-3">
-                    <span className="text-[10px] text-white/40 uppercase tracking-widest">
-                      {visibleParagraph} / {currentScene.narrative.length}
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                    <span className="hud-label">
+                      {String(visibleParagraph).padStart(2, '0')} /{' '}
+                      {String(currentScene.narrative.length).padStart(2, '0')}
                     </span>
-                    <ChevronRight className="w-3 h-3 text-white/30 animate-pulse" />
+                    <span className="key-hint">
+                      <b>[CLICK]</b> Continue
+                    </span>
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* After all paragraphs revealed, show a subtle collapsed summary */}
+          {/* Collapsed reminder of the last line once fully revealed */}
           {allRevealed && !currentScene.isDecisionPoint && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-black/50 backdrop-blur-sm border border-white/5 rounded-lg px-4 py-2 text-center"
+              className="case-panel px-4 py-2 text-center"
             >
-              <p className="text-xs text-white/40 font-serif italic">
+              <p className="hud-label normal-case tracking-normal text-foreground/50">
                 {currentScene.narrative[currentScene.narrative.length - 1]?.slice(0, 80)}…
               </p>
             </motion.div>
@@ -200,31 +279,33 @@ export function SceneHUD({
         </div>
       )}
 
-      {/* Choices panel — bottom right */}
+      {/* ---- Decision panel, bottom right ---- */}
       {!showFeedback && allRevealed && currentScene.isDecisionPoint && currentScene.choices && (
-        <div className="absolute bottom-4 right-4 md:w-[380px] pointer-events-auto">
+        <div className="absolute bottom-4 right-4 md:w-[400px] pointer-events-auto">
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-black/70 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden shadow-2xl"
+            transition={{ delay: 0.4 }}
+            className="case-panel"
           >
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-              <Hand className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-white">What do you do?</span>
+            <div className="px-5 py-3 border-b border-border">
+              <span className="hud-label text-primary">Decision — What do you do?</span>
             </div>
-            <div className="p-3 space-y-2 max-h-[40vh] overflow-y-auto">
+            <div className="p-3 space-y-px max-h-[40vh] overflow-y-auto">
               {currentScene.choices.map((choice, i) => (
                 <button
                   key={choice.id}
-                  onClick={() => setPendingChoice(choice)}
-                  className="w-full text-left px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-decision-highlight/30 transition-all group"
+                  onClick={() => {
+                    playUiTick();
+                    setPendingChoice(choice);
+                  }}
+                  className="w-full text-left px-4 py-3 bg-secondary/40 hover:bg-secondary border border-transparent hover:border-primary/50 transition-colors group"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-xs font-bold text-decision-highlight/60 mt-0.5 group-hover:text-decision-highlight">
-                      {String.fromCharCode(65 + i)}
+                    <span className="font-mono text-xs text-muted-foreground group-hover:text-primary mt-0.5 transition-colors">
+                      [{String.fromCharCode(65 + i)}]
                     </span>
-                    <p className="text-sm text-white/80 group-hover:text-white leading-relaxed">
+                    <p className="text-sm text-foreground/85 group-hover:text-foreground leading-relaxed">
                       {choice.text}
                     </p>
                   </div>
@@ -235,46 +316,27 @@ export function SceneHUD({
         </div>
       )}
 
-      {/* Evidence inspection overlay */}
+      {/* ---- Evidence inspect: case-file panel ---- */}
       <AnimatePresence>
         {inspectedEvidence && focusedEvidenceId && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute top-20 left-1/2 -translate-x-1/2 w-[90vw] max-w-md pointer-events-auto"
-          >
-            <div className="bg-black/80 backdrop-blur-md border border-decision-highlight/30 rounded-xl p-5 shadow-2xl shadow-decision-highlight/10">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-decision-highlight/20">
-                  <Eye className="w-4 h-4 text-decision-highlight" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-white">{inspectedEvidence.title}</h4>
-                  <p className="text-xs text-white/50">{inspectedEvidence.timestamp}</p>
-                </div>
-                <button
-                  onClick={onDismissEvidence}
-                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-4 h-4 text-white/50" />
-                </button>
-              </div>
-              <p className="text-sm text-white/70 leading-relaxed border-l-2 border-decision-highlight/30 pl-3 italic">
-                {inspectedEvidence.content}
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <span className="text-[10px] uppercase tracking-widest text-decision-highlight/60 font-semibold">
-                  Evidence collected
-                </span>
-                <span className="text-decision-highlight">✓</span>
-              </div>
-            </div>
-          </motion.div>
+          <div className="absolute top-24 inset-x-0 flex justify-center pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              className="w-[90vw] max-w-md pointer-events-auto"
+            >
+              <CaseFilePanel
+                evidence={inspectedEvidence}
+                evidenceNumber={evidenceNumber}
+                onDismiss={onDismissEvidence}
+              />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
-      {/* Choice confirmation — evidence rationale */}
+      {/* ---- Choice confirmation: evidence rationale ---- */}
       {pendingChoice && !showFeedback && (
         <ChoiceConfirmModal
           choice={pendingChoice}
@@ -288,13 +350,13 @@ export function SceneHUD({
         />
       )}
 
-      {/* Feedback overlay */}
+      {/* ---- Feedback overlay ---- */}
       {showFeedback && lastChoice && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             className="relative z-10 w-[90vw] max-w-lg"
           >
             <FeedbackPanel choice={lastChoice} onContinue={onProceed} mode={mode} />
@@ -302,39 +364,42 @@ export function SceneHUD({
         </div>
       )}
 
-      {/* Evidence journal drawer */}
+      {/* ---- Evidence journal drawer ---- */}
       <AnimatePresence>
         {journalOpen && (
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25 }}
-            className="absolute top-0 right-0 bottom-0 w-80 bg-black/80 backdrop-blur-md border-l border-white/10 pointer-events-auto overflow-y-auto"
+            transition={{ type: 'tween', duration: 0.25 }}
+            className="absolute top-0 right-0 bottom-0 w-80 case-panel border-l border-border pointer-events-auto overflow-y-auto"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-decision-highlight" />
-                <span className="text-sm font-semibold text-white">Evidence Journal</span>
-              </div>
-              <button onClick={() => setJournalOpen(false)} className="p-1.5 rounded-lg hover:bg-white/10">
-                <X className="w-4 h-4 text-white/50" />
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 bg-background/90">
+              <span className="hud-label text-primary">
+                Evidence — {String(gameState.collectedEvidence.length).padStart(2, '0')} logged
+              </span>
+              <button
+                onClick={() => setJournalOpen(false)}
+                className="key-hint hover:text-foreground transition-colors"
+              >
+                <b>[TAB]</b> Close
               </button>
             </div>
-            <div className="p-4 space-y-3">
+            <div className="p-4 space-y-px">
               {gameState.collectedEvidence.length === 0 ? (
-                <p className="text-sm text-white/40 text-center py-8">
-                  No evidence collected yet. Explore the scene to find clues.
+                <p className="text-sm text-muted-foreground text-center py-8 leading-relaxed">
+                  No evidence yet. Look closely at people and objects in the scene.
                 </p>
               ) : (
-                gameState.collectedEvidence.map(ev => (
-                  <div key={ev.id} className="bg-white/5 border border-white/10 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Eye className="w-3 h-3 text-decision-highlight" />
-                      <h5 className="text-xs font-semibold text-white">{ev.title}</h5>
-                    </div>
-                    <p className="text-xs text-white/50 mb-1">{ev.timestamp}</p>
-                    <p className="text-xs text-white/60 leading-relaxed">{ev.content}</p>
+                gameState.collectedEvidence.map((ev, i) => (
+                  <div key={ev.id} className="bg-secondary/40 border border-border p-3">
+                    <p className="hud-label text-primary mb-1.5">
+                      Nº {String(i + 1).padStart(2, '0')} — {ev.timestamp}
+                    </p>
+                    <h5 className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-1.5">
+                      {ev.title}
+                    </h5>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{ev.content}</p>
                   </div>
                 ))
               )}

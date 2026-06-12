@@ -14,8 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        serif: ['Lora', 'Georgia', 'serif'],
-        sans: ['Source Sans 3', 'system-ui', 'sans-serif'],
+        // Editorial grotesque for narrative/body; legacy `font-serif` maps here too
+        serif: ['Archivo', 'system-ui', 'sans-serif'],
+        sans: ['Archivo', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

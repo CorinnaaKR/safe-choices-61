@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -12,36 +11,27 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { listScenarios } from '@/data/scenarios';
 import { Mode, Scenario } from '@/types/simulation';
-import {
-  Play,
-  Shield,
-  Gamepad2,
-  GraduationCap,
-  Lock,
-  Clock,
-  RotateCcw,
-  AlertTriangle,
-} from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 const MODE_STORAGE_KEY = 'heli-mode';
 
 const modeOptions: {
   id: Mode;
-  icon: typeof Gamepad2;
+  code: string;
   title: string;
   description: string;
 }[] = [
   {
     id: 'learning',
-    icon: Gamepad2,
+    code: '01',
     title: 'Story Mode',
     description:
       'Play through the story. Find clues, make choices, and see what happens because of them.',
   },
   {
     id: 'training',
-    icon: GraduationCap,
+    code: '02',
     title: 'Training Mode',
     description:
       'For people training in safeguarding. Includes scores, areas to improve, and a certificate.',
@@ -83,63 +73,80 @@ export default function WelcomePage() {
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative flex flex-col">
+      {/* Top rule: corner-anchored HUD labels */}
+      <header className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border">
+        <span className="hud-label">Heli — Safeguarding Simulation</span>
+        <span className="hud-label hidden sm:block">Prototype / V0.1</span>
+      </header>
+
       {/* Hero */}
-      <section className="relative py-16 md:py-24 hero-gradient overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <div className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-              <Shield className="w-4 h-4" />
-              <span className="text-sm font-semibold tracking-wide">
-                Helping Everyone Learn Interactively
-              </span>
-            </div>
-
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-[1.1]">
-              Heli
-            </h1>
-
-            <p className="text-lg md:text-xl text-muted-foreground mb-4 leading-relaxed max-w-2xl mx-auto">
-              Step into a story. Notice the signs. Help someone.
-            </p>
-            <p className="text-base text-muted-foreground mb-2 max-w-2xl mx-auto">
-              Heli teaches you to recognise when someone is at risk - and what
-              to do about it - through stories you play, not slides you read.
-            </p>
-          </motion.div>
-        </div>
+      <section className="px-4 md:px-8 py-16 md:py-24 border-b border-border">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl mx-auto"
+        >
+          <p className="hud-label mb-6">Helping Everyone Learn Interactively</p>
+          <h1 className="font-sans text-6xl md:text-8xl font-bold uppercase tracking-tight text-foreground mb-8 leading-none">
+            Heli
+          </h1>
+          <div className="rule-h w-16 bg-primary mb-8" />
+          <p className="text-xl md:text-2xl text-foreground mb-4 max-w-2xl">
+            Step into a story. Notice the signs. Help someone.
+          </p>
+          <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">
+            Heli teaches you to recognise when someone is at risk - and what to
+            do about it - through stories you play, not slides you read.
+          </p>
+        </motion.div>
       </section>
 
       {/* Mode selection */}
-      <section className="py-10 bg-muted/30 border-y border-border">
-        <div className="container mx-auto px-4 max-w-3xl">
-          <h2 className="font-serif text-xl font-bold text-foreground mb-4 text-center">
-            How do you want to play?
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-4" role="radiogroup" aria-label="Choose a mode">
+      <section className="px-4 md:px-8 py-12 border-b border-border">
+        <div className="max-w-4xl mx-auto">
+          <p className="hud-label mb-6">Select mode — How do you want to play?</p>
+          <div
+            className="grid sm:grid-cols-2 gap-px bg-border border border-border"
+            role="radiogroup"
+            aria-label="Choose a mode"
+          >
             {modeOptions.map((option) => (
               <button
                 key={option.id}
                 role="radio"
                 aria-checked={mode === option.id}
                 onClick={() => setMode(option.id)}
-                className={`text-left rounded-xl border-2 p-5 transition-colors ${
+                className={cn(
+                  'text-left p-6 transition-colors relative',
                   mode === option.id
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border bg-card hover:border-primary/40'
-                }`}
+                    ? 'bg-secondary'
+                    : 'bg-background hover:bg-secondary/50'
+                )}
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`p-2 rounded-lg ${mode === option.id ? 'bg-primary/15' : 'bg-muted'}`}>
-                    <option.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <span className="font-semibold text-foreground">{option.title}</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span
+                    className={cn(
+                      'font-mono text-[10px] uppercase tracking-[0.25em]',
+                      mode === option.id ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  >
+                    Mode {option.code}
+                  </span>
+                  <span
+                    className={cn(
+                      'w-2.5 h-2.5 border',
+                      mode === option.id
+                        ? 'bg-primary border-primary'
+                        : 'border-muted-foreground'
+                    )}
+                    aria-hidden="true"
+                  />
                 </div>
+                <span className="block font-semibold text-lg text-foreground mb-2">
+                  {option.title}
+                </span>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {option.description}
                 </p>
@@ -149,127 +156,125 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* Scenario cards */}
-      <section className="py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="font-serif text-xl font-bold text-foreground mb-6 text-center">
-            Choose a story
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+      {/* Scenario dossiers */}
+      <section className="px-4 md:px-8 py-12 flex-grow">
+        <div className="max-w-4xl mx-auto">
+          <p className="hud-label mb-6">Case files — Choose a story</p>
+          <div className="grid md:grid-cols-2 gap-px bg-border border border-border">
             {scenarios.map((scenario, index) => {
               const locked = scenario.status === 'in-development';
               const inProgress = !locked && hasProgress(scenario.id, mode);
               return (
-                <motion.div
+                <motion.article
                   key={scenario.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + index * 0.1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1 + index * 0.08 }}
+                  className={cn(
+                    'p-6 flex flex-col bg-background',
+                    locked && 'opacity-60'
+                  )}
                 >
-                  <Card
-                    className={`h-full border-2 transition-colors ${
-                      locked ? 'opacity-60' : 'hover:border-primary/40'
-                    }`}
-                  >
-                    <CardContent className="p-6 flex flex-col h-full">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                          {scenario.domain?.replace(/-/g, ' ')}
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
+                      Case {String(index + 1).padStart(2, '0')} —{' '}
+                      {scenario.domain?.replace(/-/g, ' ')}
+                    </span>
+                    {locked ? (
+                      <span className="hud-label border border-border px-2 py-1">
+                        In development
+                      </span>
+                    ) : (
+                      scenario.durationMinutes && (
+                        <span className="hud-label">
+                          ~{scenario.durationMinutes} min
                         </span>
-                        {locked ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                            <Lock className="w-3.5 h-3.5" /> In development
-                          </span>
-                        ) : (
-                          scenario.durationMinutes && (
-                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                              <Clock className="w-3.5 h-3.5" /> ~{scenario.durationMinutes} min
-                            </span>
-                          )
-                        )}
-                      </div>
-                      <h3 className="font-serif text-2xl font-bold text-foreground mb-1">
-                        {scenario.title}
-                      </h3>
-                      <p className="text-sm font-medium text-primary mb-3">
-                        You play: {scenario.role}
-                      </p>
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-grow">
-                        {scenario.description}
-                      </p>
-                      {!locked && (
-                        <div className="flex items-center gap-3">
-                          <Button
-                            onClick={() => setPendingScenario(scenario)}
-                            className="gap-2"
-                          >
-                            <Play className="w-4 h-4" />
-                            {inProgress ? 'Continue' : 'Begin Simulation'}
-                          </Button>
-                          {inProgress && (
-                            <Button
-                              variant="outline"
-                              onClick={() => startScenario(scenario, true)}
-                              className="gap-2"
-                            >
-                              <RotateCcw className="w-4 h-4" />
-                              Start Over
-                            </Button>
-                          )}
-                        </div>
+                      )
+                    )}
+                  </div>
+                  <h3 className="font-sans text-3xl font-bold uppercase tracking-tight text-foreground mb-2">
+                    {scenario.title}
+                  </h3>
+                  <p className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground mb-4">
+                    You play: {scenario.role}
+                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-8 flex-grow">
+                    {scenario.description}
+                  </p>
+                  {!locked && (
+                    <div className="flex items-center gap-3">
+                      <Button
+                        onClick={() => setPendingScenario(scenario)}
+                        className="font-mono uppercase tracking-[0.15em] text-xs"
+                      >
+                        {inProgress ? '▸ Continue' : '▸ Begin Simulation'}
+                      </Button>
+                      {inProgress && (
+                        <Button
+                          variant="outline"
+                          onClick={() => startScenario(scenario, true)}
+                          className="font-mono uppercase tracking-[0.15em] text-xs"
+                        >
+                          Start Over
+                        </Button>
                       )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                    </div>
+                  )}
+                </motion.article>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Footer note */}
-      <section className="py-8 border-t border-border">
-        <div className="container mx-auto px-4">
-          <p className="text-center text-sm text-muted-foreground max-w-2xl mx-auto">
+      {/* Footer signposting — plain language, generous type (pillar 4) */}
+      <footer className="px-4 md:px-8 py-8 border-t border-border">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
             The people in these stories are not real. They are here to help you
             learn. If you are worried about a real person, tell someone you
-            trust, or contact the NSPCC on 0808 800 5000. If someone is in
-            danger right now, call 999.
+            trust, or contact the NSPCC on{' '}
+            <span className="text-foreground font-mono">0808 800 5000</span>.
+            If someone is in danger right now, call{' '}
+            <span className="text-foreground font-mono">999</span>.
           </p>
         </div>
-      </section>
+      </footer>
 
       {/* Content warning dialog */}
       <Dialog
         open={pendingScenario !== null}
         onOpenChange={(open) => !open && setPendingScenario(null)}
       >
-        <DialogContent>
+        <DialogContent className="border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-primary" />
+            <p className="hud-label text-primary mb-1">Content notice</p>
+            <DialogTitle className="font-sans text-xl uppercase tracking-tight">
               Before you start
             </DialogTitle>
             <DialogDescription asChild>
-              <div className="pt-2 space-y-2 text-left">
+              <div className="pt-3 space-y-2 text-left">
                 {pendingScenario?.contentWarnings?.map((warning, i) => (
-                  <p key={i} className="text-sm leading-relaxed">
+                  <p key={i} className="text-sm leading-relaxed text-muted-foreground">
                     {warning}
                   </p>
                 ))}
               </div>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setPendingScenario(null)}>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setPendingScenario(null)}
+              className="font-mono uppercase tracking-[0.15em] text-xs"
+            >
               Go back
             </Button>
             <Button
               onClick={() => pendingScenario && startScenario(pendingScenario)}
-              className="gap-2"
+              className="font-mono uppercase tracking-[0.15em] text-xs"
             >
-              <Play className="w-4 h-4" />
-              I understand - start
+              I understand — start
             </Button>
           </DialogFooter>
         </DialogContent>

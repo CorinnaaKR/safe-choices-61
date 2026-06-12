@@ -1,7 +1,17 @@
 import { useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { playHoverTick, playSelect } from '@/lib/sfx';
+
+/** Toggle the expanded crosshair cursor on the canvas wrapper. */
+function useCrosshair() {
+  const gl = useThree((s) => s.gl);
+  return (active: boolean) => {
+    const area = gl.domElement.closest('.crosshair-area');
+    if (area) area.classList.toggle('crosshair-active', active);
+  };
+}
 
 export interface NPCHotspot {
   id: string;
@@ -214,19 +224,19 @@ export function NPCCharacter({
       <mesh
         position={[0, bodyY, 0]}
         visible={false}
-        onPointerOver={(e) => { e.stopPropagation(); setNameVisible(true); document.body.style.cursor = 'pointer'; }}
-        onPointerOut={() => { setNameVisible(false); document.body.style.cursor = 'default'; }}
+        onPointerOver={(e) => { e.stopPropagation(); setNameVisible(true); }}
+        onPointerOut={() => { setNameVisible(false); }}
       >
         <sphereGeometry args={[0.35, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
       {nameVisible && (
-        <Html position={[0, headY + 0.25, 0]} center>
-          <div className="bg-black/80 backdrop-blur px-3 py-1 rounded-lg border border-white/20 whitespace-nowrap pointer-events-none">
-            <p className="text-xs font-semibold text-white">{name}</p>
+        <Html position={[0, headY + 0.25, 0]} center zIndexRange={[5, 0]}>
+          <div className="bg-background/90 border border-foreground/60 px-3 py-1.5 whitespace-nowrap pointer-events-none">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground">{name}</p>
             {behaviorHint && (
-              <p className="text-[10px] text-white/50 italic">{behaviorHint}</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mt-0.5">{behaviorHint}</p>
             )}
           </div>
         </Html>
@@ -266,12 +276,14 @@ function NPCHotspotMarker({
     }
   });
 
+  const setCrosshairActive = useCrosshair();
+
   if (hotspot.collected) {
     return (
       <group position={hotspot.offset}>
-        <Html center>
-          <div className="bg-feedback-positive/80 px-1.5 py-0.5 rounded-full pointer-events-none">
-            <p className="text-[8px] font-bold text-white">✓</p>
+        <Html center zIndexRange={[5, 0]}>
+          <div className="bg-background/80 border border-border px-1.5 py-0.5 pointer-events-none">
+            <p className="font-mono text-[8px] text-muted-foreground">✓</p>
           </div>
         </Html>
       </group>
@@ -280,38 +292,35 @@ function NPCHotspotMarker({
 
   return (
     <group position={hotspot.offset}>
-      {/* Pulsing glow */}
+      {/* Pulsing marker */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[0.08, 12, 12]} />
+        <sphereGeometry args={[0.05, 12, 12]} />
         <meshBasicMaterial
-          color="#f59e0b"
+          color="#e9e7e3"
           transparent
-          opacity={isHovered ? 0.5 : 0.2}
+          opacity={isHovered ? 0.9 : 0.45}
         />
       </mesh>
 
       {/* Clickable area */}
       <mesh
-        onClick={(e) => { e.stopPropagation(); onClick(); }}
-        onPointerOver={(e) => { e.stopPropagation(); onHover(true); document.body.style.cursor = 'pointer'; }}
-        onPointerOut={() => { onHover(false); document.body.style.cursor = 'default'; }}
+        onClick={(e) => { e.stopPropagation(); playSelect(); setCrosshairActive(false); onClick(); }}
+        onPointerOver={(e) => { e.stopPropagation(); onHover(true); playHoverTick(); setCrosshairActive(true); }}
+        onPointerOut={() => { onHover(false); setCrosshairActive(false); }}
       >
         <sphereGeometry args={[0.12, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
-      {/* Attention indicator - small diamond */}
-      <mesh rotation={[0, 0, Math.PI / 4]}>
-        <boxGeometry args={[0.04, 0.04, 0.04]} />
-        <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.8} />
-      </mesh>
-
-      {/* Hover tooltip */}
+      {/* Hover label with leader line */}
       {isHovered && (
-        <Html center position={[0, 0.2, 0]}>
-          <div className="bg-card/95 backdrop-blur border-2 border-decision-highlight px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap pointer-events-none">
-            <p className="text-xs font-semibold text-foreground">{hotspot.label}</p>
-            <p className="text-[10px] text-decision-highlight">{hotspot.hint}</p>
+        <Html center position={[0, 0.2, 0]} zIndexRange={[5, 0]}>
+          <div className="flex flex-col items-center pointer-events-none -translate-y-full">
+            <div className="bg-background/90 border border-foreground/60 px-3 py-1.5 whitespace-nowrap">
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground">{hotspot.label}</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary mt-0.5">{hotspot.hint}</p>
+            </div>
+            <div className="w-px h-5 bg-foreground/60" />
           </div>
         </Html>
       )}

@@ -1,7 +1,7 @@
 import { Suspense, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, ContactShadows, SoftShadows } from '@react-three/drei';
-import { EffectComposer, DepthOfField, Vignette } from '@react-three/postprocessing';
+import { EffectComposer, DepthOfField, Vignette, Outline, Selection } from '@react-three/postprocessing';
 import { ClassroomScene } from './ClassroomScene';
 import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
@@ -63,6 +63,7 @@ export function SceneRenderer({
         style={{ background: sceneType === 'playground' ? '#87CEEB' : '#1a1a2e' }}
       >
         <Suspense fallback={null}>
+          <Selection>
           <SoftShadows size={25} samples={16} focus={0.5} />
 
           <CameraController
@@ -113,9 +114,16 @@ export function SceneRenderer({
             far={4}
           />
 
-          {/* Cinematic depth-of-field during evidence inspection */}
-          {focusTarget && (
-            <EffectComposer>
+          {/* Outline pass on hovered/focused evidence (basement-style edge
+              highlight); DoF + vignette only while inspecting */}
+          {focusTarget ? (
+            <EffectComposer multisampling={4} autoClear={false}>
+              <Outline
+                blur
+                edgeStrength={4}
+                visibleEdgeColor={0xffffff}
+                hiddenEdgeColor={0x555555}
+              />
               <DepthOfField
                 target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])}
                 focalLength={0.02}
@@ -124,9 +132,19 @@ export function SceneRenderer({
               />
               <Vignette eskil={false} offset={0.2} darkness={0.55} />
             </EffectComposer>
+          ) : (
+            <EffectComposer multisampling={4} autoClear={false}>
+              <Outline
+                blur
+                edgeStrength={4}
+                visibleEdgeColor={0xffffff}
+                hiddenEdgeColor={0x555555}
+              />
+            </EffectComposer>
           )}
 
           <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : '#1a1a2e', 12, 30]} />
+          </Selection>
         </Suspense>
       </Canvas>
     </div>

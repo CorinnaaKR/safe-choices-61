@@ -2,23 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSimulation } from '@/hooks/useSimulation';
 import { DEFAULT_SCENARIO_ID } from '@/data/scenarios';
 import { Mode } from '@/types/simulation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
-import {
-  Trophy,
-  RotateCcw,
-  CheckCircle,
-  Briefcase,
-  Target,
-  Award,
-  Printer,
-  Star,
-  BookOpen,
-  Lightbulb,
-  ExternalLink,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function ResultsPage() {
@@ -38,13 +22,13 @@ export default function ResultsPage() {
   const totalDecisions = gameState.decisions.length;
 
   const getGrade = () => {
-    if (scorePercentage >= 90) return { grade: 'Excellent', color: 'text-feedback-positive', stars: 5 };
-    if (scorePercentage >= 70) return { grade: 'Good', color: 'text-primary', stars: 4 };
-    if (scorePercentage >= 50) return { grade: 'Satisfactory', color: 'text-feedback-neutral', stars: 3 };
-    return { grade: 'Needs Improvement', color: 'text-feedback-negative', stars: 2 };
+    if (scorePercentage >= 90) return { grade: 'Excellent', accent: true };
+    if (scorePercentage >= 70) return { grade: 'Good', accent: true };
+    if (scorePercentage >= 50) return { grade: 'Satisfactory', accent: false };
+    return { grade: 'Needs Improvement', accent: false };
   };
 
-  const { grade, color, stars } = getGrade();
+  const { grade, accent } = getGrade();
 
   const handleReplay = () => {
     resetSimulation();
@@ -58,277 +42,256 @@ export default function ResultsPage() {
     return { decision, scene, choiceData, index };
   });
 
+  const completedAt = gameState.completedAt
+    ? new Date(gameState.completedAt).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : 'N/A';
+
   return (
-    <div className="min-h-screen hero-gradient relative py-12">
-      <div className="container mx-auto px-4 relative z-10">
+    <div className="min-h-screen relative">
+      {/* Top rule */}
+      <header className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border">
+        <span className="hud-label">Heli — Safeguarding Simulation</span>
+        <span className="hud-label hidden sm:block">
+          {mode === 'training' ? 'Training report' : 'End of story'}
+        </span>
+      </header>
+
+      <div className="px-4 md:px-8 py-12">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-3xl mx-auto"
         >
           {/* Header */}
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', delay: 0.2, stiffness: 100 }}
-              className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-primary/10 mb-6 shadow-lg shadow-primary/10"
-            >
-              {mode === 'training' ? (
-                <Trophy className="w-12 h-12 text-primary" />
-              ) : (
-                <BookOpen className="w-12 h-12 text-primary" />
-              )}
-            </motion.div>
-
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
+          <div className="mb-12">
+            <p className="hud-label text-primary mb-4">
+              {mode === 'training' ? 'Case closed — Debrief' : 'Case closed'}
+            </p>
+            <h1 className="font-sans text-4xl md:text-5xl font-bold uppercase tracking-tight text-foreground mb-3">
               {mode === 'training' ? 'Simulation Complete' : 'The End of the Story'}
             </h1>
             <p className="text-muted-foreground">
               {scenario.title} — {scenario.role}
             </p>
-
-            {/* Stars - training only */}
-            {mode === 'training' && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="flex items-center justify-center gap-1 mt-4"
-              >
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
-                  >
-                    <Star
-                      className={cn(
-                        'w-6 h-6',
-                        i <= stars
-                          ? 'text-decision-highlight fill-decision-highlight'
-                          : 'text-border'
-                      )}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
+            <div className="rule-h w-16 bg-primary mt-6" />
           </div>
 
-          {/* Score Card - training only */}
+          {/* Score block — training only */}
           {mode === 'training' && (
-            <Card className="mb-8 border-2 overflow-hidden">
-              <CardHeader className="text-center pb-2 bg-muted/30">
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Award className="w-5 h-5 text-primary" />
-                  Your Score
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="text-center mb-6">
+            <section className="border border-border mb-px">
+              <div className="px-6 py-3 border-b border-border">
+                <span className="hud-label">Your score</span>
+              </div>
+              <div className="px-6 py-8">
+                <div className="flex items-end gap-6 mb-6">
                   <motion.span
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, type: 'spring' }}
-                    className={cn('text-7xl font-bold', color)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="font-mono text-7xl font-bold text-foreground leading-none"
                   >
-                    {scorePercentage}%
+                    {String(scorePercentage).padStart(3, '0')}
+                    <span className="text-2xl text-muted-foreground">%</span>
                   </motion.span>
-                  <p className={cn('text-xl font-semibold mt-2', color)}>{grade}</p>
+                  <span
+                    className={cn(
+                      'font-mono text-sm uppercase tracking-[0.2em] pb-1.5',
+                      accent ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  >
+                    {grade}
+                  </span>
                 </div>
 
-                <Progress value={scorePercentage} className="h-3 mb-4" />
+                <div className="h-px bg-border relative mb-8">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${scorePercentage}%` }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                    className="absolute inset-y-0 left-0 bg-primary"
+                  />
+                </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-6">
-                  <div className="text-center p-5 rounded-xl bg-muted border border-border">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Target className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-muted-foreground">Points Earned</span>
-                    </div>
-                    <p className="text-2xl font-bold text-foreground">
+                <div className="grid grid-cols-2 gap-px bg-border border border-border">
+                  <div className="bg-background p-5">
+                    <p className="hud-label mb-2">Points earned</p>
+                    <p className="font-mono text-2xl text-foreground">
                       {gameState.totalPoints} / {gameState.maxPossiblePoints}
                     </p>
                   </div>
-
-                  <div className="text-center p-5 rounded-xl bg-muted border border-border">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <CheckCircle className="w-4 h-4 text-feedback-positive" />
-                      <span className="text-sm font-medium text-muted-foreground">Optimal Decisions</span>
-                    </div>
-                    <p className="text-2xl font-bold text-foreground">
+                  <div className="bg-background p-5">
+                    <p className="hud-label mb-2">Optimal decisions</p>
+                    <p className="font-mono text-2xl text-foreground">
                       {optimalCount} / {totalDecisions}
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </section>
           )}
 
           {/* Decision recap. Learning mode: cause and effect, no judgement. */}
-          <Card className="mb-8 border-2">
-            <CardHeader>
-              <CardTitle className="text-lg">
-                {mode === 'training' ? 'Decision Summary' : 'What you did - and what happened'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {decisionRows.map(({ decision, scene, choiceData, index }) => {
-                  const citedIds = decision.supportingEvidenceIds ?? [];
-                  const citedEvidence = citedIds
-                    .map((id) => gameState.collectedEvidence.find((e) => e.id === id))
-                    .filter((e): e is NonNullable<typeof e> => Boolean(e));
-                  return (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 * index }}
-                      className="p-4 rounded-xl border bg-muted/50 border-border"
-                    >
-                      <div className="flex-1">
-                        <span className="text-sm font-medium text-foreground block">
-                          {scene?.title || `Decision ${index + 1}`}
-                        </span>
-                        {choiceData && (
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                            You chose: {choiceData.text}
-                          </p>
-                        )}
-                        {mode === 'learning' && choiceData && (
-                          <p className="text-xs text-foreground/80 mt-2 leading-relaxed border-l-2 border-primary/30 pl-3 italic">
-                            Because of this: {choiceData.consequence}
-                          </p>
-                        )}
-                        {citedEvidence.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-border/60">
-                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground/80 font-semibold mb-1.5">
-                              {mode === 'training' ? 'Evidence you cited' : 'Clues you used'}
-                            </p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {citedEvidence.map((ev) => (
-                                <span
-                                  key={ev.id}
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-evidence-bg border border-evidence-border text-[11px] text-foreground"
-                                >
-                                  {ev.title}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+          <section className="border border-border mb-px">
+            <div className="px-6 py-3 border-b border-border">
+              <span className="hud-label">
+                {mode === 'training' ? 'Decision summary' : 'What you did — and what happened'}
+              </span>
+            </div>
+            <div className="p-3 space-y-px">
+              {decisionRows.map(({ decision, scene, choiceData, index }) => {
+                const citedIds = decision.supportingEvidenceIds ?? [];
+                const citedEvidence = citedIds
+                  .map((id) => gameState.collectedEvidence.find((e) => e.id === id))
+                  .filter((e): e is NonNullable<typeof e> => Boolean(e));
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.08 * index }}
+                    className="p-4 bg-secondary/40 border border-border"
+                  >
+                    <p className="hud-label text-primary mb-2">
+                      Decision {String(index + 1).padStart(2, '0')} —{' '}
+                      {scene?.title || 'Scene'}
+                    </p>
+                    {choiceData && (
+                      <p className="text-sm text-foreground/85 leading-relaxed">
+                        You chose: {choiceData.text}
+                      </p>
+                    )}
+                    {mode === 'learning' && choiceData && (
+                      <p className="text-sm text-foreground/70 mt-2 leading-relaxed border-l border-primary/50 pl-3">
+                        Because of this: {choiceData.consequence}
+                      </p>
+                    )}
+                    {citedEvidence.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-border">
+                        <p className="hud-label mb-2">
+                          {mode === 'training' ? 'Evidence you cited' : 'Clues you used'}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {citedEvidence.map((ev) => (
+                            <span
+                              key={ev.id}
+                              className="font-mono text-[10px] uppercase tracking-[0.1em] px-2 py-1 border border-border text-foreground/80"
+                            >
+                              {ev.title}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </section>
 
-          {/* Evidence Collected */}
-          <Card className="mb-8 border-2">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Briefcase className="w-5 h-5" />
-                {mode === 'training' ? 'Evidence Collected' : 'Clues you found'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                You {mode === 'training' ? 'collected' : 'found'} {gameState.collectedEvidence.length}{' '}
+          {/* Evidence collected */}
+          <section className="border border-border mb-px">
+            <div className="px-6 py-3 border-b border-border">
+              <span className="hud-label">
+                {mode === 'training' ? 'Evidence collected' : 'Clues you found'} —{' '}
+                {String(gameState.collectedEvidence.length).padStart(2, '0')}
+              </span>
+            </div>
+            <div className="p-3">
+              <p className="text-sm text-muted-foreground mb-3 px-1 leading-relaxed">
+                You {mode === 'training' ? 'collected' : 'found'}{' '}
+                {gameState.collectedEvidence.length}{' '}
                 {mode === 'training'
                   ? `piece${gameState.collectedEvidence.length !== 1 ? 's' : ''} of evidence`
                   : `clue${gameState.collectedEvidence.length !== 1 ? 's' : ''}`}{' '}
                 during the {mode === 'training' ? 'scenario' : 'story'}.
               </p>
               {gameState.collectedEvidence.length > 0 && (
-                <div className="space-y-2">
-                  {gameState.collectedEvidence.map((evidence) => (
+                <div className="space-y-px">
+                  {gameState.collectedEvidence.map((evidence, i) => (
                     <div
                       key={evidence.id}
-                      className="p-4 rounded-xl bg-evidence-bg border border-evidence-border"
+                      className="p-3 bg-secondary/40 border border-border flex items-baseline gap-3"
                     >
-                      <p className="font-medium text-foreground text-sm">{evidence.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{evidence.type}</p>
+                      <span className="font-mono text-[10px] text-primary">
+                        Nº {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <p className="text-sm text-foreground">{evidence.title}</p>
+                        <p className="hud-label mt-0.5">{evidence.type}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
-          {/* Key takeaway - learning mode */}
+          {/* Key takeaway — learning mode */}
           {mode === 'learning' && scenario.keyTakeaway && (
-            <Card className="mb-8 border-2 border-primary/30 bg-primary/5">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-primary" />
-                  Remember this
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-foreground leading-relaxed">{scenario.keyTakeaway}</p>
-              </CardContent>
-            </Card>
+            <section className="border border-primary mb-px">
+              <div className="px-6 py-3 border-b border-primary/50">
+                <span className="hud-label text-primary">Remember this</span>
+              </div>
+              <p className="px-6 py-5 text-base text-foreground leading-relaxed">
+                {scenario.keyTakeaway}
+              </p>
+            </section>
           )}
 
           {/* Resources */}
           {scenario.resources && scenario.resources.length > 0 && (
-            <Card className="mb-8 border-2">
-              <CardHeader>
-                <CardTitle className="text-lg">Find out more / get help</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {scenario.resources.map((resource) => (
-                    <li key={resource.url}>
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        {resource.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            <section className="border border-border mb-px">
+              <div className="px-6 py-3 border-b border-border">
+                <span className="hud-label">Find out more / get help</span>
+              </div>
+              <ul className="p-6 space-y-3">
+                {scenario.resources.map((resource) => (
+                  <li key={resource.url}>
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-foreground underline decoration-primary underline-offset-4 hover:text-primary transition-colors"
+                    >
+                      {resource.title} ↗
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button onClick={handleReplay} className="gap-2 rounded-xl h-12 px-8">
-              <RotateCcw className="w-4 h-4" />
-              {mode === 'training' ? 'Try Again' : 'Play Again'}
-            </Button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 mt-10">
+            <button
+              onClick={handleReplay}
+              className="bg-primary text-primary-foreground font-mono text-xs uppercase tracking-[0.2em] px-8 py-3.5 hover:bg-primary/90 transition-colors w-full sm:w-auto"
+            >
+              ▸ {mode === 'training' ? 'Try Again' : 'Play Again'}
+            </button>
             {mode === 'training' && (
-              <Button onClick={() => window.print()} variant="outline" className="gap-2 rounded-xl h-12">
-                <Printer className="w-4 h-4" />
+              <button
+                onClick={() => window.print()}
+                className="border border-border text-foreground font-mono text-xs uppercase tracking-[0.2em] px-8 py-3.5 hover:border-foreground transition-colors w-full sm:w-auto"
+              >
                 Print Certificate
-              </Button>
+              </button>
             )}
-            <Button onClick={() => navigate('/')} variant="ghost" className="rounded-xl h-12">
+            <button
+              onClick={() => navigate('/')}
+              className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors px-4 py-3.5"
+            >
               Return Home
-            </Button>
+            </button>
           </div>
 
-          <p className="text-center text-sm text-muted-foreground mt-10">
-            Completed on{' '}
-            {gameState.completedAt
-              ? new Date(gameState.completedAt).toLocaleDateString('en-GB', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              : 'N/A'}
-          </p>
+          <p className="hud-label mt-12">Completed {completedAt}</p>
         </motion.div>
       </div>
     </div>

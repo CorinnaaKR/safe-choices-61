@@ -9,7 +9,7 @@ import { PLAYGROUND_EVIDENCE_POSITIONS } from '@/components/3d/PlaygroundScene';
 import { OFFICE_EVIDENCE_POSITIONS } from '@/components/3d/OfficeScene';
 import { Evidence } from '@/types/simulation';
 import { SceneHUD } from '@/components/simulation/SceneHUD';
-import { motion, AnimatePresence } from 'framer-motion';
+import { SceneTitleStamp } from '@/components/LoadingSequence';
 
 /** Until every environment has a dedicated 3D scene, unknown ones render as office. */
 function environmentToSceneType(env?: SceneEnvironment): SceneType {
@@ -33,7 +33,6 @@ export default function StoryPage() {
     collectEvidence,
     makeChoice,
     proceedToNextScene,
-    resetSimulation,
     getProgress,
   } = useSimulation(scenarioId, mode);
 
@@ -101,13 +100,16 @@ export default function StoryPage() {
   if (!currentScene) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading scenario...</p>
+        <p className="hud-label">Loading scenario…</p>
       </div>
     );
   }
 
+  const sceneNumber =
+    scenario.scenes.findIndex((s) => s.id === currentScene.id) + 1;
+
   return (
-    <div className="fixed inset-0 overflow-hidden bg-black">
+    <div className="fixed inset-0 overflow-hidden bg-background crosshair-area">
       {/* Full-screen 3D scene */}
       <SceneRenderer
         sceneType={sceneType}
@@ -119,6 +121,9 @@ export default function StoryPage() {
         onFocusEvidence={handleFocusEvidence}
         onCameraReset={handleCameraReset}
       />
+
+      {/* Scene title stamp on entry */}
+      <SceneTitleStamp index={sceneNumber} title={currentScene.title} />
 
       {/* HUD overlay */}
       <SceneHUD
@@ -133,12 +138,8 @@ export default function StoryPage() {
         progress={getProgress()}
         onMakeChoice={makeChoice}
         onProceed={proceedToNextScene}
-        onReset={() => {
-          resetSimulation();
-          navigate('/');
-        }}
+        onExit={() => navigate('/')}
         onDismissEvidence={handleCameraReset}
-        onCollectEvidence={collectEvidence}
       />
     </div>
   );
