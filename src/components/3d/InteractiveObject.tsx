@@ -79,6 +79,7 @@ export function InteractiveObject({
           ref={meshRef}
           onClick={(e) => {
             e.stopPropagation();
+            if (e.delta > 5) return; // pointer travelled: this was an orbit drag, not a click
             if (!collected) {
               playSelect();
               setCrosshairActive(false);

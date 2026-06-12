@@ -1,7 +1,7 @@
 import { Suspense, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows, SoftShadows } from '@react-three/drei';
-import { EffectComposer, DepthOfField, Vignette, Outline, Selection } from '@react-three/postprocessing';
+import { Environment, ContactShadows } from '@react-three/drei';
+import { EffectComposer, DepthOfField, Vignette, Outline, Selection, N8AO, Bloom } from '@react-three/postprocessing';
 import { ClassroomScene } from './ClassroomScene';
 import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
@@ -21,16 +21,6 @@ interface SceneRendererProps {
   onCollectEvidence: (evidence: Evidence) => void;
   onFocusEvidence: (evidence: Evidence) => void;
   onCameraReset: () => void;
-}
-
-export function getSceneType(sceneId: string): SceneType {
-  if (sceneId.includes('scene-1') || sceneId.includes('scene-3a') || sceneId.includes('scene-3b')) {
-    return 'classroom';
-  }
-  if (sceneId.includes('scene-2')) {
-    return 'playground';
-  }
-  return 'office';
 }
 
 export function SceneRenderer({
@@ -58,13 +48,13 @@ export function SceneRenderer({
         gl={{
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: sceneType === 'playground' ? 1.2 : 0.9,
+          // AO darkens corners — interiors get a touch more exposure to compensate
+          toneMappingExposure: sceneType === 'playground' ? 1.2 : 1.0,
         }}
-        style={{ background: sceneType === 'playground' ? '#87CEEB' : '#1a1a2e' }}
+        style={{ background: sceneType === 'playground' ? '#87CEEB' : '#211c19' }}
       >
         <Suspense fallback={null}>
           <Selection>
-          <SoftShadows size={25} samples={16} focus={0.5} />
 
           <CameraController
             target={focusTarget}
@@ -112,38 +102,42 @@ export function SceneRenderer({
             scale={sceneType === 'playground' ? 20 : 12}
             blur={2}
             far={4}
+            frames={1}
           />
 
-          {/* Outline pass on hovered/focused evidence (basement-style edge
-              highlight); DoF + vignette only while inspecting */}
-          {focusTarget ? (
-            <EffectComposer multisampling={4} autoClear={false}>
-              <Outline
-                blur
-                edgeStrength={4}
-                visibleEdgeColor={0xffffff}
-                hiddenEdgeColor={0x555555}
-              />
+          {/* Always-on realism passes: ambient occlusion grounds objects in
+              their corners, subtle bloom lifts emissives (screens, sky).
+              Outline = basement-style edge highlight on hovered evidence.
+              DoF + vignette join only while inspecting. */}
+          <EffectComposer multisampling={0} autoClear={false}>
+            <N8AO
+              halfRes
+              quality="performance"
+              intensity={2}
+              aoRadius={0.5}
+              distanceFalloff={0.75}
+            />
+            <Outline
+              blur
+              edgeStrength={4}
+              visibleEdgeColor={0xffffff}
+              hiddenEdgeColor={0x555555}
+            />
+            <Bloom mipmapBlur intensity={0.25} luminanceThreshold={0.9} />
+            {focusTarget != null && (
               <DepthOfField
                 target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])}
                 focalLength={0.02}
                 bokehScale={4}
                 height={480}
               />
+            )}
+            {focusTarget != null && (
               <Vignette eskil={false} offset={0.2} darkness={0.55} />
-            </EffectComposer>
-          ) : (
-            <EffectComposer multisampling={4} autoClear={false}>
-              <Outline
-                blur
-                edgeStrength={4}
-                visibleEdgeColor={0xffffff}
-                hiddenEdgeColor={0x555555}
-              />
-            </EffectComposer>
-          )}
+            )}
+          </EffectComposer>
 
-          <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : '#1a1a2e', 12, 30]} />
+          <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : '#211c19', 12, 30]} />
           </Selection>
         </Suspense>
       </Canvas>

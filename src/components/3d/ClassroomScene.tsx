@@ -2,6 +2,22 @@ import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter, NPCHotspot } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
 import { useWoodTexture, useWallTexture, useTileTexture } from './TexturedMaterials';
+import {
+  Desk,
+  Chair,
+  Door,
+  Bookshelf,
+  NoticeBoard,
+  WallClock,
+  Plant,
+  Bin,
+  BookStack,
+  Mug,
+  Rug,
+  Backpack,
+  CardboardBox,
+  FlavourObject,
+} from './props';
 
 interface ClassroomSceneProps {
   evidence: Evidence[];
@@ -9,44 +25,6 @@ interface ClassroomSceneProps {
   focusedEvidenceId: string | null;
   onCollectEvidence: (evidence: Evidence) => void;
   onFocusEvidence: (evidence: Evidence) => void;
-}
-
-function Desk({ position }: { position: [number, number, number] }) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.8, 0.05, 0.5]} />
-        <meshStandardMaterial color="#8B7355" roughness={0.65} metalness={0.05} />
-      </mesh>
-      {[[-0.35, 0.35, -0.2], [0.35, 0.35, -0.2], [-0.35, 0.35, 0.2], [0.35, 0.35, 0.2]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} castShadow>
-          <cylinderGeometry args={[0.02, 0.02, 0.7, 8]} />
-          <meshStandardMaterial color="#5A5A5A" roughness={0.3} metalness={0.6} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function Chair({ position }: { position: [number, number, number] }) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.45, 0]} castShadow>
-        <boxGeometry args={[0.35, 0.035, 0.35]} />
-        <meshStandardMaterial color="#3A7BD5" roughness={0.5} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, 0.7, -0.15]} castShadow>
-        <boxGeometry args={[0.35, 0.5, 0.035]} />
-        <meshStandardMaterial color="#3A7BD5" roughness={0.5} metalness={0.1} />
-      </mesh>
-      {[[-0.15, 0.22, -0.15], [0.15, 0.22, -0.15], [-0.15, 0.22, 0.15], [0.15, 0.22, 0.15]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]}>
-          <cylinderGeometry args={[0.015, 0.015, 0.45, 8]} />
-          <meshStandardMaterial color="#4A4A4A" roughness={0.3} metalness={0.7} />
-        </mesh>
-      ))}
-    </group>
-  );
 }
 
 // NPC child sitting at a desk
@@ -120,6 +98,15 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         <planeGeometry args={[10, 4]} />
         <meshStandardMaterial map={sideWallTex} roughness={0.92} metalness={0} />
       </mesh>
+      {/* Front wall — single-sided facing inward, so the orbit camera sees
+          through it from outside (dollhouse effect) */}
+      <mesh position={[0, 2, 5]} rotation={[0, Math.PI, 0]} receiveShadow>
+        <planeGeometry args={[12, 4]} />
+        <meshStandardMaterial map={wallTex} roughness={0.92} metalness={0} />
+      </mesh>
+
+      {/* Classroom door — right wall */}
+      <Door position={[5.95, 0, 3.5]} rotation={-Math.PI / 2} />
 
       {/* Whiteboard */}
       <mesh position={[0, 2.2, -4.95]} castShadow>
@@ -232,6 +219,56 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         );
       })}
 
+      {/* ---- Scene density: lived-in clutter ---- */}
+      <Bookshelf position={[5.8, 0, -2]} rotation={-Math.PI / 2} />
+      <WallClock position={[0, 3.4, -4.94]} />
+      <Plant position={[-5.4, 0, 4.2]} />
+      <Bin position={[-1.4, 0, -4.2]} />
+      <BookStack position={[0.55, 0.78, -3.5]} rotation={0.3} />
+      <Rug position={[-4.2, 0.02, -3.4]} size={[2.2, 1.6]} color="#8A5A4A" />
+      <Backpack position={[-3.2, 0, 1.4]} rotation={1.2} color="#6B3E5C" />
+
+      {/* ---- Inspectable non-evidence: signal vs noise ---- */}
+      <FlavourObject
+        position={[-0.5, 0.78, -3.4]}
+        label="Teacher's mug"
+        note="The teacher's coffee has gone cold. Nothing unusual here."
+        hitRadius={0.14}
+        hitY={0.05}
+      >
+        <Mug position={[0, 0, 0]} />
+      </FlavourObject>
+
+      <FlavourObject
+        position={[5.2, 0, 4.2]}
+        label="Lost property box"
+        note="Odd gloves and a water bottle. Just lost property."
+        hitRadius={0.32}
+        hitY={0.22}
+      >
+        <CardboardBox position={[0, 0, 0]} rotation={0.4} />
+      </FlavourObject>
+
+      <FlavourObject
+        position={[3, 2.2, -4.95]}
+        label="Notice board"
+        note="Class artwork and a spelling chart. Nothing out of place."
+        hitRadius={0.6}
+        hitY={0}
+      >
+        <NoticeBoard position={[0, 0, 0]} />
+      </FlavourObject>
+
+      <FlavourObject
+        position={[2.6, 0, 0.2]}
+        label="School bag"
+        note="A school bag dropped in a hurry. Kids do that every day."
+        hitRadius={0.28}
+        hitY={0.2}
+      >
+        <Backpack position={[0, 0, 0]} rotation={-0.6} />
+      </FlavourObject>
+
       {/* Realistic lighting */}
       <ambientLight intensity={0.25} color="#E8E0D8" />
       <directionalLight
@@ -239,8 +276,8 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         intensity={0.8}
         color="#FFF5E0"
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-camera-far={20}
         shadow-camera-left={-8}
         shadow-camera-right={8}

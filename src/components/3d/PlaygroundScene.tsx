@@ -2,6 +2,7 @@ import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter, NPCHotspot } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
 import { useGrassTexture, useNoiseTexture, useWoodTexture } from './TexturedMaterials';
+import { Bench, Tree, Bin, Football, FlavourObject } from './props';
 
 interface PlaygroundSceneProps {
   evidence: Evidence[];
@@ -11,59 +12,21 @@ interface PlaygroundSceneProps {
   onFocusEvidence: (evidence: Evidence) => void;
 }
 
-function Bench({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
-  return (
-    <group position={position} rotation={[0, rotation, 0]}>
-      {/* Planks */}
-      {[-0.12, 0, 0.12].map((z, i) => (
-        <mesh key={`plank-${i}`} position={[0, 0.45, z]} castShadow>
-          <boxGeometry args={[1.2, 0.03, 0.1]} />
-          <meshStandardMaterial color="#9B7B2E" roughness={0.75} metalness={0} />
-        </mesh>
-      ))}
-      {/* Back planks */}
-      {[0.55, 0.7].map((y, i) => (
-        <mesh key={`back-${i}`} position={[0, y, -0.15]} castShadow>
-          <boxGeometry args={[1.2, 0.08, 0.025]} />
-          <meshStandardMaterial color="#8B6B14" roughness={0.75} />
-        </mesh>
-      ))}
-      {/* Cast iron legs */}
-      {[[-0.5, 0.22, 0], [0.5, 0.22, 0]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} castShadow>
-          <boxGeometry args={[0.04, 0.45, 0.35]} />
-          <meshStandardMaterial color="#3A3A3A" roughness={0.4} metalness={0.7} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function Tree({ position }: { position: [number, number, number] }) {
+/** Low shrub — clustered spheres along the fence line. */
+function Bush({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      {/* Trunk with bark texture */}
-      <mesh position={[0, 1, 0]} castShadow>
-        <cylinderGeometry args={[0.12, 0.22, 2, 12]} />
-        <meshStandardMaterial color="#4A3520" roughness={0.95} metalness={0} />
+      <mesh position={[0, 0.3, 0]} castShadow>
+        <sphereGeometry args={[0.45, 10, 10]} />
+        <meshStandardMaterial color="#2E5518" roughness={0.95} />
       </mesh>
-      {/* Multiple foliage clusters for realism */}
-      <mesh position={[0, 2.6, 0]} castShadow>
-        <sphereGeometry args={[1.1, 12, 12]} />
-        <meshStandardMaterial color="#2A5014" roughness={0.9} />
+      <mesh position={[0.35, 0.22, 0.1]} castShadow>
+        <sphereGeometry args={[0.3, 8, 8]} />
+        <meshStandardMaterial color="#35631C" roughness={0.95} />
       </mesh>
-      <mesh position={[0.6, 2.2, 0.3]} castShadow>
-        <sphereGeometry args={[0.75, 10, 10]} />
-        <meshStandardMaterial color="#35631C" roughness={0.9} />
-      </mesh>
-      <mesh position={[-0.4, 2.3, -0.3]} castShadow>
-        <sphereGeometry args={[0.65, 10, 10]} />
-        <meshStandardMaterial color="#2E5518" roughness={0.9} />
-      </mesh>
-      {/* Shadow on ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.2, 0.01, 0.3]}>
-        <circleGeometry args={[1.5, 16]} />
-        <meshBasicMaterial color="#1a3a0a" transparent opacity={0.12} />
+      <mesh position={[-0.3, 0.2, -0.1]} castShadow>
+        <sphereGeometry args={[0.28, 8, 8]} />
+        <meshStandardMaterial color="#2A5014" roughness={0.95} />
       </mesh>
     </group>
   );
@@ -260,6 +223,80 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         );
       })}
 
+      {/* ---- Scene density ---- */}
+      <Bush position={[-6.2, 0, -4.4]} />
+      <Bush position={[-3.5, 0, -4.5]} />
+      <Bush position={[5.8, 0, -4.4]} />
+      <Bush position={[7.2, 0, 1]} />
+
+      {/* Hopscotch chalk marks on the tarmac */}
+      <group position={[-1.8, 0.03, -1.2]}>
+        {[0, 0.55, 1.1, 1.65, 2.2].map((z, i) => (
+          <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[i % 2 ? 0.3 : 0, 0, z]}>
+            <planeGeometry args={[0.45, 0.45]} />
+            <meshBasicMaterial color="#E8E4DC" transparent opacity={0.35} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ---- Inspectable non-evidence: signal vs noise ---- */}
+      <FlavourObject
+        position={[2.8, 0, 0.5]}
+        label="Football"
+        note="A scuffed football. The game moves on without it."
+        hitRadius={0.2}
+        hitY={0.11}
+      >
+        <Football position={[0, 0, 0]} />
+      </FlavourObject>
+
+      <FlavourObject
+        position={[4.5, 0.47, -3.4]}
+        label="Lost glove"
+        note="A small glove left on the bench. Lost property, nothing more."
+        hitRadius={0.16}
+        hitY={0.03}
+      >
+        {/* Glove: palm + thumb */}
+        <mesh position={[0, 0.02, 0]} rotation={[0, 0.5, 0]} castShadow>
+          <boxGeometry args={[0.12, 0.03, 0.16]} />
+          <meshStandardMaterial color="#8A3A3A" roughness={0.9} />
+        </mesh>
+        <mesh position={[0.07, 0.02, 0.04]} rotation={[0, 1.1, 0]}>
+          <boxGeometry args={[0.04, 0.025, 0.07]} />
+          <meshStandardMaterial color="#8A3A3A" roughness={0.9} />
+        </mesh>
+      </FlavourObject>
+
+      <FlavourObject
+        position={[5.6, 0, -3.6]}
+        label="Bin"
+        note="An overflowing bin. Crisp packets and juice cartons."
+        hitRadius={0.26}
+        hitY={0.25}
+      >
+        <Bin position={[0, 0, 0]} color="#3E5C3A" />
+        {/* Overflow */}
+        <mesh position={[0.05, 0.42, 0.02]}>
+          <sphereGeometry args={[0.07, 8, 8]} />
+          <meshStandardMaterial color="#C8B8A0" roughness={0.9} />
+        </mesh>
+        <mesh position={[-0.08, 0.4, -0.04]}>
+          <boxGeometry args={[0.08, 0.05, 0.06]} />
+          <meshStandardMaterial color="#A04A3A" roughness={0.85} />
+        </mesh>
+      </FlavourObject>
+
+      <FlavourObject
+        position={[-2, 0.03, -0.1]}
+        label="Hopscotch"
+        note="Chalk hopscotch from lunchtime. Half washed away."
+        hitRadius={0.5}
+        hitY={0.05}
+      >
+        <group />
+      </FlavourObject>
+
       {/* Realistic outdoor lighting */}
       <ambientLight intensity={0.3} color="#E0E8F0" />
       <directionalLight
@@ -267,8 +304,8 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         intensity={1.2}
         color="#FFF5E0"
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-camera-far={25}
         shadow-camera-left={-12}
         shadow-camera-right={12}

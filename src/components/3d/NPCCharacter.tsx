@@ -304,7 +304,13 @@ function NPCHotspotMarker({
 
       {/* Clickable area */}
       <mesh
-        onClick={(e) => { e.stopPropagation(); playSelect(); setCrosshairActive(false); onClick(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (e.delta > 5) return; // orbit drag, not a click
+          playSelect();
+          setCrosshairActive(false);
+          onClick();
+        }}
         onPointerOver={(e) => { e.stopPropagation(); onHover(true); playHoverTick(); setCrosshairActive(true); }}
         onPointerOut={() => { onHover(false); setCrosshairActive(false); }}
       >

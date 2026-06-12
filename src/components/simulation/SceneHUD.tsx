@@ -41,13 +41,18 @@ function CaseFilePanel({
         <span className="hud-label text-primary">
           Case file — Evidence {String(evidenceNumber).padStart(2, '0')}
         </span>
-        <button
-          onClick={onDismiss}
-          className="key-hint hover:text-foreground transition-colors"
-          aria-label="Close evidence panel"
-        >
-          <b>[ESC]</b> Close
-        </button>
+        <div className="flex items-center gap-3">
+          <span className="key-hint">
+            <b>[SCROLL]</b> Zoom
+          </span>
+          <button
+            onClick={onDismiss}
+            className="key-hint hover:text-foreground transition-colors"
+            aria-label="Close evidence panel"
+          >
+            <b>[ESC]</b> Close
+          </button>
+        </div>
       </div>
 
       <div className="px-5 py-4">
@@ -226,6 +231,7 @@ export function SceneHUD({
         <div className="absolute bottom-4 left-4 pointer-events-none hidden sm:block">
           <p className="key-hint space-x-3">
             <span><b>[WASD]</b> Move</span>
+            <span><b>[DRAG]</b> Look</span>
             <span><b>[CLICK]</b> Examine</span>
             <span><b>[TAB]</b> Evidence</span>
           </p>

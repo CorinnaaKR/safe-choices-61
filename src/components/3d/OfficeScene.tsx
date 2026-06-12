@@ -2,6 +2,19 @@ import { InteractiveObject } from './InteractiveObject';
 import { NPCCharacter } from './NPCCharacter';
 import { Evidence } from '@/types/simulation';
 import { useWoodTexture, useWallTexture, useTileTexture } from './TexturedMaterials';
+import {
+  Door,
+  SideTable,
+  FilingCabinet,
+  Plant,
+  Rug,
+  WallClock,
+  WallFrame,
+  BookStack,
+  Mug,
+  KettleTray,
+  FlavourObject,
+} from './props';
 
 interface OfficeSceneProps {
   evidence: Evidence[];
@@ -43,6 +56,12 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
       <mesh position={[4, 2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
         <planeGeometry args={[6, 4]} />
         <meshStandardMaterial map={sideWallTex} roughness={0.92} />
+      </mesh>
+      {/* Front wall — single-sided facing inward, so the orbit camera sees
+          through it from outside (dollhouse effect) */}
+      <mesh position={[0, 2, 3]} rotation={[0, Math.PI, 0]} receiveShadow>
+        <planeGeometry args={[8, 4]} />
+        <meshStandardMaterial map={wallTex} roughness={0.92} />
       </mesh>
 
       {/* Desk */}
@@ -154,20 +173,8 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         <meshStandardMaterial color="#D8D0C4" roughness={0.6} metalness={0.1} />
       </mesh>
 
-      {/* Door — wood grain */}
-      <mesh position={[0, 1.1, 3]} castShadow>
-        <boxGeometry args={[0.9, 2.2, 0.06]} />
-        <meshStandardMaterial color="#5C4033" roughness={0.7} metalness={0.05} />
-      </mesh>
-      {/* Door handle */}
-      <mesh position={[0.3, 1.1, 2.95]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.1, 8]} />
-        <meshStandardMaterial color="#C0C0C0" metalness={0.85} roughness={0.15} />
-      </mesh>
-      <mesh position={[0.3, 1.1, 2.92]}>
-        <sphereGeometry args={[0.025, 12, 12]} />
-        <meshStandardMaterial color="#C0C0C0" metalness={0.85} roughness={0.15} />
-      </mesh>
+      {/* Door — set just inside the front wall */}
+      <Door position={[2.2, 0, 2.94]} rotation={Math.PI} />
 
       {/* ===== NPC: Ms. Patterson (DSL) sitting behind desk ===== */}
       <NPCCharacter
@@ -200,6 +207,55 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         );
       })}
 
+      {/* ---- Scene density: a working office, not a prop stage ---- */}
+      <Rug position={[0, 0.02, 0.9]} size={[2.6, 1.8]} color="#5A4A42" />
+      <WallClock position={[-2, 2.6, -2.96]} />
+      <WallFrame position={[2.2, 1.9, -2.96]} color="#E0D8C8" />
+      <BookStack position={[0.7, 0.8, -1.4]} rotation={-0.4} />
+      <Mug position={[0.45, 0.8, -1.7]} color="#4A6B8A" />
+      <SideTable position={[3.4, 0, 1.8]} rotation={-0.3} />
+
+      {/* ---- Inspectable non-evidence: signal vs noise ---- */}
+      <FlavourObject
+        position={[-3.6, 0, -2.4]}
+        label="Filing cabinet"
+        note="Locked. Student records are kept safe and private."
+        hitRadius={0.45}
+        hitY={0.66}
+      >
+        <FilingCabinet position={[0, 0, 0]} rotation={Math.PI / 2} />
+      </FlavourObject>
+
+      <FlavourObject
+        position={[3.4, 0.52, 1.8]}
+        label="Kettle"
+        note="A kettle and clean mugs. The kettle is still warm."
+        hitRadius={0.28}
+        hitY={0.1}
+      >
+        <KettleTray position={[0, 0, 0]} rotation={-0.3} />
+      </FlavourObject>
+
+      <FlavourObject
+        position={[1.5, 1.9, -2.96]}
+        label="Framed certificate"
+        note="A safeguarding training certificate. Renewed this year."
+        hitRadius={0.3}
+        hitY={0}
+      >
+        <WallFrame position={[0, 0, 0]} />
+      </FlavourObject>
+
+      <FlavourObject
+        position={[-3.5, 0, 2.3]}
+        label="Pot plant"
+        note="A healthy pot plant. Someone waters it regularly."
+        hitRadius={0.28}
+        hitY={0.4}
+      >
+        <Plant position={[0, 0, 0]} />
+      </FlavourObject>
+
       {/* Realistic office lighting */}
       <ambientLight intensity={0.2} color="#E0D8D0" />
       <directionalLight
@@ -207,8 +263,8 @@ export function OfficeScene({ evidence, collectedIds, focusedEvidenceId, onColle
         intensity={0.6}
         color="#FFF5E0"
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-camera-far={15}
         shadow-camera-left={-6}
         shadow-camera-right={6}

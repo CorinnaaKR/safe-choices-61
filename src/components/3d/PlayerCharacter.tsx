@@ -19,11 +19,18 @@ const SPEED = 3;
 const ROTATION_SPEED = 3;
 const WALL_MARGIN = 0.3; // character radius buffer
 
+const UP = new THREE.Vector3(0, 1, 0);
+
 export function PlayerCharacter({ onPositionChange, sceneType = 'classroom' }: PlayerCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const keys = useRef<Record<string, boolean>>({});
   const rotationY = useRef(0);
   const [bobPhase, setBobPhase] = useState(0);
+  const { camera } = useThree();
+  // Scratch vectors — reused every frame to avoid allocation
+  const camDir = useRef(new THREE.Vector3());
+  const camRight = useRef(new THREE.Vector3());
+  const moveVec = useRef(new THREE.Vector3());
 
   useEffect(() => {
     const onDown = (e: KeyboardEvent) => { keys.current[e.key.toLowerCase()] = true; };
@@ -39,38 +46,53 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom' }: P
   useFrame((_, delta) => {
     if (!groupRef.current) return;
 
+    // Keep the player inside the room even before first input (spawn may
+    // sit outside tighter scenes like the office)
+    const [bMinX, bMaxX, bMinZ, bMaxZ] = SCENE_BOUNDS[sceneType];
+    groupRef.current.position.x = THREE.MathUtils.clamp(
+      groupRef.current.position.x, bMinX + WALL_MARGIN, bMaxX - WALL_MARGIN);
+    groupRef.current.position.z = THREE.MathUtils.clamp(
+      groupRef.current.position.z, bMinZ + WALL_MARGIN, bMaxZ - WALL_MARGIN);
+
     const k = keys.current;
     const forward = (k['w'] || k['arrowup'] ? 1 : 0) - (k['s'] || k['arrowdown'] ? 1 : 0);
-    const strafe = (k['a'] || k['arrowleft'] ? 1 : 0) - (k['d'] || k['arrowright'] ? 1 : 0);
+    const strafe = (k['d'] || k['arrowright'] ? 1 : 0) - (k['a'] || k['arrowleft'] ? 1 : 0);
 
     const isMoving = forward !== 0 || strafe !== 0;
 
     if (isMoving) {
-      // Calculate movement direction relative to current rotation
-      const moveAngle = Math.atan2(strafe, forward);
-      const targetRotation = moveAngle;
-      
-      // Smoothly rotate the character to face movement direction
-      rotationY.current = THREE.MathUtils.lerp(rotationY.current, targetRotation, ROTATION_SPEED * delta * 3);
-      
-      const dx = Math.sin(rotationY.current) * SPEED * delta;
-      const dz = Math.cos(rotationY.current) * SPEED * delta;
-      
+      // Movement is relative to the camera: W walks away from the camera,
+      // A/D strafe across the view, whatever the current orbit angle.
+      camera.getWorldDirection(camDir.current);
+      camDir.current.y = 0;
+      if (camDir.current.lengthSq() < 1e-6) camDir.current.set(0, 0, -1);
+      camDir.current.normalize();
+      camRight.current.crossVectors(camDir.current, UP);
+
+      moveVec.current
+        .copy(camDir.current)
+        .multiplyScalar(forward)
+        .addScaledVector(camRight.current, strafe)
+        .normalize();
+
+      // Face the direction of travel (shortest-path turn)
+      const targetRotation = Math.atan2(moveVec.current.x, moveVec.current.z);
+      let diff = targetRotation - rotationY.current;
+      diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+      rotationY.current += diff * Math.min(1, ROTATION_SPEED * delta * 3);
+      groupRef.current.rotation.y = rotationY.current;
+
       const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType];
-      const newX = THREE.MathUtils.clamp(
-        groupRef.current.position.x + dx,
+      groupRef.current.position.x = THREE.MathUtils.clamp(
+        groupRef.current.position.x + moveVec.current.x * SPEED * delta,
         minX + WALL_MARGIN,
         maxX - WALL_MARGIN
       );
-      const newZ = THREE.MathUtils.clamp(
-        groupRef.current.position.z + dz,
+      groupRef.current.position.z = THREE.MathUtils.clamp(
+        groupRef.current.position.z + moveVec.current.z * SPEED * delta,
         minZ + WALL_MARGIN,
         maxZ - WALL_MARGIN
       );
-      groupRef.current.position.x = newX;
-      groupRef.current.position.z = newZ;
-
-      groupRef.current.rotation.y = rotationY.current;
     }
 
     // Walking bob
