@@ -145,6 +145,123 @@ export function Door({ position, rotation = 0 }: PropTransform) {
   );
 }
 
+/** Three-seat sofa. Faces +z by default. */
+export function Sofa({ position, rotation = 0, color = '#5A4A7A' }: PropTransform & { color?: string }) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      {/* Base */}
+      <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.0, 0.44, 0.75]} />
+        <meshStandardMaterial color={color} roughness={0.85} metalness={0} />
+      </mesh>
+      {/* Back cushion */}
+      <mesh position={[0, 0.6, -0.3]} castShadow>
+        <boxGeometry args={[2.0, 0.5, 0.18]} />
+        <meshStandardMaterial color={color} roughness={0.85} metalness={0} />
+      </mesh>
+      {/* Seat cushions (3) */}
+      {[-0.64, 0, 0.64].map((x, i) => (
+        <mesh key={i} position={[x, 0.46, 0.06]} castShadow>
+          <boxGeometry args={[0.58, 0.1, 0.6]} />
+          <meshStandardMaterial color={color} roughness={0.9} metalness={0} />
+        </mesh>
+      ))}
+      {/* Arms */}
+      <mesh position={[1.06, 0.48, 0]} castShadow>
+        <boxGeometry args={[0.12, 0.56, 0.75]} />
+        <meshStandardMaterial color={color} roughness={0.85} />
+      </mesh>
+      <mesh position={[-1.06, 0.48, 0]} castShadow>
+        <boxGeometry args={[0.12, 0.56, 0.75]} />
+        <meshStandardMaterial color={color} roughness={0.85} />
+      </mesh>
+      {/* Legs */}
+      {[[-0.88, -0.32], [0.88, -0.32], [-0.88, 0.32], [0.88, 0.32]].map(([x, z], i) => (
+        <mesh key={i} position={[x, 0.04, z]} castShadow>
+          <boxGeometry args={[0.06, 0.08, 0.06]} />
+          <meshStandardMaterial color="#2A1A0A" roughness={0.5} metalness={0.1} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Low rectangular coffee table. */
+export function CoffeeTable({ position, rotation = 0 }: PropTransform) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      <mesh position={[0, 0.32, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.1, 0.04, 0.55]} />
+        <meshStandardMaterial color="#4A3020" roughness={0.65} metalness={0.05} />
+      </mesh>
+      {/* Shelf */}
+      <mesh position={[0, 0.14, 0]} receiveShadow>
+        <boxGeometry args={[0.95, 0.02, 0.42]} />
+        <meshStandardMaterial color="#3A2518" roughness={0.7} />
+      </mesh>
+      {[[-0.46, -0.2], [0.46, -0.2], [-0.46, 0.2], [0.46, 0.2]].map(([x, z], i) => (
+        <mesh key={i} position={[x, 0.16, z]} castShadow>
+          <boxGeometry args={[0.04, 0.32, 0.04]} />
+          <meshStandardMaterial color="#2A1A0A" roughness={0.5} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Flat panel television on a low stand. Faces +z by default. */
+export function Television({ position, rotation = 0 }: PropTransform) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      {/* Stand base */}
+      <mesh position={[0, 0.04, 0]} castShadow>
+        <boxGeometry args={[0.55, 0.08, 0.3]} />
+        <meshStandardMaterial color="#1A1A1A" roughness={0.4} metalness={0.5} />
+      </mesh>
+      {/* Neck */}
+      <mesh position={[0, 0.2, 0]} castShadow>
+        <boxGeometry args={[0.06, 0.24, 0.06]} />
+        <meshStandardMaterial color="#1A1A1A" roughness={0.4} metalness={0.5} />
+      </mesh>
+      {/* Screen panel */}
+      <mesh position={[0, 0.64, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.1, 0.64, 0.06]} />
+        <meshStandardMaterial color="#111111" roughness={0.3} metalness={0.6} />
+      </mesh>
+      {/* Screen surface */}
+      <mesh position={[0, 0.64, 0.032]}>
+        <planeGeometry args={[1.0, 0.55]} />
+        <meshStandardMaterial color="#0A0F16" roughness={0.1} metalness={0.2} emissive="#0A0F16" emissiveIntensity={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Tall floor lamp. */
+export function FloorLamp({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Base */}
+      <mesh position={[0, 0.05, 0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.22, 0.1, 16]} />
+        <meshStandardMaterial color="#3A3A3A" roughness={0.4} metalness={0.6} />
+      </mesh>
+      {/* Pole */}
+      <mesh position={[0, 0.9, 0]} castShadow>
+        <cylinderGeometry args={[0.015, 0.015, 1.6, 8]} />
+        <meshStandardMaterial color="#4A4A4A" roughness={0.3} metalness={0.7} />
+      </mesh>
+      {/* Shade */}
+      <mesh position={[0, 1.75, 0]} castShadow>
+        <cylinderGeometry args={[0.22, 0.14, 0.28, 16, 1, true]} />
+        <meshStandardMaterial color="#D4C4A0" roughness={0.9} side={2} />
+      </mesh>
+      {/* Bulb glow */}
+      <pointLight position={[0, 1.68, 0]} intensity={1.2} distance={4} color="#FFD080" decay={2} />
+    </group>
+  );
+}
+
 /** Low side table. */
 export function SideTable({ position, rotation = 0 }: PropTransform) {
   return (

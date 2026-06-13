@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -18,25 +17,30 @@ const MODE_STORAGE_KEY = 'heli-mode';
 
 const modeOptions: {
   id: Mode;
-  code: string;
   title: string;
+  tagline: string;
   description: string;
 }[] = [
   {
     id: 'learning',
-    code: '01',
-    title: 'Story Mode',
+    title: 'Story mode',
+    tagline: 'For everyone',
     description:
       'Play through the story. Find clues, make choices, and see what happens because of them.',
   },
   {
     id: 'training',
-    code: '02',
-    title: 'Training Mode',
+    title: 'Training mode',
+    tagline: 'For professionals',
     description:
-      'For people training in safeguarding. Includes scores, areas to improve, and a certificate.',
+      'Designed for safeguarding training. Includes scoring, detailed feedback, and a certificate on completion.',
   },
 ];
+
+const scenarioHooks: Record<string, string> = {
+  'jamie-case': 'It wasn\'t the uniform that stayed with you. It was the way Jamie pulled their sleeve down when you came close.',
+  'lazlo-case': 'Lazlo used to reply within the hour. Then his uncle died. Then he stopped replying at all. Then his sister called you.',
+};
 
 function savedStateKey(scenarioId: string, mode: Mode) {
   return `heli-state:${scenarioId}:${mode}`;
@@ -74,149 +78,101 @@ export default function WelcomePage() {
 
   return (
     <div className="min-h-screen relative flex flex-col">
-      {/* Top rule: corner-anchored HUD labels */}
-      <header className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border">
-        <span className="hud-label">Heli — Safeguarding Simulation</span>
-        <span className="hud-label hidden sm:block">Prototype / V0.1</span>
+      {/* Header */}
+      <header className="flex items-center justify-between px-5 md:px-10 py-4 border-b border-border">
+        <span className="font-sans text-sm font-semibold text-foreground/80 tracking-wide">Heli</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground hidden sm:block">
+          Prototype v0.1
+        </span>
       </header>
 
       {/* Hero */}
-      <section className="px-4 md:px-8 py-16 md:py-24 border-b border-border">
+      <section className="px-5 md:px-10 pt-16 md:pt-24 pb-12 md:pb-16">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-4xl mx-auto"
+          transition={{ duration: 0.6 }}
+          className="max-w-2xl"
         >
-          <p className="hud-label mb-6">Helping Everyone Learn Interactively</p>
-          <h1 className="font-sans text-6xl md:text-8xl font-bold uppercase tracking-tight text-foreground mb-8 leading-none">
-            Heli
-          </h1>
-          <div className="rule-h w-16 bg-primary mb-8" />
-          <p className="text-xl md:text-2xl text-foreground mb-4 max-w-2xl">
-            Step into a story. Notice the signs. Help someone.
+          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-8">
+            Case file — open
           </p>
-          <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">
-            Heli teaches you to recognise when someone is at risk - and what to
-            do about it - through stories you play, not slides you read.
+          <h1 className="font-sans text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight tracking-tight">
+            The signs were there.<br />
+            <span className="text-primary">Someone just had to see them.</span>
+          </h1>
+          <p className="text-base text-muted-foreground max-w-lg leading-relaxed">
+            Step into a real situation. Read the room. Make decisions under
+            uncertainty. Find out what you missed — and what your choices meant.
           </p>
         </motion.div>
       </section>
 
-      {/* Mode selection */}
-      <section className="px-4 md:px-8 py-12 border-b border-border">
-        <div className="max-w-4xl mx-auto">
-          <p className="hud-label mb-6">Select mode — How do you want to play?</p>
-          <div
-            className="grid sm:grid-cols-2 gap-px bg-border border border-border"
-            role="radiogroup"
-            aria-label="Choose a mode"
-          >
-            {modeOptions.map((option) => (
-              <button
-                key={option.id}
-                role="radio"
-                aria-checked={mode === option.id}
-                onClick={() => setMode(option.id)}
-                className={cn(
-                  'text-left p-6 transition-colors relative',
-                  mode === option.id
-                    ? 'bg-secondary'
-                    : 'bg-background hover:bg-secondary/50'
-                )}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span
-                    className={cn(
-                      'font-mono text-[10px] uppercase tracking-[0.25em]',
-                      mode === option.id ? 'text-primary' : 'text-muted-foreground'
-                    )}
-                  >
-                    Mode {option.code}
-                  </span>
-                  <span
-                    className={cn(
-                      'w-2.5 h-2.5 border',
-                      mode === option.id
-                        ? 'bg-primary border-primary'
-                        : 'border-muted-foreground'
-                    )}
-                    aria-hidden="true"
-                  />
-                </div>
-                <span className="block font-semibold text-lg text-foreground mb-2">
-                  {option.title}
-                </span>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {option.description}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Scenario dossiers */}
-      <section className="px-4 md:px-8 py-12 flex-grow">
-        <div className="max-w-4xl mx-auto">
-          <p className="hud-label mb-6">Case files — Choose a story</p>
-          <div className="grid md:grid-cols-2 gap-px bg-border border border-border">
+      {/* Scenario cards — lead with the stories */}
+      <section className="px-5 md:px-10 pb-12 flex-grow">
+        <div className="max-w-3xl">
+          <p className="page-label mb-5">Choose a case</p>
+          <div className="grid md:grid-cols-2 gap-4">
             {scenarios.map((scenario, index) => {
               const locked = scenario.status === 'in-development';
               const inProgress = !locked && hasProgress(scenario.id, mode);
+              const hook = scenarioHooks[scenario.id];
               return (
                 <motion.article
                   key={scenario.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.1 + index * 0.08 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 + index * 0.1 }}
                   className={cn(
-                    'p-6 flex flex-col bg-background',
-                    locked && 'opacity-60'
+                    'content-card p-6 flex flex-col group',
+                    locked && 'opacity-40'
                   )}
                 >
                   <div className="flex items-center justify-between mb-5">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
-                      Case {String(index + 1).padStart(2, '0')} —{' '}
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                       {scenario.domain?.replace(/-/g, ' ')}
                     </span>
                     {locked ? (
-                      <span className="hud-label border border-border px-2 py-1">
-                        In development
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground border border-border rounded px-2 py-0.5">
+                        Coming soon
                       </span>
                     ) : (
                       scenario.durationMinutes && (
-                        <span className="hud-label">
+                        <span className="text-[10px] font-mono text-muted-foreground">
                           ~{scenario.durationMinutes} min
                         </span>
                       )
                     )}
                   </div>
-                  <h3 className="font-sans text-3xl font-bold uppercase tracking-tight text-foreground mb-2">
+
+                  {hook && (
+                    <p className="text-sm text-foreground/70 leading-relaxed mb-5 italic border-l-2 border-primary/40 pl-4">
+                      {hook}
+                    </p>
+                  )}
+
+                  <h3 className="font-sans text-xl font-bold text-foreground mb-1 leading-snug tracking-tight">
                     {scenario.title}
                   </h3>
-                  <p className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground mb-4">
+                  <p className="text-xs text-muted-foreground mb-6 flex-grow">
                     You play: {scenario.role}
                   </p>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-8 flex-grow">
-                    {scenario.description}
-                  </p>
+
                   {!locked && (
-                    <div className="flex items-center gap-3">
-                      <Button
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <button
                         onClick={() => setPendingScenario(scenario)}
-                        className="font-mono uppercase tracking-[0.15em] text-xs"
+                        className="bg-primary text-primary-foreground font-sans text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
                       >
-                        {inProgress ? '▸ Continue' : '▸ Begin Simulation'}
-                      </Button>
+                        {inProgress ? 'Continue' : 'Enter the story'}
+                      </button>
                       {inProgress && (
-                        <Button
-                          variant="outline"
+                        <button
                           onClick={() => startScenario(scenario, true)}
-                          className="font-mono uppercase tracking-[0.15em] text-xs"
+                          className="border border-border text-foreground/60 font-sans text-sm px-4 py-2.5 rounded-lg hover:border-foreground/50 hover:text-foreground/80 transition-colors"
                         >
-                          Start Over
-                        </Button>
+                          Start over
+                        </button>
                       )}
                     </div>
                   )}
@@ -227,10 +183,60 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* Footer signposting — plain language, generous type (pillar 4) */}
-      <footer className="px-4 md:px-8 py-8 border-t border-border">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
+      {/* Mode selection — quieter, below the stories */}
+      <section className="px-5 md:px-10 pb-14">
+        <div className="max-w-3xl">
+          <p className="page-label mb-4">How do you want to approach this?</p>
+          <div
+            className="flex flex-col sm:flex-row gap-2"
+            role="radiogroup"
+            aria-label="Choose a mode"
+          >
+            {modeOptions.map((option) => {
+              const selected = mode === option.id;
+              return (
+                <button
+                  key={option.id}
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => setMode(option.id)}
+                  className={cn(
+                    'text-left px-5 py-4 rounded-lg border transition-all duration-150 flex-1',
+                    selected
+                      ? 'border-primary/50 bg-primary/6 ring-1 ring-primary/20'
+                      : 'border-border bg-card hover:border-border/80 hover:bg-secondary/30'
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={cn(
+                        'w-3 h-3 rounded-full border-2 flex-shrink-0 transition-colors',
+                        selected
+                          ? 'border-primary bg-primary'
+                          : 'border-muted-foreground/40'
+                      )}
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <span className="block font-medium text-sm text-foreground">
+                        {option.title}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {option.tagline} — {option.description}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="px-5 md:px-10 py-8 border-t border-border">
+        <div className="max-w-3xl">
+          <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
             The people in these stories are not real. They are here to help you
             learn. If you are worried about a real person, tell someone you
             trust, or contact the NSPCC on{' '}
@@ -246,10 +252,10 @@ export default function WelcomePage() {
         open={pendingScenario !== null}
         onOpenChange={(open) => !open && setPendingScenario(null)}
       >
-        <DialogContent className="border-border">
+        <DialogContent className="border-border rounded-xl">
           <DialogHeader>
-            <p className="hud-label text-primary mb-1">Content notice</p>
-            <DialogTitle className="font-sans text-xl uppercase tracking-tight">
+            <p className="page-label mb-1">Content notice</p>
+            <DialogTitle className="font-sans text-xl font-bold tracking-tight">
               Before you start
             </DialogTitle>
             <DialogDescription asChild>
@@ -262,20 +268,19 @@ export default function WelcomePage() {
               </div>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button
-              variant="outline"
+          <DialogFooter className="gap-2 sm:gap-2 pt-2">
+            <button
               onClick={() => setPendingScenario(null)}
-              className="font-mono uppercase tracking-[0.15em] text-xs"
+              className="border border-border text-foreground/80 font-sans text-sm font-medium px-5 py-2.5 rounded-lg hover:border-foreground/50 hover:text-foreground transition-colors"
             >
               Go back
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={() => pendingScenario && startScenario(pendingScenario)}
-              className="font-mono uppercase tracking-[0.15em] text-xs"
+              className="bg-primary text-primary-foreground font-sans text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
             >
               I understand — start
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

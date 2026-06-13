@@ -5,12 +5,13 @@ import { EffectComposer, DepthOfField, Vignette, Outline, Selection, N8AO, Bloom
 import { ClassroomScene } from './ClassroomScene';
 import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
+import { HomeScene, HOME_OBSTACLES } from './HomeScene';
 import { CameraController } from './CameraController';
 import { PlayerCharacter } from './PlayerCharacter';
 import { Evidence } from '@/types/simulation';
 import * as THREE from 'three';
 
-export type SceneType = 'classroom' | 'playground' | 'office';
+export type SceneType = 'classroom' | 'playground' | 'office' | 'home';
 
 interface SceneRendererProps {
   sceneType: SceneType;
@@ -48,10 +49,9 @@ export function SceneRenderer({
         gl={{
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          // AO darkens corners — interiors get a touch more exposure to compensate
-          toneMappingExposure: sceneType === 'playground' ? 1.2 : 1.0,
+          toneMappingExposure: sceneType === 'playground' ? 1.2 : sceneType === 'home' ? 0.85 : 1.0,
         }}
-        style={{ background: sceneType === 'playground' ? '#87CEEB' : '#211c19' }}
+        style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : '#211c19' }}
       >
         <Suspense fallback={null}>
           <Selection>
@@ -62,7 +62,11 @@ export function SceneRenderer({
             onArrived={() => {}}
           />
 
-          <PlayerCharacter onPositionChange={handlePlayerMove} sceneType={sceneType} />
+          <PlayerCharacter
+            onPositionChange={handlePlayerMove}
+            sceneType={sceneType}
+            obstacles={sceneType === 'home' ? HOME_OBSTACLES : undefined}
+          />
 
           {sceneType === 'classroom' && (
             <ClassroomScene
@@ -91,9 +95,18 @@ export function SceneRenderer({
               onFocusEvidence={onFocusEvidence}
             />
           )}
+          {sceneType === 'home' && (
+            <HomeScene
+              evidence={evidence}
+              collectedIds={collectedIds}
+              focusedEvidenceId={focusedEvidenceId}
+              onCollectEvidence={onCollectEvidence}
+              onFocusEvidence={onFocusEvidence}
+            />
+          )}
 
           {/* Environment-based lighting for realistic reflections */}
-          <Environment preset={sceneType === 'playground' ? 'park' : 'apartment'} />
+          <Environment preset={sceneType === 'playground' ? 'park' : sceneType === 'home' ? 'night' : 'apartment'} />
 
           {/* Contact shadows for grounding objects */}
           <ContactShadows
@@ -137,7 +150,11 @@ export function SceneRenderer({
             )}
           </EffectComposer>
 
-          <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : '#211c19', 12, 30]} />
+          <fog attach="fog" args={[
+            sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : '#211c19',
+            sceneType === 'home' ? 8 : 12,
+            sceneType === 'home' ? 18 : 30,
+          ]} />
           </Selection>
         </Suspense>
       </Canvas>

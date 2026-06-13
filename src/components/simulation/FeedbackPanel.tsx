@@ -16,17 +16,19 @@ export function FeedbackPanel({ choice, onContinue, mode = 'training' }: Feedbac
       animate={{ opacity: 1, y: 0 }}
       className="max-w-lg mx-auto"
     >
-      {/* Consequence — the story reacts */}
+      {/* Consequence — in training mode labelled; in learning mode pure narrative */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.15 }}
         className="case-panel mb-px"
       >
-        <div className="px-6 py-3 border-b border-border">
-          <span className="hud-label text-primary">What happens</span>
-        </div>
-        <p className="px-6 py-5 text-base md:text-lg text-foreground/90 leading-relaxed">
+        {mode === 'training' && (
+          <div className="px-6 py-3 border-b border-border">
+            <span className="hud-label text-primary">What happens</span>
+          </div>
+        )}
+        <p className={`px-6 text-foreground/90 leading-relaxed ${mode === 'learning' ? 'py-6 text-base md:text-xl italic' : 'py-5 text-base md:text-lg'}`}>
           {choice.consequence}
         </p>
       </motion.div>

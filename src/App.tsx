@@ -8,6 +8,7 @@ import { MotionConfig } from "framer-motion";
 import WelcomePage from "./pages/WelcomePage";
 import NotFound from "./pages/NotFound";
 import { LoadingCounter } from "./components/LoadingSequence";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Lazy-load the 3D-heavy pages so the welcome screen doesn't pay for three.js
 const StoryPage = lazy(() => import("./pages/StoryPage"));
@@ -24,15 +25,31 @@ const App = () => (
         {/* Film grain over everything; hidden under prefers-reduced-motion */}
         <div className="film-grain" aria-hidden="true" />
         <BrowserRouter>
-          <Suspense fallback={<LoadingCounter />}>
-            <Routes>
-              <Route path="/" element={<WelcomePage />} />
-              <Route path="/story/:scenarioId?" element={<StoryPage />} />
-              <Route path="/results" element={<ResultsPage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+          <ErrorBoundary context="application">
+            <Suspense fallback={<LoadingCounter />}>
+              <Routes>
+                <Route path="/" element={<WelcomePage />} />
+                <Route
+                  path="/story/:scenarioId?"
+                  element={
+                    <ErrorBoundary context="simulation">
+                      <StoryPage />
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/results"
+                  element={
+                    <ErrorBoundary context="results">
+                      <ResultsPage />
+                    </ErrorBoundary>
+                  }
+                />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>
     </MotionConfig>

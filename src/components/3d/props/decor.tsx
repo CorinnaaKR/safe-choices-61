@@ -286,3 +286,148 @@ export function KettleTray({ position, rotation = 0 }: PropTransform) {
     </group>
   );
 }
+
+/** Cluster of 3–4 small framed photos (memorial / shrine corner). */
+export function PhotoCluster({ position }: { position: [number, number, number] }) {
+  const frames = [
+    { x: -0.14, y: 0, size: [0.2, 0.16] as [number, number], col: '#B8A898' },
+    { x: 0.12, y: 0.04, size: [0.16, 0.2] as [number, number], col: '#C8B8A0' },
+    { x: -0.04, y: -0.02, size: [0.18, 0.14] as [number, number], col: '#A89888' },
+  ];
+  return (
+    <group position={position}>
+      {frames.map(({ x, y, size, col }, i) => (
+        <group key={i} position={[x, y, i * 0.015]}>
+          <mesh castShadow>
+            <boxGeometry args={[size[0] + 0.025, size[1] + 0.025, 0.015]} />
+            <meshStandardMaterial color="#2A1A10" roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0, 0.01]}>
+            <planeGeometry args={size} />
+            <meshStandardMaterial color={col} roughness={0.8} />
+          </mesh>
+          {/* Simple face silhouette */}
+          <mesh position={[0, 0.02, 0.012]}>
+            <circleGeometry args={[size[0] * 0.22, 12]} />
+            <meshStandardMaterial color="#7A5A40" roughness={0.9} />
+          </mesh>
+        </group>
+      ))}
+      {/* Small candle stub */}
+      <mesh position={[0.22, 0.05, 0]} castShadow>
+        <cylinderGeometry args={[0.018, 0.02, 0.1, 10]} />
+        <meshStandardMaterial color="#F2EDE2" roughness={0.9} />
+      </mesh>
+      <pointLight position={[0.22, 0.12, 0]} intensity={0.3} distance={0.5} color="#FF9040" decay={2} />
+    </group>
+  );
+}
+
+/** Open laptop on a surface. Screen faces +z by default. */
+export function Laptop({ position, rotation = 0 }: PropTransform) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      {/* Base */}
+      <mesh position={[0, 0.01, 0.05]} castShadow>
+        <boxGeometry args={[0.36, 0.02, 0.25]} />
+        <meshStandardMaterial color="#2A2A2A" roughness={0.4} metalness={0.6} />
+      </mesh>
+      {/* Screen (tilted open ~110°) */}
+      <group position={[0, 0.02, -0.075]} rotation={[-1.92, 0, 0]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.36, 0.24, 0.015]} />
+          <meshStandardMaterial color="#222222" roughness={0.3} metalness={0.6} />
+        </mesh>
+        {/* Screen glow */}
+        <mesh position={[0, 0, 0.009]}>
+          <planeGeometry args={[0.32, 0.2]} />
+          <meshStandardMaterial
+            color="#0A1520"
+            roughness={0.1}
+            emissive="#1A3060"
+            emissiveIntensity={0.9}
+          />
+        </mesh>
+      </group>
+      {/* Keyboard hint */}
+      <mesh position={[0, 0.022, 0.04]}>
+        <planeGeometry args={[0.3, 0.18]} />
+        <meshStandardMaterial color="#1A1A1A" roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Small pamphlet / folded leaflet lying face-up. */
+export function Pamphlet({ position, rotation = 0, color = '#1C1C2A' }: PropTransform & { color?: string }) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      <mesh position={[0, 0.003, 0]} castShadow>
+        <boxGeometry args={[0.2, 0.006, 0.14]} />
+        <meshStandardMaterial color={color} roughness={0.8} />
+      </mesh>
+      {/* Fold line */}
+      <mesh position={[0, 0.007, 0]}>
+        <planeGeometry args={[0.001, 0.14]} />
+        <meshStandardMaterial color="#3A3A4A" roughness={0.7} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Pile of unopened letters and envelopes. */
+export function MailPile({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {[0, 1, 2, 3].map((i) => (
+        <mesh
+          key={i}
+          position={[(i % 2) * 0.015, i * 0.008, (i % 3) * 0.01]}
+          rotation={[0, (i % 2 === 0 ? 1 : -1) * 0.06 * (i + 1), 0]}
+          castShadow
+        >
+          <boxGeometry args={[0.22, 0.005, 0.11]} />
+          <meshStandardMaterial
+            color={['#F5F0E8', '#E8E0D0', '#F0EAE0', '#EAE4D8'][i]}
+            roughness={0.9}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Curtained window — drawn closed, minimal light bleed. */
+export function CurtainedWindow({ position, rotation = 0 }: PropTransform) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      {/* Window recess */}
+      <mesh position={[0, 0, -0.02]}>
+        <boxGeometry args={[1.4, 1.6, 0.04]} />
+        <meshStandardMaterial color="#1A1814" roughness={0.9} />
+      </mesh>
+      {/* Light bleed — very dim, curtains are almost fully closed */}
+      <mesh position={[0, 0, 0.01]}>
+        <planeGeometry args={[1.35, 1.55]} />
+        <meshStandardMaterial color="#1E1C14" roughness={1} emissive="#302818" emissiveIntensity={0.15} />
+      </mesh>
+      {/* Left curtain panel */}
+      <mesh position={[-0.6, 0, 0.06]} castShadow>
+        <boxGeometry args={[0.3, 1.7, 0.04]} />
+        <meshStandardMaterial color="#3A2A1E" roughness={0.95} />
+      </mesh>
+      {/* Right curtain panel */}
+      <mesh position={[0.6, 0, 0.06]} castShadow>
+        <boxGeometry args={[0.3, 1.7, 0.04]} />
+        <meshStandardMaterial color="#3A2A1E" roughness={0.95} />
+      </mesh>
+      {/* Curtain rod */}
+      <mesh position={[0, 0.85, 0.1]} castShadow>
+        <cylinderGeometry args={[0.012, 0.012, 1.6, 8]} rotation={[0, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#5A5A5A" metalness={0.7} roughness={0.3} />
+      </mesh>
+      {/* Thin gap of light between curtains */}
+      <pointLight position={[0, 0, 0.2]} intensity={0.08} distance={1} color="#C8B88A" decay={2} />
+    </group>
+  );
+}

@@ -7,13 +7,16 @@ import { SceneRenderer, SceneType } from '@/components/3d/SceneRenderer';
 import { CLASSROOM_EVIDENCE_POSITIONS } from '@/components/3d/ClassroomScene';
 import { PLAYGROUND_EVIDENCE_POSITIONS } from '@/components/3d/PlaygroundScene';
 import { OFFICE_EVIDENCE_POSITIONS } from '@/components/3d/OfficeScene';
+import { HOME_EVIDENCE_POSITIONS } from '@/components/3d/HomeScene';
 import { Evidence } from '@/types/simulation';
 import { SceneHUD } from '@/components/simulation/SceneHUD';
+import { PreVisitConversation } from '@/components/simulation/PreVisitConversation';
+import { TrainingGate } from '@/components/simulation/TrainingGate';
 import { SceneTitleStamp } from '@/components/LoadingSequence';
+import { PauseOverlay } from '@/components/simulation/PauseOverlay';
 
-/** Until every environment has a dedicated 3D scene, unknown ones render as office. */
 function environmentToSceneType(env?: SceneEnvironment): SceneType {
-  if (env === 'classroom' || env === 'playground' || env === 'office') return env;
+  if (env === 'classroom' || env === 'playground' || env === 'office' || env === 'home') return env;
   return 'office';
 }
 
@@ -32,12 +35,16 @@ export default function StoryPage() {
     lastChoice,
     collectEvidence,
     makeChoice,
+    completeTrainingGate,
+    completePreVisit,
     proceedToNextScene,
+    completeFinalScene,
     getProgress,
   } = useSimulation(scenarioId, mode);
 
   const [focusedEvidenceId, setFocusedEvidenceId] = useState<string | null>(null);
   const [inspectedEvidence, setInspectedEvidence] = useState<Evidence | null>(null);
+  const [showPause, setShowPause] = useState(false);
 
   useEffect(() => {
     if (gameState.isComplete) {
@@ -71,16 +78,17 @@ export default function StoryPage() {
   // Build evidence position map
   const evidencePositions = useMemo(() => {
     const posMap = new Map<string, [number, number, number]>();
-    const positions =
-      sceneType === 'classroom' ? CLASSROOM_EVIDENCE_POSITIONS :
-      sceneType === 'playground' ? PLAYGROUND_EVIDENCE_POSITIONS :
-      OFFICE_EVIDENCE_POSITIONS;
     sceneEvidence.forEach((ev, i) => {
-      // Use NPC position if this evidence is character-attached
       if (NPC_EVIDENCE_POSITIONS[ev.id]) {
         posMap.set(ev.id, NPC_EVIDENCE_POSITIONS[ev.id]);
+      } else if (sceneType === 'home' && HOME_EVIDENCE_POSITIONS[ev.id]) {
+        posMap.set(ev.id, HOME_EVIDENCE_POSITIONS[ev.id]);
       } else {
-        posMap.set(ev.id, positions[i] || [i * 1.5, 1, 0]);
+        const fallback =
+          sceneType === 'classroom' ? CLASSROOM_EVIDENCE_POSITIONS :
+          sceneType === 'playground' ? PLAYGROUND_EVIDENCE_POSITIONS :
+          OFFICE_EVIDENCE_POSITIONS;
+        posMap.set(ev.id, fallback[i] || [i * 1.5, 1, 0]);
       }
     });
     return posMap;
@@ -102,6 +110,26 @@ export default function StoryPage() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="hud-label">Loading scenario…</p>
       </div>
+    );
+  }
+
+  // Training mode: show declaration gate before anything else
+  if (mode === 'training' && !gameState.trainingProfile) {
+    return (
+      <TrainingGate
+        scenarioTitle={scenario.title}
+        onComplete={completeTrainingGate}
+      />
+    );
+  }
+
+  // Show pre-visit SMS conversation if scenario has one and it hasn't been completed
+  if (scenario.preVisit && !gameState.preVisitComplete) {
+    return (
+      <PreVisitConversation
+        data={scenario.preVisit}
+        onComplete={(choiceIds, finalTrust) => completePreVisit(choiceIds, finalTrust)}
+      />
     );
   }
 
@@ -136,11 +164,20 @@ export default function StoryPage() {
         inspectedEvidence={inspectedEvidence}
         focusedEvidenceId={focusedEvidenceId}
         progress={getProgress()}
+        trustLevel={gameState.trustLevel}
         onMakeChoice={makeChoice}
         onProceed={proceedToNextScene}
-        onExit={() => navigate('/')}
+        onComplete={completeFinalScene}
+        onExit={() => setShowPause(true)}
         onDismissEvidence={handleCameraReset}
       />
+      {showPause && (
+        <PauseOverlay
+          scenario={scenario}
+          onResume={() => setShowPause(false)}
+          onLeave={() => navigate('/')}
+        />
+      )}
     </div>
   );
 }

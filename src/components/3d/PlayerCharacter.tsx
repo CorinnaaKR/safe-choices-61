@@ -8,20 +8,31 @@ const SCENE_BOUNDS: Record<SceneType, [number, number, number, number]> = {
   classroom: [-5.5, 5.5, -4.5, 4.5],
   playground: [-7, 7, -5, 5],
   office: [-3.5, 3.5, -2.5, 2.5],
+  home: [-4.2, 4.2, -3.6, 3.6],
 };
 
 interface PlayerCharacterProps {
   onPositionChange: (position: THREE.Vector3) => void;
   sceneType?: SceneType;
+  obstacles?: [number, number, number, number][];
 }
 
 const SPEED = 3;
 const ROTATION_SPEED = 3;
-const WALL_MARGIN = 0.3; // character radius buffer
+const WALL_MARGIN = 0.3;
+const CHAR_RADIUS = 0.32; // collision radius for furniture AABB checks
+
+function hitsObstacle(x: number, z: number, obs: [number, number, number, number][]): boolean {
+  for (const [minX, maxX, minZ, maxZ] of obs) {
+    if (x + CHAR_RADIUS > minX && x - CHAR_RADIUS < maxX &&
+        z + CHAR_RADIUS > minZ && z - CHAR_RADIUS < maxZ) return true;
+  }
+  return false;
+}
 
 const UP = new THREE.Vector3(0, 1, 0);
 
-export function PlayerCharacter({ onPositionChange, sceneType = 'classroom' }: PlayerCharacterProps) {
+export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obstacles = [] }: PlayerCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const keys = useRef<Record<string, boolean>>({});
   const rotationY = useRef(0);
@@ -83,16 +94,13 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom' }: P
       groupRef.current.rotation.y = rotationY.current;
 
       const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType];
-      groupRef.current.position.x = THREE.MathUtils.clamp(
-        groupRef.current.position.x + moveVec.current.x * SPEED * delta,
-        minX + WALL_MARGIN,
-        maxX - WALL_MARGIN
-      );
-      groupRef.current.position.z = THREE.MathUtils.clamp(
-        groupRef.current.position.z + moveVec.current.z * SPEED * delta,
-        minZ + WALL_MARGIN,
-        maxZ - WALL_MARGIN
-      );
+      const curX = groupRef.current.position.x;
+      const curZ = groupRef.current.position.z;
+      const nextX = THREE.MathUtils.clamp(curX + moveVec.current.x * SPEED * delta, minX + WALL_MARGIN, maxX - WALL_MARGIN);
+      const nextZ = THREE.MathUtils.clamp(curZ + moveVec.current.z * SPEED * delta, minZ + WALL_MARGIN, maxZ - WALL_MARGIN);
+      // Axis-separated collision: try each axis independently so the player slides along furniture
+      if (!hitsObstacle(nextX, curZ, obstacles)) groupRef.current.position.x = nextX;
+      if (!hitsObstacle(groupRef.current.position.x, nextZ, obstacles)) groupRef.current.position.z = nextZ;
     }
 
     // Walking bob

@@ -9,56 +9,60 @@
 
 @layer base {
   :root {
-    --background: 24 14% 10%;
-    --foreground: 36 28% 92%;
+    /* Ground: warm espresso — lifted from near-black for depth and accessibility */
+    --background: 26 14% 19%;
+    --foreground: 36 25% 91%;
 
-    --card: 24 12% 13%;
-    --card-foreground: 36 28% 92%;
+    /* Card surfaces sit visibly above the ground */
+    --card: 26 14% 30%;
+    --card-foreground: 36 25% 91%;
 
-    --popover: 24 13% 11%;
-    --popover-foreground: 36 28% 92%;
+    --popover: 26 14% 22%;
+    --popover-foreground: 36 25% 91%;
 
     /* Warm amber accent */
-    --primary: 32 88% 56%;
+    --primary: 32 85% 58%;
     --primary-foreground: 24 14% 10%;
 
-    --secondary: 26 10% 18%;
-    --secondary-foreground: 36 28% 92%;
+    --secondary: 26 12% 26%;
+    --secondary-foreground: 36 25% 91%;
 
-    --muted: 25 10% 16%;
-    --muted-foreground: 32 12% 66%;
+    --muted: 26 10% 24%;
+    /* Lightened from 62% to 70% lightness — passes AA on card surfaces */
+    --muted-foreground: 33 22% 70%;
 
-    --accent: 32 88% 56%;
+    --accent: 32 85% 58%;
     --accent-foreground: 24 14% 10%;
 
     --destructive: 0 55% 50%;
-    --destructive-foreground: 36 28% 92%;
+    --destructive-foreground: 36 25% 91%;
 
-    --border: 28 10% 26%;
-    --input: 28 10% 26%;
-    --ring: 32 88% 56%;
+    /* Border visible against both ground and card */
+    --border: 26 14% 38%;
+    --input: 26 14% 38%;
+    --ring: 32 85% 58%;
 
-    --radius: 0.375rem;
+    --radius: 0.5rem;
 
-    /* Story-specific tokens */
-    --story-bg: 24 14% 10%;
+    /* Story-specific tokens — slightly darker than ground for atmosphere */
+    --story-bg: 26 14% 16%;
     --story-text: 36 28% 92%;
     --story-accent: 32 88% 56%;
-    --evidence-bg: 25 12% 14%;
-    --evidence-border: 28 12% 30%;
+    --evidence-bg: 26 14% 22%;
+    --evidence-border: 26 14% 34%;
     --decision-highlight: 32 88% 56%;
-    /* Semantic feedback keeps hue for clarity (pillar 4) */
+    /* Semantic feedback — icon + label alongside colour (colour-blind safe) */
     --positive: 145 35% 52%;
     --negative: 0 55% 60%;
     --neutral: 32 12% 66%;
 
-    --sidebar-background: 24 13% 11%;
+    --sidebar-background: 26 14% 19%;
     --sidebar-foreground: 36 28% 92%;
     --sidebar-primary: 32 88% 56%;
     --sidebar-primary-foreground: 24 14% 10%;
-    --sidebar-accent: 25 10% 16%;
+    --sidebar-accent: 26 12% 26%;
     --sidebar-accent-foreground: 36 28% 92%;
-    --sidebar-border: 28 10% 26%;
+    --sidebar-border: 26 14% 34%;
     --sidebar-ring: 32 88% 56%;
   }
 }
@@ -79,9 +83,14 @@
 }
 
 @layer components {
-  /* Monospace HUD label: uppercase, gently letter-spaced */
+  /* Monospace HUD label: uppercase, gently letter-spaced — used inside the simulation HUD */
   .hud-label {
     @apply font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground;
+  }
+
+  /* Warmer label for content pages (welcome, gate, results) — no uppercase aggression */
+  .page-label {
+    @apply font-sans text-xs font-medium tracking-wide text-primary/80;
   }
 
   /* Bracketed keyboard affordance: [E] EXAMINE */
@@ -98,12 +107,27 @@
     background: hsl(var(--border));
   }
 
-  /* Case-file / dossier panel */
+  /* Case-file / dossier panel — used inside the simulation HUD */
   .case-panel {
     background: hsl(var(--background) / 0.88);
     backdrop-filter: blur(8px);
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
+  }
+
+  /* Content card — used on welcome, gate, results pages */
+  .content-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) * 1.5);
+  }
+
+  /* Warm divider */
+  .warm-divider {
+    height: 2px;
+    width: 2.5rem;
+    background: hsl(var(--primary));
+    border-radius: 9999px;
   }
 }
 

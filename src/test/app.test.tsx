@@ -14,10 +14,9 @@ describe('app smoke test', () => {
     // Both modes offered
     expect(screen.getByRole('radio', { name: /story mode/i })).toBeTruthy();
     expect(screen.getByRole('radio', { name: /training mode/i })).toBeTruthy();
-    // Jamie playable, Lazlo locked
+    // Both scenarios now playable
     expect(screen.getByText(/Jamie's Story/)).toBeTruthy();
     expect(screen.getByText(/Lazlo's Story/)).toBeTruthy();
-    expect(screen.getByText(/in development/i)).toBeTruthy();
-    expect(screen.getByRole('button', { name: /begin simulation/i })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: /begin simulation/i }).length).toBeGreaterThanOrEqual(1);
   });
 });

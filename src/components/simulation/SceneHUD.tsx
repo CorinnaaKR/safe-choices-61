@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Evidence, Scene, Choice, GameState, Mode } from '@/types/simulation';
 import { FeedbackPanel } from './FeedbackPanel';
 import { ChoiceConfirmModal } from './ChoiceConfirmModal';
-import { useTypewriter } from '@/hooks/useTypewriter';
+import { InspectViewer } from './InspectViewer';
 import { playUiTick } from '@/lib/sfx';
 
 interface SceneHUDProps {
@@ -16,82 +16,15 @@ interface SceneHUDProps {
   inspectedEvidence: Evidence | null;
   focusedEvidenceId: string | null;
   progress: number;
+  trustLevel?: number;
   onMakeChoice: (choice: Choice, supportingEvidenceIds?: string[]) => void;
   onProceed: () => void;
   onExit: () => void;
   onDismissEvidence: () => void;
+  /** Called when the player clicks "View results" on the final scene. */
+  onComplete?: () => void;
 }
 
-/** Case-file inspect panel: mono type, typewriter reveal, category stamps. */
-function CaseFilePanel({
-  evidence,
-  evidenceNumber,
-  onDismiss,
-}: {
-  evidence: Evidence;
-  evidenceNumber: number;
-  onDismiss: () => void;
-}) {
-  const { text, done } = useTypewriter(evidence.content);
-
-  return (
-    <div className="case-panel">
-      {/* Stamp header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-        <span className="hud-label text-primary">
-          Case file — Evidence {String(evidenceNumber).padStart(2, '0')}
-        </span>
-        <div className="flex items-center gap-3">
-          <span className="key-hint">
-            <b>[SCROLL]</b> Zoom
-          </span>
-          <button
-            onClick={onDismiss}
-            className="key-hint hover:text-foreground transition-colors"
-            aria-label="Close evidence panel"
-          >
-            <b>[ESC]</b> Close
-          </button>
-        </div>
-      </div>
-
-      <div className="px-5 py-4">
-        <h4 className="font-mono text-sm uppercase tracking-[0.15em] text-foreground mb-1">
-          {evidence.title}
-        </h4>
-        <p className="hud-label mb-4">{evidence.timestamp}</p>
-
-        <p
-          className={`text-sm text-foreground/85 leading-relaxed min-h-[3.5rem] ${done ? '' : 'type-caret'}`}
-          aria-label={evidence.content}
-        >
-          {text}
-        </p>
-
-        {/* Category / importance stamps */}
-        <div className="flex flex-wrap items-center gap-2 mt-5">
-          {evidence.category && (
-            <span className="hud-label border border-border px-2 py-1">
-              {evidence.category}
-            </span>
-          )}
-          {evidence.importance && (
-            <span
-              className={`hud-label border px-2 py-1 ${
-                evidence.importance === 'critical'
-                  ? 'border-primary text-primary'
-                  : 'border-border'
-              }`}
-            >
-              {evidence.importance}
-            </span>
-          )}
-          <span className="hud-label text-primary ml-auto">Logged ✓</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function SceneHUD({
   scenarioTitle,
@@ -103,30 +36,40 @@ export function SceneHUD({
   inspectedEvidence,
   focusedEvidenceId,
   progress,
+  trustLevel,
   onMakeChoice,
   onProceed,
   onExit,
   onDismissEvidence,
+  onComplete,
 }: SceneHUDProps) {
   const [journalOpen, setJournalOpen] = useState(false);
   const [visibleParagraph, setVisibleParagraph] = useState(() =>
     currentScene.narrative.length > 0 ? 1 : 0
   );
   const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
+  // Blocks narrative interaction while the scene-title stamp is showing (2.4s).
+  // Prevents clicking through paragraphs before you've read the scene title.
+  const [sceneReady, setSceneReady] = useState(false);
   const prevSceneId = useRef(currentScene.id);
+  const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const sceneEvidence = currentScene.evidence || [];
   const uncollected = sceneEvidence.filter(
     e => !gameState.collectedEvidence.some(c => c.id === e.id)
   );
 
-  // Restart paragraph progression on scene change (first paragraph shows immediately)
+  // On scene change: reset narrative and hold for stamp duration before going interactive
   useEffect(() => {
     if (prevSceneId.current !== currentScene.id) {
       prevSceneId.current = currentScene.id;
       setPendingChoice(null);
       setVisibleParagraph(currentScene.narrative.length > 0 ? 1 : 0);
+      setSceneReady(false);
     }
+    if (readyTimer.current) clearTimeout(readyTimer.current);
+    readyTimer.current = setTimeout(() => setSceneReady(true), 2400);
+    return () => { if (readyTimer.current) clearTimeout(readyTimer.current); };
   }, [currentScene.id, currentScene.narrative.length]);
 
   const advanceNarrative = () => {
@@ -239,7 +182,7 @@ export function SceneHUD({
       )}
 
       {/* ---- Narrative: progressive reveal, bottom centre ---- */}
-      {!showFeedback && (
+      {!showFeedback && sceneReady && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl pointer-events-auto">
           <AnimatePresence mode="wait">
             {!allRevealed && visibleParagraph > 0 && (
@@ -270,8 +213,25 @@ export function SceneHUD({
             )}
           </AnimatePresence>
 
-          {/* Collapsed reminder of the last line once fully revealed */}
-          {allRevealed && !currentScene.isDecisionPoint && (
+          {/* Final scene: "View results" CTA once narrative is done */}
+          {allRevealed && currentScene.isFinalScene && onComplete && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-center"
+            >
+              <button
+                onClick={onComplete}
+                className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-8 py-3.5 rounded-lg hover:bg-primary/90 transition-colors shadow-lg"
+              >
+                View results
+              </button>
+            </motion.div>
+          )}
+
+          {/* Collapsed reminder of the last line once fully revealed (non-final, non-decision scenes) */}
+          {allRevealed && !currentScene.isDecisionPoint && !currentScene.isFinalScene && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -286,7 +246,7 @@ export function SceneHUD({
       )}
 
       {/* ---- Decision panel, bottom right ---- */}
-      {!showFeedback && allRevealed && currentScene.isDecisionPoint && currentScene.choices && (
+      {!showFeedback && sceneReady && allRevealed && currentScene.isDecisionPoint && currentScene.choices && (
         <div className="absolute bottom-4 right-4 md:w-[400px] pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, x: 16 }}
@@ -298,12 +258,19 @@ export function SceneHUD({
               <span className="hud-label text-primary">Decision — What do you do?</span>
             </div>
             <div className="p-3 space-y-px max-h-[40vh] overflow-y-auto">
-              {currentScene.choices.map((choice, i) => (
+              {currentScene.choices.filter((choice) =>
+                choice.requiresMinTrust === undefined ||
+                (trustLevel ?? 50) >= choice.requiresMinTrust
+              ).map((choice, i) => (
                 <button
                   key={choice.id}
                   onClick={() => {
                     playUiTick();
-                    setPendingChoice(choice);
+                    if (mode === 'learning') {
+                      onMakeChoice(choice, []);
+                    } else {
+                      setPendingChoice(choice);
+                    }
                   }}
                   className="w-full text-left px-4 py-3 bg-secondary/40 hover:bg-secondary border border-transparent hover:border-primary/50 transition-colors group"
                 >
@@ -322,7 +289,7 @@ export function SceneHUD({
         </div>
       )}
 
-      {/* ---- Evidence inspect: case-file panel ---- */}
+      {/* ---- Evidence inspect: rich visual panel ---- */}
       <AnimatePresence>
         {inspectedEvidence && focusedEvidenceId && (
           <div className="absolute top-24 inset-x-0 flex justify-center pointer-events-none">
@@ -332,7 +299,7 @@ export function SceneHUD({
               exit={{ opacity: 0, y: 16 }}
               className="w-[90vw] max-w-md pointer-events-auto"
             >
-              <CaseFilePanel
+              <InspectViewer
                 evidence={inspectedEvidence}
                 evidenceNumber={evidenceNumber}
                 onDismiss={onDismissEvidence}
