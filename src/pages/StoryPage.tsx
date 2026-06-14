@@ -105,14 +105,6 @@ export default function StoryPage() {
     setInspectedEvidence(null);
   };
 
-  if (!currentScene) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="hud-label">Loading scenario…</p>
-      </div>
-    );
-  }
-
   // Training mode: show declaration gate before anything else
   if (mode === 'training' && !gameState.trainingProfile) {
     return (
@@ -130,6 +122,14 @@ export default function StoryPage() {
         data={scenario.preVisit}
         onComplete={(choiceIds, finalTrust) => completePreVisit(choiceIds, finalTrust)}
       />
+    );
+  }
+
+  if (!currentScene) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="hud-label">Loading scenario…</p>
+      </div>
     );
   }
 
