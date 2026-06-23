@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { playHoverTick, playSelect } from '@/lib/sfx';
+import { GLBCharacter } from './GLBCharacter';
 
 /** Toggle the expanded crosshair cursor on the canvas wrapper. */
 function useCrosshair() {
@@ -40,6 +41,8 @@ interface NPCCharacterProps {
   fidget?: number;
   /** Whether this NPC should show sleeve-pulling behavior */
   pullsSleeves?: boolean;
+  /** Path to a .glb model — when set, replaces the primitive geometry */
+  modelUrl?: string | null;
 }
 
 export function NPCCharacter({
@@ -54,6 +57,7 @@ export function NPCCharacter({
   onHotspotClick,
   fidget = 0.5,
   pullsSleeves = false,
+  modelUrl = null,
 }: NPCCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Group>(null);
@@ -106,6 +110,18 @@ export function NPCCharacter({
 
   return (
     <group ref={groupRef} position={position} rotation={[0, rotation, 0]}>
+
+      {/* ── GLB model (when downloaded) ────────────────────────────────── */}
+      {modelUrl ? (
+        <GLBCharacter
+          url={modelUrl}
+          pose={pose}
+          pullsSleeves={pullsSleeves}
+          fidget={fidget}
+        />
+      ) : (
+      <>
+      {/* ── Geometry fallback ──────────────────────────────────────────── */}
       {/* Body */}
       <mesh position={[0, bodyY, 0]} castShadow>
         <capsuleGeometry args={[0.16, 0.3, 10, 20]} />
@@ -219,6 +235,8 @@ export function NPCCharacter({
         <circleGeometry args={[0.2, 20]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.15} />
       </mesh>
+      </>
+      )} {/* end geometry fallback */}
 
       {/* Name label on hover over body */}
       <mesh

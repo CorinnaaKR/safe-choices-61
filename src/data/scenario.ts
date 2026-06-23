@@ -1,121 +1,179 @@
 import { Scenario } from '@/types/simulation';
 
+/**
+ * Jamie's Story — Story mode, friend POV.
+ *
+ * Restructured from the original Year 5 Class Teacher framing to a same-age
+ * classmate/friend protagonist. See the safeguarding-restructure-jamie-friend-pov
+ * memory for the full design rationale — in short: this is not a memory/attention
+ * test. There is no "correct" amount of evidence to collect, and the ending is
+ * gated only on whether the player tells a trusted adult, never on how much was
+ * noticed. Evidence ("Observations" in Story mode) is written to stay genuinely
+ * ambiguous — explainable away, the way real signs of abuse usually are.
+ */
 export const safeguardingScenario: Scenario = {
   id: 'jamie-case',
   title: "Jamie's Story",
-  description: "A concerning pattern emerges around a Year 5 pupil. Your decisions will shape the outcome.",
-  role: "Year 5 Class Teacher",
+  description: "Your friend Jamie has changed since the summer. What you notice — and what you do about it — will shape what happens to them.",
+  role: "Jamie's friend",
   learningObjectives: [
-    "Recognise signs of potential abuse and neglect",
-    "Understand when and how to escalate concerns",
-    "Practice evidence gathering and documentation",
-    "Learn appropriate professional boundaries",
-    "Understand multi-agency working"
+    "Recognise signs that a friend might be going through something difficult",
+    "Understand why kids often hint at problems rather than say them outright",
+    "Know who counts as a trusted adult, and that telling them isn't betrayal",
+    "Trust a gut feeling even without proof — noticing is enough to act on"
   ],
   scenes: [
     // Scene 1: Opening
     {
       id: 'scene-1',
-      title: 'Monday Morning',
+      title: 'First Day Back',
+      environment: 'classroom',
       narrative: [
-        "It's a crisp Monday morning in late October. You arrive at Riverside Primary School, coffee in hand, ready to start another week with your Year 5 class.",
-        "As children file into the classroom, you notice Jamie—usually one of the first to arrive, chatty and eager—slipping in quietly after the bell. Their uniform looks crumpled, as if slept in, and there's a faint smell of unwashed clothes.",
-        "Jamie avoids eye contact and heads straight to their seat at the back, pulling their sleeves down over their hands despite the warm classroom.",
-        "You've known Jamie for two months now. Bright, creative, usually full of energy. But something feels different today."
+        "It's the first day of term. You've been looking forward to seeing Jamie all summer — six weeks apart, and there's a backlog of stuff to tell them.",
+        "Jamie — always one of the first through the gate, always talking before you've even said hello — slips into the form room quietly, just as the bell goes. Their uniform looks slept-in, and there's a faint smell of unwashed clothes.",
+        "They don't really look at you. They go straight to their seat, pulling their sleeves down over their hands even though the room's already warm.",
+        "You've been friends with Jamie since Year 7 started. Something's different today. You just don't know what yet."
       ],
       evidence: [
         {
           id: 'obs-1',
           type: 'observation',
-          title: 'Initial Appearance',
-          description: 'Observations from Monday morning',
-          content: 'Jamie arrived late, wearing crumpled uniform that appeared unwashed. Avoided eye contact and sat at the back. Sleeves pulled down over hands. Noticeable change from usual bright demeanor.',
-          timestamp: 'Monday, 9:05 AM'
+          title: 'Something felt off',
+          description: "First morning back",
+          content: "Jamie came in late and quiet — not like them at all. Crumpled uniform, like it hadn't been washed. They wouldn't really look at you, and kept their sleeves pulled down even though it wasn't cold. Could be nothing. Could just be first-day-back tiredness. But it didn't feel like nothing.",
+          timestamp: 'Monday, registration'
         }
       ],
       choices: [
         {
           id: 'c1-1',
-          text: 'Approach Jamie quietly and ask if everything is okay',
-          consequence: 'You walk over to Jamie\'s desk during registration. They flinch slightly as you approach, then mumble "I\'m fine, miss" without looking up.',
-          feedback: 'Good instinct to check in, but be mindful of approaching gently and not putting pressure on the child to disclose in front of peers.',
+          text: 'Catch Jamie quietly and ask if they\'re okay',
+          consequence: 'You lean over during registration. "You alright?" Jamie winces slightly, then mutters "I\'m fine" without looking up.',
+          feedback: 'They brushed it off, but you noticed, and that matters more than you might think.',
           isOptimal: true,
           nextSceneId: 'scene-2',
           points: 10
         },
         {
           id: 'c1-2',
-          text: 'Make a mental note and observe throughout the day',
-          consequence: 'You decide to watch Jamie throughout the morning, giving them space while staying alert to any other concerning signs.',
-          feedback: 'Observation is important, but an initial gentle check-in shows the child you\'ve noticed and care.',
+          text: 'Leave it for now and keep an eye on them through the day',
+          consequence: 'You decide to give Jamie some space, but you find yourself glancing over more than usual.',
+          feedback: 'Watching is a reasonable instinct — just don\'t let "later" quietly become "never."',
           isOptimal: false,
           nextSceneId: 'scene-2',
           points: 5
         },
         {
           id: 'c1-3',
-          text: 'Ask Jamie loudly if they forgot to wash their uniform',
-          consequence: 'Jamie\'s face flushes red. Other children giggle. Jamie shrinks further into their seat, and you notice their hands trembling slightly.',
-          feedback: 'This approach risks humiliating the child and may damage trust. Always maintain dignity and speak privately about sensitive matters.',
+          text: 'Call out loudly: "Someone woke up on the wrong side of the bed this morning!"',
+          consequence: 'A couple of people nearby laugh. Jamie goes completely still — not embarrassed, something closer to shut down. They look at the desk and don\'t say anything. The sleeves get tugged down further.',
+          feedback: 'That kind of joke would usually get a comeback from Jamie. The fact that it didn\'t land at all is itself a sign that something\'s not right — but right now, they\'re a bit more alone than they were a minute ago.',
           isOptimal: false,
-          nextSceneId: 'scene-2',
+          nextSceneId: 'scene-1b',
           points: 0
         }
       ],
       isDecisionPoint: true
     },
-    // Scene 2: The Playground
+    // Scene 1b: The Apology (only reached via c1-3)
+    {
+      id: 'scene-1b',
+      title: 'A Bit Awkward',
+      environment: 'classroom',
+      narrative: [
+        "First lesson drags. You keep glancing over at Jamie, who is staring at their exercise book and not writing anything in it.",
+        "At break, you head over. \"Hey.\" Nothing. Jamie keeps looking at the fence.",
+        "You try again. Still nothing.",
+        "This is genuinely strange. Jamie is someone who can give as good as they get — you've traded worse than that and both ended up laughing. For a moment you think they're just winding you up.",
+        "They're not winding you up.",
+        "There's a long pause, and then it clicks: you're going to have to actually apologise. Not in a jokey way. Properly. Which is mildly annoying, because it really did feel like a normal joke.",
+        "But Jamie not laughing at it is in itself kind of strange. That's not like them."
+      ],
+      choices: [
+        {
+          id: 'c1b-1',
+          text: 'Apologise properly — "That was a rubbish thing to say, sorry"',
+          consequence: 'Jamie looks at you for the first time all day. "It\'s fine." It\'s not entirely fine yet, but they shift slightly along the bench to make room. You sit down.',
+          feedback: 'A proper apology, rather than a deflection, was what was needed. Jamie\'s not someone who usually needs one — which makes it worth paying attention to.',
+          isOptimal: true,
+          nextSceneId: 'scene-2',
+          points: 5
+        },
+        {
+          id: 'c1b-2',
+          text: 'Try to smooth it over — "Come on, I was only joking"',
+          consequence: 'Jamie shrugs. "Yeah, whatever." They don\'t look up. You pause. "Hey — are you okay?" A beat. "Fine." Still not looking at you.',
+          feedback: '"I was only joking" can end up asking someone not to be hurt rather than actually apologising. You did ask if they were okay, which matters — Jamie just didn\'t have anywhere to go with it.',
+          isOptimal: false,
+          nextSceneId: 'scene-2',
+          points: 2
+        }
+      ],
+      isDecisionPoint: true
+    },
+    // Scene 2: Break Time (PE + playground)
     {
       id: 'scene-2',
       title: 'Break Time',
+      environment: 'playground',
       narrative: [
-        "During morning break, you're on playground duty. The October sun is weak but the children are energetic, running and playing as usual.",
-        "You spot Jamie sitting alone on a bench near the fence, picking at a sleeve. Their usual group of friends are playing football nearby, but Jamie makes no move to join them.",
-        "As you watch, one of Jamie's friends—Marcus—runs over and tries to pull Jamie up to join the game. Jamie yanks their arm away sharply and you catch a glimpse of something dark on their wrist before the sleeve is quickly pulled down.",
-        "Marcus looks confused and walks back to the game, shrugging at his friends."
+        "It's a PE day. While everyone else gets changed in the usual chaos of the changing room — bags everywhere, someone always losing a trainer — Jamie slips off to use the toilets instead.",
+        "You don't think much of it until Jamie comes out in a long-sleeve top, even though the room's thick and humid from forty people getting changed at once. Everyone else is in shorts and t-shirts complaining about the heat. Jamie isn't.",
+        "It's probably nothing. Loads of people get weird about changing rooms at this age. But you noticed it, and once you've noticed something, it's hard to unnotice it.",
+        "Later, at break, you spot Jamie sitting alone on a bench near the fence, picking at their sleeve. Their usual group is playing football nearby, but Jamie hasn't moved to join in.",
+        "Marcus — who lives next door to Jamie — jogs over and tries to pull Jamie up to play. Jamie yanks their arm away sharply — and for a second, before the sleeve drops back down, you catch a glimpse of something dark on their wrist.",
+        "Marcus shrugs and jogs back to the game, looking a bit confused."
       ],
       evidence: [
         {
+          id: 'obs-pe-1',
+          type: 'observation',
+          title: 'Changing room, again',
+          description: 'PE lesson',
+          content: "Jamie changed in the toilets instead of with everyone else, then wore long sleeves on a hot, sweaty day when literally no one else did. Could just be self-conscious — that's normal at this age. But it's the kind of thing that's easy to explain away one at a time, and hard to explain away all together.",
+          timestamp: 'Monday, PE lesson'
+        },
+        {
           id: 'obs-2',
           type: 'observation',
-          title: 'Playground Observation',
-          description: 'Behaviour during break time',
-          content: 'Jamie sat alone, avoiding friends. When Marcus tried to pull them up, Jamie reacted sharply. Glimpse of dark mark on wrist before sleeve pulled down. Social withdrawal from usual friend group.',
-          timestamp: 'Monday, 10:45 AM'
+          title: 'Sitting it out',
+          description: 'Behaviour at break',
+          content: "Jamie sat alone instead of playing football with their usual group, and pulled away sharply when Marcus tried to get them up. Might just be a mood. People have off days.",
+          timestamp: 'Monday, break time'
         },
         {
           id: 'vis-1',
           type: 'visual',
-          title: 'Possible Injury',
-          description: 'Mark observed on wrist',
-          content: 'Brief glimpse of dark mark on Jamie\'s wrist. Could not determine nature of mark. Jamie quickly concealed it by pulling down sleeve.',
-          timestamp: 'Monday, 10:47 AM'
+          title: 'Something on their wrist',
+          description: 'A glimpse, nothing more',
+          content: "A flash of something dark on Jamie's wrist before the sleeve covered it again. Could be a bruise. Could be a smudge of pen, dirt, anything. You didn't get a proper look.",
+          timestamp: 'Monday, break time'
         }
       ],
       choices: [
         {
           id: 'c2-1',
-          text: 'Go over and sit with Jamie, making casual conversation',
-          consequence: 'You sit beside Jamie on the bench. "Mind if I join you? I needed a rest from all that running around." Jamie shrugs but doesn\'t move away. After a moment, they quietly say, "My arm hurts."',
-          feedback: 'Excellent approach. Creating a safe, low-pressure opportunity for the child to share shows good safeguarding practice.',
+          text: 'Go and sit with Jamie, just talk like normal',
+          consequence: 'You plonk down next to Jamie. "Budge up, I need a break from all that running around." Jamie shrugs but doesn\'t move away. After a moment, quietly: "My arm hurts."',
+          feedback: 'Just being there, without making it a big deal, gave Jamie the opening to say something.',
           isOptimal: true,
           nextSceneId: 'scene-3a',
           points: 15
         },
         {
           id: 'c2-2',
-          text: 'Ask Marcus what happened with Jamie',
-          consequence: 'Marcus says Jamie has been "weird" lately and won\'t play anymore. "They said their mum\'s boyfriend doesn\'t like them going out after school."',
-          feedback: 'Gathering information from peers can be helpful, but be careful not to encourage gossip. Direct engagement with the child is usually better.',
+          text: 'Ask Marcus if he knows what\'s going on',
+          consequence: 'Marcus shrugs. "Dunno. I live next door so I see them sometimes — from our garden, on the street. They\'ve barely been out since the summer. Said their mum\'s boyfriend doesn\'t want them around after school."',
+          feedback: 'Useful, but Jamie\'s the one who actually knows what\'s happening — worth talking to them directly when you can.',
           isOptimal: false,
           nextSceneId: 'scene-3b',
           points: 8
         },
         {
           id: 'c2-3',
-          text: 'Write down what you saw and continue monitoring',
-          consequence: 'You note down your observations but remain at a distance. Jamie stays on the bench until the bell rings, walking back to class alone.',
-          feedback: 'Documentation is important, but this was an opportunity for gentle engagement that was missed.',
+          text: 'Keep half an eye on it without saying anything yet',
+          consequence: 'You stay near enough to notice if anything else happens, but don\'t go over. Jamie stays on the bench until the bell goes.',
+          feedback: 'Watching from a distance feels safe, but it also meant a chance to talk passed by.',
           isOptimal: false,
           nextSceneId: 'scene-3b',
           points: 5
@@ -123,60 +181,66 @@ export const safeguardingScenario: Scenario = {
       ],
       isDecisionPoint: true
     },
-    // Scene 3a: After Approaching Jamie
+    // Scene 3a: A Moment of Trust
     {
       id: 'scene-3a',
-      title: 'A Moment of Trust',
+      title: 'Slept Funny',
+      environment: 'classroom',
       narrative: [
-        '"My arm hurts." Jamie\'s voice is small, almost a whisper.',
-        "You keep your voice calm and gentle. \"I'm sorry to hear that. What happened?\"",
-        "Jamie is quiet for a long moment. A football bounces past. Children shriek with laughter somewhere across the playground.",
-        "\"I fell,\" Jamie says finally. But their eyes tell a different story—they dart to yours for just a second, searching for something. Permission, perhaps. Or trust.",
-        "\"Sometimes,\" you say carefully, \"it can be hard to talk about things. But I want you to know I'm here if you ever want to.\"",
-        "Jamie nods. The bell rings. As they stand up, their sleeve rides up again and you see it more clearly now—a distinct bruise, finger-shaped, wrapped around their forearm."
+        "At break, for a moment, Jamie is almost themselves — laughing at something Marcus said, shoulders relaxed, easy in a way they weren't this morning. You almost talk yourself out of it.",
+        "Then their phone lights up. Jamie glances at the screen and something changes — not dramatically, just a door closing behind the eyes. They pocket the phone and the laughter stops.",
+        "You plonk down next to them. \"Budge up.\" Jamie shrugs but moves along the bench.",
+        "After a moment you notice their hand moving — fingers pressing gently at the top of their forearm, through the sleeve. Rubbing at something.",
+        '"What happened to your arm?" you ask, keeping it casual.',
+        "Jamie stops. A beat.",
+        '"I slept funny. It\'s nothing."',
+        "A ball bounces past somewhere nearby. Someone across the field shrieks with laughter.",
+        "Their eyes flick to yours for a second — like they're checking something. Whether it's safe, maybe. Then they look away.",
+        '“You can talk to me, you know,” you say. “Whenever.”',
+        "Jamie nods, small. The bell goes. As they stand up, their sleeve shifts — and there's a bruise on their forearm, dark, in an odd spot. Could be from football. Could be a dozen ordinary things. Jamie clocks that you've seen it and tugs the sleeve down without saying anything."
       ],
       evidence: [
         {
           id: 'vis-2',
           type: 'visual',
-          title: 'Confirmed Bruising',
-          description: 'Finger-shaped bruise on forearm',
-          content: 'Clear finger-shaped bruising visible on Jamie\'s forearm when sleeve rode up. Consistent with grabbing injury. Jamie claimed they "fell" but explanation does not match injury pattern.',
-          timestamp: 'Monday, 10:55 AM'
+          title: 'A bruise, probably nothing',
+          description: 'Forearm, glimpsed properly this time',
+          content: "A dark bruise on Jamie's forearm. On its own this could mean almost anything — kids bruise easily, PE is rough, siblings fight. What stands out isn't the bruise itself, it's how fast Jamie covered it up the second they noticed you'd seen.",
+          timestamp: 'Monday, break time'
         },
         {
           id: 'obs-3',
           type: 'observation',
-          title: 'Verbal Disclosure Attempt',
-          description: 'Possible disclosure during conversation',
-          content: 'Jamie stated "my arm hurts" unprompted. When asked what happened, gave unconvincing explanation of falling. Eye contact suggested they wanted to share more but felt unable to.',
-          timestamp: 'Monday, 10:52 AM'
+          title: '"Slept funny"',
+          description: 'Something said without quite landing',
+          content: 'You noticed Jamie rubbing their arm through their sleeve. When you asked about it, the answer came a beat too slow — "I slept funny, it\'s nothing." Maybe they did. But they also looked at you for just a second after they said it, like they were checking something. Maybe they just want it to be that simple too.',
+          timestamp: 'Monday, break time'
         }
       ],
       choices: [
         {
           id: 'c3a-1',
-          text: 'Report to the Designated Safeguarding Lead immediately',
-          consequence: 'You find Ms. Patterson, the DSL, at lunchtime and share everything you\'ve observed. She thanks you for reporting and says she\'ll begin the appropriate procedures.',
-          feedback: 'This is the correct response. A physical injury that doesn\'t match the explanation given should always be reported to the DSL promptly.',
+          text: 'Decide you need to tell someone today',
+          consequence: 'You\'ve been turning it over all afternoon — the changing room, the bruise, the way Jamie covered it up. You don\'t have proof of anything. But you know enough.',
+          feedback: 'You don\'t need to be certain to act. You just need to trust what you\'ve noticed.',
           isOptimal: true,
           nextSceneId: 'scene-4',
           points: 20
         },
         {
           id: 'c3a-2',
-          text: 'Wait to see if there are more signs before reporting',
-          consequence: 'You decide to gather more evidence before escalating. But as the day goes on, you can\'t stop thinking about that bruise.',
-          feedback: 'Waiting for "more evidence" can delay protection for a child at risk. One clear indicator with concerning context is enough to report.',
+          text: 'Wait to see if there are more signs first',
+          consequence: 'You decide to give it a bit longer before saying anything. But you can\'t stop thinking about that bruise for the rest of the day.',
+          feedback: 'Waiting feels safer in the moment — but it also means Jamie\'s carrying this alone a bit longer than they need to.',
           isOptimal: false,
           nextSceneId: 'scene-4-delayed',
           points: 5
         },
         {
           id: 'c3a-3',
-          text: 'Speak to Jamie\'s parents first to get their side',
-          consequence: 'You resolve to call Jamie\'s home that evening to discuss your concerns with the family.',
-          feedback: 'Never contact parents before speaking with the DSL when abuse is suspected. This could put the child at further risk and compromise any investigation.',
+          text: 'Message the group chat — ask if anyone else has noticed Jamie being off',
+          consequence: 'You type it out before you can think too hard about it. A few people reply. "Yeah a bit." "Why, what\'s happened?" You end up saying more than you meant to.',
+          feedback: 'Wanting to understand what\'s happening is natural. But going sideways to friends instead of up to a trusted adult means the information spreads the wrong way.',
           isOptimal: false,
           nextSceneId: 'scene-4-risk',
           points: 0
@@ -188,47 +252,86 @@ export const safeguardingScenario: Scenario = {
     {
       id: 'scene-3b',
       title: 'The Afternoon',
+      environment: 'classroom',
       narrative: [
-        "The afternoon passes with a heavy feeling. Jamie sits through lessons, barely participating—so unlike the child who usually has their hand up for every question.",
-        "During art class, you notice Jamie drawing while others work on their assigned project. You drift over casually and catch a glimpse of the picture: a small figure, alone, surrounded by dark, scratchy lines. A larger figure looms in the corner, colored in angry red.",
-        "Jamie sees you looking and quickly crumples the paper, shoving it into their bag.",
-        "\"Just doodling,\" they mutter.",
-        "By the end of the day, you've accumulated several concerning observations. The question is: what do you do with them?"
+        "At lunch Jamie is briefly, almost fine — laughing at something, easy for a moment. Then they check their phone and go quiet, slipping away from the group without a word.",
+        "Marcus drops into the seat next to you. \"They were off for the last few days of last term — you know that?\" He's not gossiping, just mentioning it. \"I live next door so I noticed. And their mum's boyfriend doesn't want them going out after school, so they just go straight home now.\"",
+        "He shrugs and goes back to his lunch. You sit with that for a moment.",
+        "The afternoon drags. Jamie sits through lessons barely speaking — so unlike the person who normally can't stop talking.",
+        "In art, you notice Jamie drawing instead of doing the actual task. You drift past and catch a glimpse: a small figure standing alone, surrounded by dark scribbly lines. A much bigger figure looms in the corner, coloured in heavy red.",
+        "Jamie spots you looking and quickly screws the paper up, shoving it in their bag.",
+        '"Just doodling," they mutter.',
+        "It's just a drawing. You've scribbled worse in double maths. Probably.",
+        "When the bell goes for the end of the day, the corridor fills fast — bags, chairs, the push for the door. You're halfway out before you notice Jamie is still at their desk. Slowly, slowly putting things away. Like there's no particular reason to be anywhere soon.",
+        "By the end of the day, you've noticed a few things now, and they're starting to add up to a feeling you can't quite shake."
       ],
       evidence: [
         {
           id: 'vis-3',
           type: 'visual',
-          title: 'Concerning Drawing',
-          description: 'Art created during class',
-          content: 'Drawing showed small isolated figure surrounded by dark scribbles. Larger figure colored in red in corner - appeared threatening. Jamie crumpled and hid the drawing when noticed.',
-          timestamp: 'Monday, 2:15 PM'
+          title: 'Just a doodle',
+          description: 'Drawing in art',
+          content: "A small lonely figure, a much bigger one looming over it in red. On its own it's just a drawing — kids draw dark stuff sometimes and it means nothing. What stuck with you was how fast Jamie hid it the second they noticed you'd seen.",
+          timestamp: 'Monday, art lesson'
+        },
+        {
+          id: 'obs-attendance',
+          type: 'observation',
+          title: 'Missing days',
+          description: 'Something Marcus mentioned at lunch',
+          content: "Marcus said Jamie missed the last few days of last term. No real explanation, just gone. Absences on their own don't mean much — kids get ill, things come up. But unexplained gaps, especially when they line up with a change at home, are one of the things schools are specifically asked to notice. This one slipped through.",
+          timestamp: 'Monday, lunchtime'
+        },
+        {
+          id: 'obs-control',
+          type: 'observation',
+          title: "Can't go out after school",
+          description: 'Something Marcus mentioned at lunch',
+          content: "Jamie's mum's boyfriend doesn't want them going out after school — so they go straight home. Strict parenting looks like this too, and most of the time that's all it is. But isolating a child from their friends — cutting off the relationships where they might say something — is also a pattern. It's worth holding alongside everything else.",
+          timestamp: 'Monday, lunchtime'
+        },
+        {
+          id: 'obs-home',
+          type: 'observation',
+          title: 'Not in a hurry to leave',
+          description: 'End of the school day',
+          content: "When the bell went, everyone moved. Jamie didn't. Still at their desk, slowly packing up while the corridor emptied around them. Kids who aren't in a hurry to go home usually have a reason. It's one of the quieter signs — easy to miss, easy to explain away. But you noticed it.",
+          timestamp: 'Monday, end of day'
         }
       ],
       choices: [
         {
           id: 'c3b-1',
-          text: 'Report all observations to the Designated Safeguarding Lead',
-          consequence: 'You compile your notes and speak to Ms. Patterson before leaving for the day. She listens carefully and thanks you for your thoroughness.',
-          feedback: 'Good decision. Multiple concerning signs should always be reported. The DSL can assess the full picture and decide on next steps.',
+          text: 'Go over to Jamie — say something before the day ends',
+          consequence: 'You catch them by the door. "Hey. You alright?" Jamie looks up — surprised, maybe. "Yeah. Fine." They look at the floor. You stay there for a second. "I\'m just — I\'m fine." It\'s the same word twice. You let them go.',
+          feedback: 'They didn\'t say anything useful. But they also didn\'t walk away immediately. You noticed that too.',
+          isOptimal: true,
+          nextSceneId: 'scene-4',
+          points: 12
+        },
+        {
+          id: 'c3b-2',
+          text: 'Find Marcus — ask what he actually knows about the home situation',
+          consequence: '"Not loads," he says. "I live next door so I see them — through the garden, on the street. They don\'t really come out anymore. I asked once if things were alright and they kind of just changed the subject." He pauses. "You think something\'s actually wrong?"',
+          feedback: 'Marcus noticed too — he just didn\'t know what to do with it either. This isn\'t yours to carry on your own.',
+          isOptimal: true,
+          nextSceneId: 'scene-4',
+          points: 12
+        },
+        {
+          id: 'c3b-3',
+          text: 'Decide you\'ve seen enough — tell a trusted adult today',
+          consequence: 'You keep thinking about the drawing, the missed days, the way Jamie stayed behind when everyone else left. None of it is proof of anything. But it doesn\'t feel like nothing.',
+          feedback: 'You don\'t need a complete picture to know something\'s wrong.',
           isOptimal: true,
           nextSceneId: 'scene-4',
           points: 15
         },
         {
-          id: 'c3b-2',
-          text: 'Discuss concerns with a colleague first',
-          consequence: 'You mention your worries to Mr. Evans in the staff room. He says, "Kids have off days. Probably just tired."',
-          feedback: 'While peer support is valuable, concerns should go to the DSL rather than being discussed informally. Colleagues may inadvertently minimize or dismiss valid concerns.',
-          isOptimal: false,
-          nextSceneId: 'scene-4-delayed',
-          points: 5
-        },
-        {
-          id: 'c3b-3',
-          text: 'Keep monitoring for the rest of the week',
-          consequence: 'You decide to watch and wait, keeping detailed notes of anything concerning.',
-          feedback: 'Every day of delay is a day a child might remain at risk. When you have multiple indicators, report promptly.',
+          id: 'c3b-4',
+          text: 'Give it more time — keep an eye on things',
+          consequence: 'You tell yourself you\'ll see how the rest of the week goes. The feeling doesn\'t go anywhere.',
+          feedback: 'Every day you wait is a day Jamie\'s carrying this on their own.',
           isOptimal: false,
           nextSceneId: 'scene-4-delayed',
           points: 3
@@ -236,55 +339,130 @@ export const safeguardingScenario: Scenario = {
       ],
       isDecisionPoint: true
     },
-    // Scene 4: The Report
+    // Scene 4: Telling Your Mum
     {
       id: 'scene-4',
-      title: 'The Right Response',
+      title: 'Telling Your Mum',
+      environment: 'home',
       narrative: [
-        "Ms. Patterson, the Designated Safeguarding Lead, closes her office door and gestures for you to sit.",
-        "\"Tell me everything,\" she says, notepad ready.",
-        "You walk through the morning: Jamie's late arrival, the crumpled uniform, the smell of unwashed clothes, the social withdrawal. Then the playground—the flinch, the glimpse of the bruise, the unconvincing explanation.",
-        "Ms. Patterson nods, making notes. \"You've done exactly the right thing by coming to me. I'll need you to write this up formally—stick to facts, what you observed, exact words used.\"",
-        "\"What happens now?\" you ask.",
-        "\"I'll review our records for Jamie, speak with other staff, and make a decision about whether this meets the threshold for a referral to Children's Services. You may be asked to provide your written account if it goes further.\""
-      ],
-      evidence: [
-        {
-          id: 'msg-1',
-          type: 'message',
-          title: 'DSL Meeting Notes',
-          description: 'Record of safeguarding meeting',
-          content: 'Met with DSL Ms. Patterson. Provided verbal account of all observations. Asked to complete formal written record. DSL to review records and assess threshold for Children\'s Services referral.',
-          timestamp: 'Monday, 3:45 PM'
-        }
+        "That evening you bring it up while your mum's making tea. The long sleeves. The way Jamie winced. The bruise you caught a glimpse of. And the image that keeps coming back — Jamie still at their desk when everyone else had gone, not in any hurry to go home.",
+        "She's half-listening, stirring something on the hob.",
+        '"He\'s probably just having a hard adjustment," she says. "First few weeks back after summer are always tough. Give it a bit."',
+        "You're quiet for a moment.",
+        '"I really don\'t think it\'s that," you say.',
+        "She turns around properly now. Looks at you.",
+        '"If you\'re genuinely worried about your friend," she says, "tell your teacher. That\'s what they\'re there for."',
+        "She turns back to the hob. You stay where you are, thinking about Jamie's sleeve."
       ],
       choices: [
         {
           id: 'c4-1',
-          text: 'Complete the written record immediately, using only factual observations',
-          consequence: 'You stay late to write up your account, being careful to separate what you observed from your interpretations. You submit it to Ms. Patterson before leaving.',
-          feedback: 'Excellent practice. Prompt, factual documentation is crucial. Distinguishing observations from opinions ensures the record is useful for any investigation.',
+          text: 'Decide to find your form tutor first thing tomorrow',
+          consequence: 'You don\'t sleep brilliantly. But you know what you\'re going to do in the morning.',
+          feedback: 'A trusted adult doesn\'t have to be a parent. Your form tutor is exactly the right person for this.',
           isOptimal: true,
-          nextSceneId: 'scene-5',
+          nextSceneId: 'scene-4-tutor',
           points: 15
         },
         {
           id: 'c4-2',
-          text: 'Write the report but include your theory about what\'s happening at home',
-          consequence: 'Your report includes detailed speculation about possible abuse scenarios based on what you\'ve observed.',
-          feedback: 'While your instincts may be correct, records should contain observations, not theories. Speculation can compromise investigations and is not your role to determine.',
+          text: 'Leave it for now — maybe your mum\'s right',
+          consequence: 'You tell yourself she probably knows best. But you don\'t quite believe it.',
+          feedback: 'Doubt is normal. But the feeling that made you bring it up in the first place was there for a reason.',
           isOptimal: false,
-          nextSceneId: 'scene-5',
-          points: 8
+          nextSceneId: 'scene-4-delayed',
+          points: 3
+        }
+      ],
+      isDecisionPoint: true
+    },
+    // Scene 4-tutor: Before Registration
+    {
+      id: 'scene-4-tutor',
+      title: 'Before Registration',
+      environment: 'classroom',
+      narrative: [
+        "You get in early the next morning. Your form tutor is at their desk, marking something.",
+        "You hover in the doorway for a second. They look up and smile. \"Morning. You alright?\"",
+        "\"Can I — can I talk to you about something? It's about a friend.\"",
+        "They set the pen down. \"Course. Sit down.\""
+      ],
+      choices: [
+        {
+          id: 'c4t-1',
+          text: '"I feel like I\'m grassing on my friend. But I don\'t know what else to do."',
+          consequence: 'You tell them. The sleeves. The wince when Marcus grabbed their arm. The bruise. All the things that have been sitting in your chest since Monday.',
+          feedback: 'The guilt you felt walking in is what most people feel. But telling someone and betraying someone aren\'t the same thing — one keeps your friend safe.',
+          isOptimal: true,
+          nextSceneId: 'scene-4-tutor-resolve',
+          points: 20
         },
         {
-          id: 'c4-3',
-          text: 'Promise to write the report but leave it for tomorrow',
-          consequence: 'The busyness of the day catches up with you. You\'ll definitely do it first thing tomorrow.',
-          feedback: 'Delays in documentation can mean details are forgotten or the urgency is lost. Complete records promptly while events are fresh.',
+          id: 'c4t-2',
+          text: '"Actually — it\'s probably nothing. Sorry. Forget I said anything."',
+          consequence: 'Your tutor smiles, unhurried. "Okay. No pressure." They slide a small card across the desk. "That\'s got my email on it. And I\'m in here at lunch if you change your mind, alright?"',
+          feedback: 'The tutor gave you a way back in. The question is whether you take it.',
           isOptimal: false,
-          nextSceneId: 'scene-5',
+          nextSceneId: 'scene-4-tutor-interim',
           points: 5
+        }
+      ],
+      isDecisionPoint: true
+    },
+    // Scene 4-tutor-interim: Second period — gnawing feeling
+    {
+      id: 'scene-4-tutor-interim',
+      title: 'Second Period',
+      environment: 'classroom',
+      narrative: [
+        "The feeling doesn't go anywhere. If anything it gets heavier.",
+        "In second period you see Jamie a few rows ahead — sleeves pulled down, staring at the desk. Someone asks them something and they just shake their head.",
+        "This isn't the same person you saw laughing at break yesterday.",
+        "You look at the clock. Lunch is forty minutes away."
+      ],
+      choices: [
+        {
+          id: 'c4ti-1',
+          text: 'Go back to your form tutor at lunch',
+          consequence: 'The classroom door is open. Your tutor is eating a sandwich but looks up and waves you in with a smile. "Glad you came back," they say, easy, like it\'s nothing. They push the sandwich aside.',
+          feedback: 'You nearly didn\'t come back. But you did. That\'s the part that matters.',
+          isOptimal: true,
+          nextSceneId: 'scene-4-tutor-resolve',
+          points: 15
+        },
+        {
+          id: 'c4ti-2',
+          text: 'Leave it. See how the rest of the week goes.',
+          consequence: 'You tell yourself you\'ll go back tomorrow if it\'s still bothering you. It still bothers you. But the moment keeps not feeling quite right.',
+          feedback: 'Every day of waiting is another day Jamie carries this on their own.',
+          isOptimal: false,
+          nextSceneId: 'scene-4-delayed',
+          points: 0
+        }
+      ],
+      isDecisionPoint: true
+    },
+    // Scene 4-tutor-resolve: At lunch — full disclosure
+    {
+      id: 'scene-4-tutor-resolve',
+      title: 'At Lunch',
+      environment: 'classroom',
+      narrative: [
+        "You tell them everything. The sleeves. The bruise. The way Jamie winced when Marcus grabbed their arm. The drawing in art. All the things that have been sitting in your chest.",
+        "Your tutor listens without rushing you.",
+        '"Thank you for telling me. I mean that." A pause. "I need to speak to Mrs Okonkwo — she\'s our designated safeguarding lead. It\'s her job to take this forward properly. I can\'t keep it between us, but it will be handled carefully. I promise you that."',
+        "You nod.",
+        '"You haven\'t got Jamie in trouble," they say. "You\'ve made sure someone knows to look out for them. Those are different things."'
+      ],
+      choices: [
+        {
+          id: 'c4tr-1',
+          text: 'Nod and go to your next lesson',
+          consequence: 'You don\'t know exactly what happens next — that part isn\'t yours to know. But you\'re not carrying it alone anymore.',
+          feedback: 'The telling was the part that was yours to do. The rest belongs to the people whose job it is.',
+          isOptimal: true,
+          nextSceneId: 'scene-5',
+          points: 10
         }
       ],
       isDecisionPoint: true
@@ -293,104 +471,120 @@ export const safeguardingScenario: Scenario = {
     {
       id: 'scene-4-delayed',
       title: 'A Sleepless Night',
+      environment: 'home',
       narrative: [
-        "That night, you can't sleep. Jamie's face keeps appearing—the flinch, the hidden wrist, the crumpled drawing stuffed into a bag.",
-        "You tell yourself you'll keep watching. Gather more evidence. Be sure before you escalate.",
-        "But a question keeps circling: What if tonight is the night something worse happens? What if your hesitation costs Jamie something you can't take back?",
-        "By morning, you've made your decision."
+        "That night you can't sleep. Jamie's face keeps surfacing — the wince, the hidden wrist, the screwed-up drawing.",
+        "You tell yourself you'll wait, watch a bit longer, be sure before you say anything.",
+        "But a question keeps circling: what if waiting means Jamie goes through more of this alone, for nothing?",
+        "By morning, you've made up your mind."
       ],
       choices: [
         {
           id: 'c4d-1',
-          text: 'Go straight to the DSL first thing in the morning',
-          consequence: 'You arrive early and catch Ms. Patterson before the school day starts. She listens intently and thanks you for reporting.',
-          feedback: 'Better late than never. You recognized the weight of what you observed and took action. In future, report on the same day when possible.',
+          text: 'Tell your mum everything, first thing',
+          consequence: 'You tell her on the way to school. She pulls over for a second to really listen, then says, "Thank you for telling me. I\'ll speak to the school today."',
+          feedback: 'A day later than you might have liked, but you still trusted the feeling enough to act on it. That\'s what matters.',
           isOptimal: true,
-          nextSceneId: 'scene-5-late',
+          nextSceneId: 'scene-5',
           points: 10
         },
         {
           id: 'c4d-2',
-          text: 'Continue monitoring for a few more days',
-          consequence: 'You watch Jamie closely for the next two days. On Wednesday, Jamie doesn\'t come to school at all.',
-          feedback: 'Delays can have serious consequences. By the time you act, the situation may have escalated beyond what early intervention could have prevented.',
+          text: 'Decide to keep watching instead',
+          consequence: 'You tell yourself you\'ll say something if it gets worse. The days go by. Jamie seems to retreat further, and the moment to say something never quite feels like the right one.',
+          feedback: 'Every day of waiting is another day Jamie carries this on their own.',
           isOptimal: false,
-          nextSceneId: 'scene-5-crisis',
+          nextSceneId: 'scene-4-silence',
           points: 0
         }
       ],
       isDecisionPoint: true
     },
-    // Scene 4 Risk Path - Parent Contact
+    // Scene 4 Risk Path
     {
       id: 'scene-4-risk',
-      title: 'A Dangerous Decision',
+      title: 'Asking Around',
+      environment: 'home',
       narrative: [
-        "That evening, you call Jamie's home number from the school records.",
-        "A man's voice answers—gruff, suspicious. \"Who's this?\"",
-        "You explain you're Jamie's teacher, that you noticed some things today and wanted to check in.",
-        "There's a long pause. \"Jamie's fine. Mind your own business.\" The line goes dead.",
-        "The next morning, Jamie arrives at school even more withdrawn than before. They won't look at you at all now. During break, you overhear them whisper to Marcus: \"I'm in so much trouble. Someone told.\""
+        "That evening you open the group chat and type it out: \"hey has anyone noticed jamie being a bit off lately? like really off? kinda worried\"",
+        "A few people reply quickly. \"Yeah a bit.\" \"Why, what's happened?\" \"Is everything okay?\"",
+        "You end up saying more than you meant to. The long sleeves. The way they winced. The bruise you thought you saw.",
+        "You put your phone down and feel slightly better.",
+        "Until the next morning.",
+        "Jamie doesn't look at you when you walk in — not the not-looking of someone having a bad day, but the not-looking of someone who knows you talked about them.",
+        "At break Marcus finds you. \"Jamie's not happy. They know someone's been saying something.\" He looks uncomfortable. \"You know what this lot are like. It got around.\""
       ],
       evidence: [
         {
           id: 'obs-4',
           type: 'observation',
-          title: 'Increased Withdrawal',
-          description: 'Change after parent contact',
-          content: 'Following phone call to home, Jamie significantly more withdrawn. Avoiding all eye contact with teacher. Heard saying "I\'m in so much trouble. Someone told." Suggests child may be at increased risk.',
-          timestamp: 'Tuesday, 9:15 AM'
+          title: 'Word got around',
+          description: 'The morning after the group chat',
+          content: 'Jamie knows someone was talking about them — and they\'re reading it as betrayal, not concern. Going sideways to friends instead of up to a trusted adult meant the information spread without reaching anyone who could actually help. Jamie may be harder to reach now than they were before.',
+          timestamp: 'Tuesday morning'
         }
       ],
       choices: [
         {
           id: 'c4r-1',
-          text: 'Report everything to the DSL immediately, including your phone call',
-          consequence: 'You find Ms. Patterson and tell her everything—including your mistake in calling home. Her expression is serious but she thanks you for your honesty.',
-          feedback: 'You made an error in contacting the family, but you recognized it and reported immediately. Honesty about mistakes is essential in safeguarding.',
+          text: 'Tell your mum what happened — all of it, including the group chat',
+          consequence: '"That probably wasn\'t the best move," your mum says, not unkindly. "But the important thing is what you noticed. Tell your form tutor tomorrow — that\'s the right person for this."',
+          feedback: 'Owning the part that didn\'t go well is hard. But it opened the right path again.',
           isOptimal: true,
-          nextSceneId: 'scene-5-urgent',
-          points: 10
+          nextSceneId: 'scene-4-tutor',
+          points: 8
         },
         {
           id: 'c4r-2',
-          text: 'Don\'t mention the phone call—just report the original concerns',
-          consequence: 'You tell the DSL about Jamie\'s appearance and the bruise but leave out your phone call home.',
-          feedback: 'Withholding information compromises the safeguarding process. The DSL needs the full picture to protect the child—including any actions that may have escalated risk.',
+          text: 'Say nothing more — hope it dies down',
+          consequence: 'You tell yourself Jamie will get over it. The days go by. They don\'t.',
+          feedback: 'The group chat made things harder — and now the moment to put it right is passing too.',
           isOptimal: false,
-          nextSceneId: 'scene-5-incomplete',
+          nextSceneId: 'scene-4-silence',
           points: 0
         }
       ],
       isDecisionPoint: true
     },
-    // Scene 5: Following Up
+    // Bridge scene: didn't tell anyone
+    {
+      id: 'scene-4-silence',
+      title: 'Carrying It Alone',
+      environment: 'classroom',
+      narrative: [
+        "The weeks go on. Jamie's seat is empty more often than not now.",
+        "You think about saying something more than once. Each time, it feels like too much, or too late, or not really your business after all.",
+        "You don't know what's happening at Jamie's house. You never told anyone enough to find out."
+      ],
+      choices: [
+        {
+          id: 'c4s-1',
+          text: 'Carry on',
+          consequence: 'There\'s no big moment, no dramatic ending. Just the quiet weight of a feeling you didn\'t do anything with.',
+          feedback: '',
+          isOptimal: false,
+          nextSceneId: 'scene-final-sobering',
+          points: 0
+        }
+      ],
+      isDecisionPoint: true
+    },
+    // Scene 5: telling someone, leading to the good outcome
     {
       id: 'scene-5',
       title: 'The Days That Follow',
+      environment: 'classroom',
       narrative: [
-        "The wheels of safeguarding turn. Ms. Patterson makes a referral to Children's Services. A social worker is assigned to assess Jamie's situation.",
-        "You continue to be a calm, consistent presence for Jamie in school. Some days they seem brighter; others, they retreat again. But you notice small things—they sit a little closer to the front now. Once, they stayed behind to show you a story they wrote.",
-        "Two weeks later, Ms. Patterson calls you into her office.",
-        "\"I wanted to update you,\" she says. \"Children's Services have completed their initial assessment. Jamie has been placed with their grandmother while things are investigated further. They wanted me to tell you—your report was the first piece of the puzzle. It may have changed everything for that child.\"",
-        "You think about that first Monday morning. The crumpled uniform. The covered wrists. The small voice saying, 'I'm fine.'"
-      ],
-      evidence: [
-        {
-          id: 'msg-2',
-          type: 'message',
-          title: 'Case Outcome Update',
-          description: 'Feedback from DSL',
-          content: 'Children\'s Services completed assessment. Jamie placed with grandmother during investigation. Teacher\'s initial report cited as crucial first indicator that prompted action.',
-          timestamp: 'Two weeks later'
-        }
+        "You don't hear exactly what happens next — that part isn't really yours to know. But over the next couple of weeks, things shift, quietly.",
+        "Jamie's away for a few days. When they come back, something about them is different — lighter, somehow, even if they're still quiet about it.",
+        "You don't ask. You just keep being around, the way you always were."
       ],
       choices: [
         {
           id: 'c5-1',
-          text: 'Reflect on the experience and continue supporting Jamie\'s learning',
-          consequence: 'You focus on making your classroom a safe, supportive space. Jamie begins to flourish again, their creative light slowly returning.',
-          feedback: 'The best follow-up is continued care. Children need stability and normalcy. Your ongoing support is as important as your initial report.',
+          text: 'Keep being a normal friend',
+          consequence: 'You don\'t make it a big thing. You just sit with Jamie at lunch, same as always, and let them set the pace.',
+          feedback: 'Consistency matters as much as the original telling did — Jamie needs things to feel normal again.',
           isOptimal: true,
           nextSceneId: 'scene-final-good',
           points: 10
@@ -398,168 +592,31 @@ export const safeguardingScenario: Scenario = {
       ],
       isDecisionPoint: true
     },
-    // Scene 5 Late Path
-    {
-      id: 'scene-5-late',
-      title: 'Acting on Your Instinct',
-      narrative: [
-        "Ms. Patterson listens carefully to everything you share. When you finish, she's quiet for a moment.",
-        "\"Thank you for bringing this to me,\" she says. \"I wish you'd come yesterday—but I understand. It's not always easy to know when to escalate. That's why we have these conversations.\"",
-        "She makes a referral that morning. Children's Services respond quickly. By the end of the week, a social worker has made contact with Jamie's family.",
-        "The outcome is good, but you can't help wondering: what if you'd waited longer? What if that one extra day had mattered?"
-      ],
-      choices: [
-        {
-          id: 'c5l-1',
-          text: 'Commit to reporting concerns on the same day in future',
-          consequence: 'You learn from this experience. Next time, you won\'t wait. A child\'s safety is worth an uncomfortable conversation.',
-          feedback: 'This is professional growth. Reflecting on what you could have done differently prepares you to act faster when it matters.',
-          isOptimal: true,
-          nextSceneId: 'scene-final-mixed',
-          points: 10
-        }
-      ],
-      isDecisionPoint: true
-    },
-    // Scene 5 Crisis Path
-    {
-      id: 'scene-5-crisis',
-      title: 'The Empty Seat',
-      narrative: [
-        "Wednesday morning arrives and Jamie's seat is empty.",
-        "At lunch, the headteacher calls an emergency staff meeting. Jamie was taken to hospital last night with serious injuries. The police are involved.",
-        "\"If anyone has any information about concerns prior to this incident,\" the head says, \"please speak to me or Ms. Patterson immediately.\"",
-        "Your stomach drops. You had information. You had concerns. And you waited.",
-        "After the meeting, you go straight to Ms. Patterson and tell her everything you observed over the past two days."
-      ],
-      choices: [
-        {
-          id: 'c5c-1',
-          text: 'Provide your account and commit to learning from this',
-          consequence: 'You give a full statement. The guilt is heavy, but you vow that no concern will ever go unreported again.',
-          feedback: 'This is a painful but important lesson. Early intervention might have prevented escalation. Your future vigilance can help other children.',
-          isOptimal: true,
-          nextSceneId: 'scene-final-poor',
-          points: 5
-        }
-      ],
-      isDecisionPoint: true
-    },
-    // Scene 5 Urgent Path (after parent contact)
-    {
-      id: 'scene-5-urgent',
-      title: 'Swift Response',
-      narrative: [
-        "Ms. Patterson's expression is grave as she listens about the phone call.",
-        "\"We need to act immediately,\" she says. \"Your call may have increased the risk at home. I'm going to escalate this as urgent.\"",
-        "Within hours, Children's Services and police are involved. Jamie is spoken to by a trained interviewer that afternoon. By evening, they're safe with a relative.",
-        "It wasn't the smoothest path. Your well-intentioned call complicated things. But ultimately, Jamie is protected.",
-        "Ms. Patterson debriefs with you the next day. \"Your honesty about the phone call was crucial. We could plan our response knowing the family was alerted. In future—always come to me first.\""
-      ],
-      choices: [
-        {
-          id: 'c5u-1',
-          text: 'Accept the feedback and learn from the experience',
-          consequence: 'You understand now why the protocols exist. The DSL is the coordinator. Your role is to report, not investigate.',
-          feedback: 'Mistakes happen. What matters is honesty and learning. You\'ve now internalized a key principle of safeguarding practice.',
-          isOptimal: true,
-          nextSceneId: 'scene-final-mixed',
-          points: 10
-        }
-      ],
-      isDecisionPoint: true
-    },
-    // Scene 5 Incomplete Path
-    {
-      id: 'scene-5-incomplete',
-      title: 'An Incomplete Picture',
-      narrative: [
-        "Ms. Patterson proceeds with a referral based on what you've told her—Jamie's appearance, the bruise, the withdrawal.",
-        "But the social worker's visit takes the family by surprise. Or so it seems. They're prepared, polished, presenting a calm household. \"We're just going through a rough patch,\" Jamie's mother says. \"The school has been very... attentive.\"",
-        "The case is closed as 'no further action.' Jamie returns to school, quiet as ever. They still flinch when adults approach. They still hide their arms.",
-        "You know something is wrong. But you've also hidden the truth about your phone call—the reason the family was ready for that visit.",
-        "The weight of what you didn't say sits heavy in your chest."
-      ],
-      choices: [
-        {
-          id: 'c5i-1',
-          text: 'Come clean to the DSL about your phone call',
-          consequence: 'You tell Ms. Patterson everything. It\'s humiliating, but necessary. She reopens the case with the new information.',
-          feedback: 'It took courage to admit your mistake. Transparency, even late, can still help. The safeguarding system can only work with complete information.',
-          isOptimal: true,
-          nextSceneId: 'scene-final-poor',
-          points: 5
-        },
-        {
-          id: 'c5i-2',
-          text: 'Stay silent and hope the situation improves',
-          consequence: 'Weeks pass. Jamie becomes more withdrawn. Then one day, they stop coming to school altogether.',
-          feedback: 'Covering up mistakes puts children at risk. Your discomfort matters far less than a child\'s safety.',
-          isOptimal: false,
-          nextSceneId: 'scene-final-very-poor',
-          points: 0
-        }
-      ],
-      isDecisionPoint: true
-    },
-    // Final Scenes
+    // Final scenes — binary, narrative, never scored
     {
       id: 'scene-final-good',
-      title: 'Best Outcome',
+      title: 'Some Weeks Later',
       narrative: [
-        "Months later, you're tidying the classroom at the end of the day when Jamie appears at the door.",
-        "\"I just wanted to say thank you,\" they say quietly. \"For noticing. For telling someone. Nan says you helped save me.\"",
-        "You smile, blinking back tears. \"I just did what any teacher should do.\"",
-        "\"But you actually did it,\" Jamie says. \"That's different.\"",
-        "They leave, backpack bouncing, heading to their grandmother's car. A child with a future stretching out before them—a future that might not have existed without that first report.",
-        "You did your job. You followed the procedures. You trusted the system.",
-        "And it worked."
+        "It's a few weeks later, and Jamie's at lunch with the rest of you, actually laughing at something stupid Marcus said.",
+        "Walking home, Jamie says, out of nowhere: \"Thanks for not just... ignoring it. The thing in the summer.\"",
+        "You don't really know what to say to that, so you just shrug. \"Course.\"",
+        "Jamie smiles — a small one, but a real one — and changes the subject."
       ],
       isDecisionPoint: false,
-      isFinalScene: true
+      isFinalScene: true,
+      epilogueOutcome: 'good'
     },
     {
-      id: 'scene-final-mixed',
-      title: 'A Difficult Lesson',
+      id: 'scene-final-sobering',
+      title: 'Some Weeks Later',
       narrative: [
-        "Jamie is safe now, living with their grandmother while the investigation continues. But the road was bumpier than it needed to be.",
-        "Looking back, you see the moments where things could have gone differently—faster, smoother, with less risk along the way.",
-        "In the staff training session a month later, you share your experience (with details anonymized). \"I learned that trusting my instincts isn't enough,\" you tell your colleagues. \"I had to trust the process too. Report early. Report to the right person. Let the DSL coordinate.\"",
-        "You'll carry these lessons forward. The next time a child needs help, you'll be ready.",
-        "Jamie's story could have had a worse ending. But it didn't—because eventually, the right actions were taken.",
-        "That knowledge will have to be enough."
+        "It's a few weeks later. Jamie's seat is still empty more often than it used to be.",
+        "You still think about that bruise sometimes, the way it disappeared the second you noticed it.",
+        "You tell yourself it's probably fine. You're not sure you believe it."
       ],
       isDecisionPoint: false,
-      isFinalScene: true
-    },
-    {
-      id: 'scene-final-poor',
-      title: 'Hard Lessons Learned',
-      narrative: [
-        "Jamie eventually found safety—but not as quickly as they should have. The delays, the missteps, the incomplete information—all of it meant more days at risk.",
-        "In the formal debrief that follows, you sit with the weight of what could have been done differently. The DSL is kind but clear: \"Early reporting saves lives. Complete information is essential. And we never contact parents when abuse is suspected.\"",
-        "You nod, these lessons branded into your memory now.",
-        "Jamie is recovering, slowly. Their grandmother reports progress. The creative light is returning.",
-        "You didn't handle this perfectly. But you learned. And that learning might protect the next child—might ensure they get help faster, sooner, before things escalate.",
-        "In safeguarding, we don't always get second chances. But we can always do better next time."
-      ],
-      isDecisionPoint: false,
-      isFinalScene: true
-    },
-    {
-      id: 'scene-final-very-poor',
-      title: 'The Cost of Silence',
-      narrative: [
-        "Jamie didn't come back to school. You heard through whispers in the staff room that they'd been hospitalized, then moved far away to live with relatives in another county.",
-        "The investigation that followed was thorough. Your name came up—the teacher who noticed things early. Who called the house. Who then said nothing about it.",
-        "There's a formal review. Questions about what you knew and when. About why information was withheld.",
-        "In the end, Jamie survived. They're getting help now, far from Riverside Primary. But the months of additional suffering—the silence that protected you more than them—that's something you'll carry forever.",
-        "The training manual says it clearly: 'It could happen here.'",
-        "It did happen here. And you could have done more.",
-        "That's the hardest lesson of all."
-      ],
-      isDecisionPoint: false,
-      isFinalScene: true
+      isFinalScene: true,
+      epilogueOutcome: 'sobering'
     }
   ]
 };

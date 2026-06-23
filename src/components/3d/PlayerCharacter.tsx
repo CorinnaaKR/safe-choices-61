@@ -15,6 +15,8 @@ interface PlayerCharacterProps {
   onPositionChange: (position: THREE.Vector3) => void;
   sceneType?: SceneType;
   obstacles?: [number, number, number, number][];
+  moveTarget?: THREE.Vector3 | null;
+  onArrived?: () => void;
 }
 
 const SPEED = 3;
@@ -32,16 +34,18 @@ function hitsObstacle(x: number, z: number, obs: [number, number, number, number
 
 const UP = new THREE.Vector3(0, 1, 0);
 
-export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obstacles = [] }: PlayerCharacterProps) {
+export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obstacles = [], moveTarget = null, onArrived }: PlayerCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const keys = useRef<Record<string, boolean>>({});
   const rotationY = useRef(0);
   const [bobPhase, setBobPhase] = useState(0);
   const { camera } = useThree();
+  const arrivedRef = useRef(false);
   // Scratch vectors — reused every frame to avoid allocation
   const camDir = useRef(new THREE.Vector3());
   const camRight = useRef(new THREE.Vector3());
   const moveVec = useRef(new THREE.Vector3());
+  const toTarget = useRef(new THREE.Vector3());
 
   useEffect(() => {
     const onDown = (e: KeyboardEvent) => { keys.current[e.key.toLowerCase()] = true; };
@@ -64,6 +68,39 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
       groupRef.current.position.x, bMinX + WALL_MARGIN, bMaxX - WALL_MARGIN);
     groupRef.current.position.z = THREE.MathUtils.clamp(
       groupRef.current.position.z, bMinZ + WALL_MARGIN, bMaxZ - WALL_MARGIN);
+
+    // Click-to-move: walk toward moveTarget if set
+    if (moveTarget && !arrivedRef.current) {
+      toTarget.current.set(moveTarget.x, 0, moveTarget.z);
+      toTarget.current.sub(new THREE.Vector3(groupRef.current.position.x, 0, groupRef.current.position.z));
+      const distToTarget = toTarget.current.length();
+      if (distToTarget < 1.2) {
+        arrivedRef.current = true;
+        onArrived?.();
+      } else {
+        toTarget.current.normalize();
+        const targetRotation = Math.atan2(toTarget.current.x, toTarget.current.z);
+        let diff = targetRotation - rotationY.current;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        rotationY.current += diff * Math.min(1, ROTATION_SPEED * delta * 3);
+        groupRef.current.rotation.y = rotationY.current;
+
+        const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType];
+        const curX = groupRef.current.position.x;
+        const curZ = groupRef.current.position.z;
+        const nextX = THREE.MathUtils.clamp(curX + toTarget.current.x * SPEED * delta, minX + WALL_MARGIN, maxX - WALL_MARGIN);
+        const nextZ = THREE.MathUtils.clamp(curZ + toTarget.current.z * SPEED * delta, minZ + WALL_MARGIN, maxZ - WALL_MARGIN);
+        if (!hitsObstacle(nextX, curZ, obstacles)) groupRef.current.position.x = nextX;
+        if (!hitsObstacle(groupRef.current.position.x, nextZ, obstacles)) groupRef.current.position.z = nextZ;
+
+        setBobPhase(prev => prev + delta * 10);
+        groupRef.current.position.y = Math.abs(Math.sin(bobPhase)) * 0.06;
+        onPositionChange(groupRef.current.position);
+        return;
+      }
+    }
+    // Reset arrived flag when target clears
+    if (!moveTarget) arrivedRef.current = false;
 
     const k = keys.current;
     const forward = (k['w'] || k['arrowup'] ? 1 : 0) - (k['s'] || k['arrowdown'] ? 1 : 0);

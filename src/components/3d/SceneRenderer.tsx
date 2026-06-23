@@ -1,4 +1,4 @@
-import { Suspense, useRef, useCallback } from 'react';
+import { Suspense, useRef, useCallback, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, ContactShadows } from '@react-three/drei';
 import { EffectComposer, DepthOfField, Vignette, Outline, Selection, N8AO, Bloom } from '@react-three/postprocessing';
@@ -36,10 +36,31 @@ export function SceneRenderer({
 }: SceneRendererProps) {
   const focusTarget = focusedEvidenceId ? evidencePositions.get(focusedEvidenceId) ?? null : null;
   const playerPosRef = useRef(new THREE.Vector3(0, 0, 3));
+  const [walkTarget, setWalkTarget] = useState<THREE.Vector3 | null>(null);
+  const pendingEvidenceRef = useRef<Evidence | null>(null);
 
   const handlePlayerMove = useCallback((pos: THREE.Vector3) => {
     playerPosRef.current.copy(pos);
   }, []);
+
+  // When evidence is clicked, walk toward it first, then open inspect panel
+  const handleFocusEvidence = useCallback((evidence: Evidence) => {
+    const pos = evidencePositions.get(evidence.id);
+    if (pos) {
+      pendingEvidenceRef.current = evidence;
+      setWalkTarget(new THREE.Vector3(pos[0], 0, pos[2]));
+    } else {
+      onFocusEvidence(evidence);
+    }
+  }, [evidencePositions, onFocusEvidence]);
+
+  const handlePlayerArrived = useCallback(() => {
+    setWalkTarget(null);
+    if (pendingEvidenceRef.current) {
+      onFocusEvidence(pendingEvidenceRef.current);
+      pendingEvidenceRef.current = null;
+    }
+  }, [onFocusEvidence]);
 
   return (
     <div className="absolute inset-0">
@@ -66,6 +87,8 @@ export function SceneRenderer({
             onPositionChange={handlePlayerMove}
             sceneType={sceneType}
             obstacles={sceneType === 'home' ? HOME_OBSTACLES : undefined}
+            moveTarget={walkTarget}
+            onArrived={handlePlayerArrived}
           />
 
           {sceneType === 'classroom' && (
@@ -74,7 +97,7 @@ export function SceneRenderer({
               collectedIds={collectedIds}
               focusedEvidenceId={focusedEvidenceId}
               onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={onFocusEvidence}
+              onFocusEvidence={handleFocusEvidence}
             />
           )}
           {sceneType === 'playground' && (
@@ -83,7 +106,7 @@ export function SceneRenderer({
               collectedIds={collectedIds}
               focusedEvidenceId={focusedEvidenceId}
               onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={onFocusEvidence}
+              onFocusEvidence={handleFocusEvidence}
             />
           )}
           {sceneType === 'office' && (
@@ -92,7 +115,7 @@ export function SceneRenderer({
               collectedIds={collectedIds}
               focusedEvidenceId={focusedEvidenceId}
               onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={onFocusEvidence}
+              onFocusEvidence={handleFocusEvidence}
             />
           )}
           {sceneType === 'home' && (
@@ -101,7 +124,7 @@ export function SceneRenderer({
               collectedIds={collectedIds}
               focusedEvidenceId={focusedEvidenceId}
               onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={onFocusEvidence}
+              onFocusEvidence={handleFocusEvidence}
             />
           )}
 

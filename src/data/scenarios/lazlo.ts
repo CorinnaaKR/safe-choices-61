@@ -20,6 +20,11 @@ export const lazloScenario: Scenario = {
   difficulty: 2,
   durationMinutes: 20,
   status: 'available',
+  maxPoints: 70,
+  // Demo scoping: Lazlo's Story is the training-mode story (scoring + certificate).
+  // Jamie's Story covers the personal/Story-mode side. Long-term, each story
+  // will have both POVs — see HANDOVER.md.
+  supportedModes: ['training'],
   learningObjectives: [
     'Recognise signs that someone may be drawing towards extremism',
     'Understand how grief and isolation increase vulnerability',
@@ -36,6 +41,39 @@ export const lazloScenario: Scenario = {
     requiredCriticalEvidence: 2,
     maxPoorDecisions: 1,
   },
+  castOfCharacters: [
+    {
+      name: 'Evan (you)',
+      role: "Lazlo's friend",
+      details: "You and Lazlo grew up together. You haven't seen him much since his uncle died — Lilly called you because she's worried and doesn't know who else to ask.",
+    },
+    {
+      name: 'Lazlo',
+      role: 'Your old friend',
+      details: "Lazlo is 24. His uncle Joey was the closest thing he had to a father figure. Since Joey died six months ago, Lazlo has withdrawn from almost everyone — changed his look, stopped replying, quit his job.",
+    },
+    {
+      name: 'Lilly',
+      role: "Lazlo's sister",
+      details: "Lilly is Lazlo's younger sister. She asked you to visit because she's noticed the same changes and is frightened. She isn't here today — she didn't want Lazlo to feel ambushed.",
+    },
+    {
+      name: 'Priya',
+      role: "Lazlo's girlfriend (ex?)",
+      details: "Priya and Lazlo were together for two years. Lazlo hasn't mentioned her since Joey died. A photo of them at a festival has been turned face-down in the flat.",
+    },
+    {
+      name: 'Uncle Joey',
+      role: "Lazlo's uncle — deceased",
+      details: "Joey died six months ago. He was Lazlo's main male role model. Lazlo has barely spoken about the death to anyone, but it seems to be at the root of everything.",
+    },
+  ],
+  knownFacts: [
+    { label: 'Lazlo lost his job', detail: 'He stopped going in about two months ago. No explanation given — just stopped.' },
+    { label: "Uncle Joey died 6 months ago", detail: "Lazlo and Joey were very close. The grief hit Lazlo hard and he has not processed it with anyone around him." },
+    { label: "Lilly asked you to visit", detail: "She is worried about her brother. She asked you to check on him without telling him she'd called." },
+    { label: "Lazlo has been withdrawing", detail: "He used to reply to messages within the hour. Then his uncle died. Then he stopped replying at all." },
+  ],
   resources: [
     { title: 'ACT Early — report concerns about radicalisation', url: 'https://actearly.uk/' },
     { title: 'Prevent duty guidance (gov.uk)', url: 'https://www.gov.uk/government/publications/prevent-duty-guidance' },
@@ -248,6 +286,8 @@ export const lazloScenario: Scenario = {
         "He sets the mug down without comment. Sits.",
         "'I wasn't expecting to hear from your sister before I heard from you,' you say. Casual. Like it's nothing.",
         "Lazlo's eyes move to the wall where you're looking, then back to you. 'She messages everyone,' he says. Just that. The way he says 'she' has something in it.",
+        "'Heard it's been a rough few months,' you say, keeping it casual. 'The job. You and Sienna.'",
+        "Lazlo looks at his mug. 'Yeah,' he says. 'Lot happened.' He doesn't go further. You don't push.",
       ],
       evidence: [
         {
@@ -587,8 +627,14 @@ export const lazloScenario: Scenario = {
       isDecisionPoint: true,
       narrative: [
         '"Joey was the only one who actually knew me." Lazlo is still looking at the TV but he is speaking now.',
-        '"My mum, Lilly — they weren\'t close to him. So when he died, they just... moved on. Like it was nothing."',
-        '"These guys I\'ve been speaking to — they get it. They\'ve lost people too. They don\'t tell you to get over it."',
+        '"Mum. Lilly." He stops. Starts again. "When he died they just — kept going. Like it was nothing."',
+        '"She cheated. While I was in it." He says it flatly. "And the job — I went to HR. Said what was happening. Two weeks later." A short breath. "Performance issues."',
+        '"These guys I\'ve been speaking to." He glances at the wall for just a moment. "They don\'t do that. Tell you to move on. They get it."',
+        "He doesn't elaborate. As if that's the whole explanation.",
+        "You look at the clippings. At the poster. You've heard that language before — on that wall, somewhere.",
+        "A silence settles. Then, almost as an afterthought: 'Lilly's got her own thing going on anyway. That relationship.' A small shrug. 'Goes against God's will. And Priya — she doesn't belong here anyway.'",
+        "He says it the way you'd close a topic. Already moving on.",
+        "The name sits in the room. Priya. Someone he has known for years.",
         "His phone buzzes. He glances at it, then puts it face-down on the cushion. You caught a glimpse of the screen.",
       ],
       evidence: [
@@ -598,7 +644,7 @@ export const lazloScenario: Scenario = {
           title: 'Anger at Old Friends',
           description: 'Lazlo is dismissive and contemptuous about mutual friends',
           content:
-            '"They\'re all the same," he says, unprompted, when you mention a mutual friend. "They didn\'t even go to the funeral. None of them." The contempt in his voice is sharp. The grief has curdled into something harder — he is sorting people into those who understood Joey and those who didn\'t, and almost everyone is failing the test.',
+            'Lazlo talks about his family and old friends with contempt he makes no effort to soften. "They just moved on. Like it was nothing." The grief has curdled into something harder — he is sorting people into those who understood Joey and those who didn\'t, and almost everyone is failing the test. The warmth he reserves for the online group is completely absent when he talks about the people who were actually in his life.',
           timestamp: 'Wednesday, 2:24 PM',
           category: 'behavioural',
           importance: 'major',
@@ -646,13 +692,13 @@ export const lazloScenario: Scenario = {
         {
           id: 'dig-l2',
           type: 'visual',
-          title: "Lazlo's Phone — Group Chat",
+          title: "Lazlo's Phone — Meet Invitation",
           description: 'Screen glimpse showing an extremist group message thread',
           content:
-            'A brief glimpse of Lazlo\'s phone screen before he puts it face-down. A Telegram group: "EUROPA SONS 🔥". The last visible message reads: "When you coming to the meet? We need you, brother."',
+            'A brief glimpse of Lazlo\'s phone screen before he puts it face-down. A Telegram group: "EUROPA SONS 🔥". The last message: "When you coming to the meet? We need you, brother." They are calling him in person. Online contact is one level of involvement — an in-person meeting with this group is a significant step further. Groups like this use face-to-face gatherings to deepen loyalty and make it much harder to step back. The fact that they\'re asking suggests he hasn\'t been yet. That may not stay true for long.',
           timestamp: 'Wednesday, 2:26 PM',
           category: 'digital',
-          importance: 'major',
+          importance: 'critical',
           points: 15,
           visual: {
             type: 'phone-message',
@@ -668,13 +714,37 @@ export const lazloScenario: Scenario = {
             ],
           },
         },
+        {
+          id: 'beh-l8',
+          type: 'observation',
+          title: 'Three Things — Lazlo\'s Account of the Past Year',
+          description: 'Lazlo outlines what has happened since Joey died',
+          content:
+            'Lazlo describes three things hitting at once: his uncle\'s death, his girlfriend cheating on him while he was grieving, and losing his job after reporting a manager for bullying a junior colleague. He was the only one who spoke up. Two weeks later he was out. He does not frame this as a complaint — he lists it flatly, like someone who has stopped expecting to be believed. Groups like the one Lazlo has found specifically target this kind of story: someone who did the right thing, was punished for it, and has been told that is normal. The narrative fits perfectly into what they say about systems being rigged against people like him.',
+          timestamp: 'Wednesday, 2:25 PM',
+          category: 'behavioural',
+          importance: 'major',
+          points: 15,
+        },
+        {
+          id: 'beh-l7',
+          type: 'observation',
+          title: 'Something He Said About Priya',
+          description: 'Lazlo makes a comment about his sister\'s relationship',
+          content:
+            'Lazlo said Lilly\'s relationship with Priya "goes against God\'s will" — and that Priya "doesn\'t belong in this country anyway." He said it without anger, as a statement of fact. This is almost certainly what Lilly heard that alarmed her — and why she, as someone who works with the law, went looking for help. The words aren\'t his in origin. They\'re the group\'s language, absorbed until it sounds like common sense.',
+          timestamp: 'Wednesday, 2:27 PM',
+          category: 'behavioural',
+          importance: 'critical',
+          points: 20,
+        },
       ],
       choices: [
         {
           id: 'c-l3a-1',
           text: '"Tell me more about these people. What do they actually talk about?"',
           consequence:
-            '"They talk about what\'s really happening," Lazlo says. "Joey found them first. After he died they reached out to me." His voice is flatter than it was.',
+            '"They talk about what\'s really happening," Lazlo says. "After Joey died I just needed somewhere to put it. Found a thread online. Posted something. They were the first people who actually responded like it mattered." His voice is flatter than it was.',
           feedback:
             'Open, curious questioning keeps Lazlo talking and gathers more information. You are not judging — you are listening. This is the right approach.',
           isOptimal: true,
@@ -785,11 +855,11 @@ export const lazloScenario: Scenario = {
           id: 'c-l4a-1',
           text: 'Contact ACT Early — the government programme for reporting radicalisation concerns.',
           consequence:
-            'You call the ACT Early helpline and describe what you saw. They take your details and explain the next steps.',
+            'You sit in your car outside his flat and dial. Your hands are slightly unsteady. You have never done this before.',
           feedback:
             'ACT Early is the right route for this concern. You do not need to be certain — you need to be worried. A trained practitioner will assess the risk and connect Lazlo with appropriate support.',
           isOptimal: true,
-          nextSceneId: 'scene-l5',
+          nextSceneId: 'scene-call',
           points: 25,
           skillArea: 'escalation',
         },
@@ -838,11 +908,11 @@ export const lazloScenario: Scenario = {
           id: 'c-l4b-1',
           text: 'Contact ACT Early with what you know — partial information is still information.',
           consequence:
-            "The ACT Early adviser says: 'Thank you for calling. You don't need to be certain. What you've described is exactly what we'd want to hear about.'",
+            'You stand outside on the pavement and dial. You don\'t have everything. You have enough.',
           feedback:
             'ACT Early specifically exists for situations where you have concerns but not proof. You did the right thing by calling.',
           isOptimal: true,
-          nextSceneId: 'scene-l5',
+          nextSceneId: 'scene-call',
           points: 20,
           skillArea: 'escalation',
         },
@@ -889,4 +959,97 @@ export const lazloScenario: Scenario = {
       ],
     },
   ],
+
+  // ── "Making the call" — ACT Early simulation ──────────────────────────────
+  callScene: {
+    phoneNumber: '0800 011 3764',
+    serviceName: 'ACT Early Support Line',
+    operatorName: 'Sam',
+    steps: [
+      {
+        operatorLine: "ACT Early, you're through to Sam. Take your time — what's brought you to call today?",
+        choices: [
+          {
+            requiresEvidenceId: 'beh-l1',
+            text: "He's grown a beard, lost weight, the flat's always dark now — he's just different.",
+          },
+          {
+            requiresEvidenceId: 'env-l1',
+            text: "There's a poster on his wall. Some group called Sons of Europa. It's... it's bad.",
+          },
+          {
+            requiresEvidenceId: 'beh-l5',
+            text: "He said he's \"part of something bigger\" since his uncle died.",
+          },
+          {
+            requiresEvidenceId: 'env-l4',
+            text: "There's a pamphlet — it's basically recruiting people who are grieving.",
+          },
+        ],
+        fallbackChoiceText:
+          "Honestly I'm not sure how to put it into words. Something's wrong.",
+      },
+      {
+        operatorLine:
+          "Okay. Thank you for noticing that, and for calling — that takes something. Can I ask — has he said anything about taking action, or is this more about how he's thinking and who he's around?",
+        choices: [
+          { text: "It's how he's thinking. The people around him. Nothing about doing anything." },
+          { text: "I don't know. I didn't want to push him on it." },
+        ],
+      },
+      {
+        operatorLine:
+          "That's helpful, and it's the right call either way. Here's what happens next — this is voluntary for him, and it's confidential. Nothing goes on his record. I'll pass this to a Prevent officer in your area. They might involve other people — a GP, someone from the council, sometimes a mentor — whatever fits him. You won't necessarily hear exactly what happens, because it's his process, not yours. But you've done the hard part.",
+        choices: [
+          { text: "What if he won't talk to anyone?" },
+        ],
+      },
+      {
+        operatorLine:
+          "Then we try again, gently, over time. Nobody's forcing him. But most people do, eventually — especially when someone like you cared enough to make this call.",
+      },
+    ],
+    closingLine: 'Call ended.',
+  },
+
+  // ── Epilogue — outcome shown before results ───────────────────────────────
+  epilogue: {
+    good: {
+      sceneStamp: 'Three weeks later',
+      contactName: 'Lazlo',
+      messages: [
+        { sender: 'contact', text: 'hey' },
+        { sender: 'contact', text: "sorry i've been off grid" },
+        { sender: 'contact', text: 'someone came round. from the council. bit awkward at first ngl' },
+        { sender: 'contact', text: 'turns out it\'s not like... an interrogation. she just asks questions. mostly about uncle Joey tbh' },
+        { sender: 'contact', text: 'apparently I\'ve been "filling a gap" or whatever' },
+        { sender: 'contact', text: 'anyway. not going to the group as much' },
+        { sender: 'contact', text: "lilly's actually talking to me again which is. something" },
+        { sender: 'contact', text: 'thanks for being annoying about it btw' },
+        { sender: 'contact', text: "wouldn't have happened otherwise" },
+      ],
+    },
+    sobering: {
+      sceneStamp: 'Three weeks later',
+      contactName: 'Lazlo',
+      sentMessages: [
+        "hey. haven't heard from you in a while",
+        'lazlo?',
+      ],
+      narrativeCard: [
+        'You called twice. It rang out both times.',
+        "Three weeks later, Lilly messages you. She tells you Lazlo moved out of his flat. He's staying with people from the group now.",
+        "She doesn't know where.",
+      ],
+    },
+    middle: {
+      sceneStamp: 'Three weeks later',
+      narrativeCard: [
+        'You passed it on. Someone listened.',
+        "It took a few days before anyone reached Lazlo — these things don't move fast.",
+        "But Lilly told you later that he'd agreed to talk to someone. Just once, to start with.",
+        "That's not everything. But it's not nothing either.",
+      ],
+    },
+  },
 };

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lazlo's Story — Scoring Assessment</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0e0c; color: #e8e4dc; font-family: 'Courier New', monospace; padding: 32px; }
+  h1 { font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; color: #a09070; margin-bottom: 4px; }
+  .subtitle { font-size: 11px; color: #5a5040; letter-spacing: 0.1em; margin-bottom: 32px; }
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #608050; margin-bottom: 12px; border-bottom: 1px solid #252010; padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 8px 10px; color: #6a6050; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid #252010; }
+  td { padding: 8px 10px; border-bottom: 1px solid #1a1810; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .optimal { color: #c8922a; }
+  .ok { color: #8aaa60; }
+  .poor { color: #8b3030; }
+  .badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; }
+  .badge-opt { background: #2a1e08; color: #c8922a; border: 1px solid #4a3010; }
+  .badge-ok { background: #141e0a; color: #8aaa60; border: 1px solid #2a4010; }
+  .badge-poor { background: #1e0808; color: #8b3030; border: 1px solid #3a1010; }
+  .issue { background: #1a1610; border: 1px solid #3a3010; border-radius: 4px; padding: 12px 16px; margin-bottom: 10px; }
+  .issue-title { color: #c8922a; font-size: 11px; margin-bottom: 4px; }
+  .issue-body { font-size: 11px; color: #8a8070; line-height: 1.6; }
+  .totals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .total-card { background: #131210; border: 1px solid #252010; border-radius: 4px; padding: 14px; }
+  .total-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #6a6050; margin-bottom: 8px; }
+  .total-value { font-size: 22px; color: #e8e4dc; }
+  .total-note { font-size: 10px; color: #5a5040; margin-top: 4px; }
+  .path-row { background: #131210; border: 1px solid #252010; border-radius: 4px; padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .path-desc { font-size: 11px; color: #a09070; }
+  .path-score { font-size: 13px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Lazlo's Story — Scoring Assessment</h1>
+<p class="subtitle">How decisions are scored · Pass mark · Path totals · Known issues</p>
+
+<!-- HOW SCORING WORKS -->
+<div class="section">
+  <div class="section-title">How scoring works</div>
+  <table>
+    <tr>
+      <th>Mechanic</th><th>Detail</th>
+    </tr>
+    <tr><td>Score basis</td><td>Points earned ÷ maximum available <em>on the path you took</em> (not global max)</td></tr>
+    <tr><td>Decision points</td><td>5 scenes with scored choices (S1, S2/S2w, S2b/S3a, S3a/S3b, S4a/S4b)</td></tr>
+    <tr><td>Evidence</td><td>Collected but NOT currently counted in score — above-100% is therefore impossible</td></tr>
+    <tr><td>Pass mark (current)</td><td>75% — <strong style="color:#c8922a">should be 85% per spec</strong></td></tr>
+    <tr><td>Skill areas</td><td>recognising-signs · responding · evidence-gathering · escalation</td></tr>
+    <tr><td>Skill % shown</td><td>Points earned in area ÷ max available in that area on path taken</td></tr>
+  </table>
+</div>
+
+<!-- DECISION TABLE -->
+<div class="section">
+  <div class="section-title">All decisions scored</div>
+  <table>
+    <tr>
+      <th>Scene</th><th>Choice ID</th><th>Text (shortened)</th><th>Points</th><th>Skill area</th><th>Optimal?</th><th>Leads to</th>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 1 — Wednesday Afternoon · Max available: 10</td>
+    </tr>
+    <tr>
+      <td>S1</td><td>c-l1-1</td><td>"Coffee would be great"</td>
+      <td class="optimal">+10</td><td>recognising-signs</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S2 (alone)</td>
+    </tr>
+    <tr>
+      <td>S1</td><td>c-l1-2</td><td>"Water's fine"</td>
+      <td class="ok">+5</td><td>recognising-signs</td>
+      <td><span class="badge badge-ok">ok</span></td><td>→ S2w (together)</td>
+    </tr>
+    <tr>
+      <td>S1</td><td>c-l1-3</td><td>"I'm alright. Don't worry."</td>
+      <td class="poor">0</td><td>recognising-signs</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S2w (together)</td>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 2 (coffee path) — The Living Room · Max available: 15</td>
+    </tr>
+    <tr>
+      <td>S2</td><td>c-l2-1</td><td>"How are you doing since Joey?"</td>
+      <td class="optimal">+15</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S3a</td>
+    </tr>
+    <tr>
+      <td>S2</td><td>c-l2-2</td><td>"What is that symbol?"</td>
+      <td class="ok">+10</td><td>evidence-gathering</td>
+      <td><span class="badge badge-ok">ok</span></td><td>→ S3a</td>
+    </tr>
+    <tr>
+      <td>S2</td><td>c-l2-3</td><td>"Push on Lilly comment"</td>
+      <td class="poor">0</td><td>responding</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S2b (walls up)</td>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 2W (water path) — The Living Room · Max available: 15</td>
+    </tr>
+    <tr>
+      <td>S2w</td><td>c-l2w-1</td><td>"Part of something — what kind?"</td>
+      <td class="optimal">+15</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S3a</td>
+    </tr>
+    <tr>
+      <td>S2w</td><td>c-l2w-2</td><td>"That's good. Makes sense you'd find something."</td>
+      <td class="optimal">+12</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S3a</td>
+    </tr>
+    <tr>
+      <td>S2w</td><td>c-l2w-3</td><td>"Push on Lilly"</td>
+      <td class="poor">0</td><td>responding</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S2b (walls up)</td>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 2B — Walls Up (recovery scene) · Max available: 8</td>
+    </tr>
+    <tr>
+      <td>S2b</td><td>c-l2b-1</td><td>"I'm sorry. That came out wrong."</td>
+      <td class="optimal">+8</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S3b</td>
+    </tr>
+    <tr>
+      <td>S2b</td><td>c-l2b-2</td><td>"You're right. I'll just sit here."</td>
+      <td class="optimal">+8</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S3b</td>
+    </tr>
+    <tr>
+      <td>S2b</td><td>c-l2b-3</td><td>"She's scared. You have to talk to someone."</td>
+      <td class="poor">0</td><td>responding</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S4b (skip to end)</td>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 3A — He Starts to Talk · Max available: 20</td>
+    </tr>
+    <tr>
+      <td>S3a</td><td>c-l3a-1</td><td>"Tell me more about these people."</td>
+      <td class="optimal">+20</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S4a</td>
+    </tr>
+    <tr>
+      <td>S3a</td><td>c-l3a-2</td><td>"That sounds good — hard after a loss."</td>
+      <td class="ok">+15</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S4a</td>
+    </tr>
+    <tr>
+      <td>S3a</td><td>c-l3a-3</td><td>"Some groups aren't what they seem."</td>
+      <td class="poor">0</td><td>responding</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S4b</td>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 3B — The Quiet Room · Max available: 10</td>
+    </tr>
+    <tr>
+      <td>S3b</td><td>c-l3b-1</td><td>"I'm going to go. But I'm here."</td>
+      <td class="ok">+8</td><td>responding</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S4a</td>
+    </tr>
+    <tr>
+      <td>S3b</td><td>c-l3b-2</td><td>"Is there anyone you trust?"</td>
+      <td class="optimal">+10</td><td>escalation</td>
+      <td><span class="badge badge-ok">ok</span></td>
+      <td style="color:#c8922a">→ S4a ⚠️ +10 pts but not flagged optimal</td>
+    </tr>
+    <tr>
+      <td>S3b</td><td>c-l3b-3</td><td>"Leave without saying much."</td>
+      <td class="poor">0</td><td>responding</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S4b</td>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 4A — What You Now Know · Max available: 25</td>
+    </tr>
+    <tr>
+      <td>S4a</td><td>c-l4a-1</td><td>"Contact ACT Early"</td>
+      <td class="optimal">+25</td><td>escalation</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S5</td>
+    </tr>
+    <tr>
+      <td>S4a</td><td>c-l4a-2</td><td>"Tell a trusted adult"</td>
+      <td class="ok">+15</td><td>escalation</td>
+      <td><span class="badge badge-ok">ok</span></td><td>→ S5</td>
+    </tr>
+    <tr>
+      <td>S4a</td><td>c-l4a-3</td><td>"Do nothing for now"</td>
+      <td class="poor">0</td><td>escalation</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S5</td>
+    </tr>
+
+    <tr style="background:#1a1a10">
+      <td colspan="7" style="color:#5a5040;font-size:10px;padding:4px 10px">SCENE 4B — Left With Questions · Max available: 20</td>
+    </tr>
+    <tr>
+      <td>S4b</td><td>c-l4b-1</td><td>"Contact ACT Early (partial info)"</td>
+      <td class="optimal">+20</td><td>escalation</td>
+      <td><span class="badge badge-opt">✓ optimal</span></td><td>→ S5</td>
+    </tr>
+    <tr>
+      <td>S4b</td><td>c-l4b-2</td><td>"Tell Lilly what you noticed"</td>
+      <td class="ok">+8</td><td>escalation</td>
+      <td><span class="badge badge-ok">ok</span></td><td>→ S5</td>
+    </tr>
+    <tr>
+      <td>S4b</td><td>c-l4b-3</td><td>"Do nothing"</td>
+      <td class="poor">0</td><td>escalation</td>
+      <td><span class="badge badge-poor">poor</span></td><td>→ S5</td>
+    </tr>
+  </table>
+</div>
+
+<!-- PATH TOTALS -->
+<div class="section">
+  <div class="section-title">Path totals (score = pts earned ÷ max on path)</div>
+
+  <div class="path-row">
+    <div class="path-desc">OPTIMAL &nbsp;·&nbsp; coffee → Joey → tell me more → ACT Early<br><span style="color:#5a5040;font-size:10px">S1:10 + S2:15 + S3a:20 + S4a:25 = 70 ÷ 70</span></div>
+    <div class="path-score optimal">100%</div>
+  </div>
+  <div class="path-row">
+    <div class="path-desc">GOOD &nbsp;·&nbsp; water → validate → sounds good → ACT Early<br><span style="color:#5a5040;font-size:10px">S1:5 + S2w:12 + S3a:20 + S4a:25 = 62 ÷ 70 (path max)</span></div>
+    <div class="path-score ok">89%</div>
+  </div>
+  <div class="path-row">
+    <div class="path-desc">GOOD &nbsp;·&nbsp; coffee → symbol → tell me more → trusted adult<br><span style="color:#5a5040;font-size:10px">S1:10 + S2:10 + S3a:20 + S4a:15 = 55 ÷ 70</span></div>
+    <div class="path-score ok">79%</div>
+  </div>
+  <div class="path-row">
+    <div class="path-desc">RECOVERY &nbsp;·&nbsp; push Lilly → sorry → leave kindly → ACT Early (partial)<br><span style="color:#5a5040;font-size:10px">S1:10 + S2:0 + S2b:8 + S3b:8 + S4b:20 = 46 ÷ 61 (path max)</span></div>
+    <div class="path-score" style="color:#806050">75%</div>
+  </div>
+  <div class="path-row">
+    <div class="path-desc">POOR &nbsp;·&nbsp; push → push again → leave silently → do nothing<br><span style="color:#5a5040;font-size:10px">S1:10 + S2:0 + S2b:0 + S3b:0 + S4b:0 = 10 ÷ 61</span></div>
+    <div class="path-score poor">16%</div>
+  </div>
+</div>
+
+<!-- ISSUES -->
+<div class="section">
+  <div class="section-title">Issues to fix</div>
+
+  <div class="issue">
+    <div class="issue-title">⚠️ Issue 1 — Pass mark is 75%, spec says 85%</div>
+    <div class="issue-body">
+      <code>PASS_THRESHOLD = 75</code> in <code>src/pages/ResultsPage.tsx</code>.
+      Change to <code>85</code>. At 85%, the coffee→validate→sounds-good→ACT-Early path (89%) passes comfortably; the symbol-then-trusted-adult path (79%) fails — which is appropriate.
+    </div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-title">⚠️ Issue 2 — Evidence not counted; above-100% is impossible</div>
+    <div class="issue-body">
+      Evidence items total ~150 pts but are excluded from <code>totalPoints</code> in <code>useSimulation.ts</code>.
+      To allow above-100%, evidence points need to be added to the numerator while the denominator stays as path-max-decisions.
+      A thorough player who collects all evidence on the optimal path would score ~314% (70 + 150 decision-evidence points ÷ 70).
+      Needs a cap or weight decision before implementing.
+    </div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-title">⚠️ Issue 3 — S3b misalignment: c-l3b-2 scores +10 but is not flagged optimal; c-l3b-1 scores +8 and is</div>
+    <div class="issue-body">
+      <code>c-l3b-1</code> ("I'm going to go. But I'm here.") = <code>isOptimal: true</code>, 8 pts.<br>
+      <code>c-l3b-2</code> ("Is there anyone you trust?") = <code>isOptimal: false</code>, 10 pts.<br>
+      Either raise c-l3b-1 to 10 pts and flag c-l3b-2 as optimal too, or swap the point values so the flags match the numbers.
+      Needs a story call: is "suggest professional help" more correct than "leave the door open"?
+    </div>
+  </div>
+</div>
+
+<p style="font-size:10px;color:#3a3830;margin-top:16px">Generated 14 June 2026 · safe-choices-61</p>
+</body>
+</html>

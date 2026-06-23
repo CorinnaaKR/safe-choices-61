@@ -42,7 +42,7 @@
     --input: 26 14% 38%;
     --ring: 32 85% 58%;
 
-    --radius: 0.5rem;
+    --radius: 0px;
 
     /* Story-specific tokens — slightly darker than ground for atmosphere */
     --story-bg: 26 14% 16%;
@@ -85,7 +85,7 @@
 @layer components {
   /* Monospace HUD label: uppercase, gently letter-spaced — used inside the simulation HUD */
   .hud-label {
-    @apply font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground;
+    @apply font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground hud-float;
   }
 
   /* Warmer label for content pages (welcome, gate, results) — no uppercase aggression */
@@ -95,7 +95,7 @@
 
   /* Bracketed keyboard affordance: [E] EXAMINE */
   .key-hint {
-    @apply font-mono text-[11px] uppercase tracking-[0.12em] text-foreground/65;
+    @apply font-mono text-[11px] uppercase tracking-[0.12em] text-foreground/65 hud-float;
   }
   .key-hint b {
     @apply font-medium text-foreground/90;
@@ -109,26 +109,82 @@
 
   /* Case-file / dossier panel — used inside the simulation HUD */
   .case-panel {
-    background: hsl(var(--background) / 0.88);
-    backdrop-filter: blur(8px);
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
+    background: hsl(var(--background) / 0.82);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.7);
+    border-radius: 0;
+  }
+
+  /* Narrative story panel — immersive literary feel, distinct from case-file panels */
+  .narrative-panel {
+    background: hsl(var(--background) / 0.72);
+    backdrop-filter: blur(16px);
+    border-left: 2px solid hsl(var(--primary) / 0.35);
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  /* Narrative body text — readable, slightly warmer than HUD mono */
+  .narrative-text {
+    @apply font-sans text-[15px] md:text-base leading-[1.75] text-foreground/90 tracking-[0.01em];
   }
 
   /* Content card — used on welcome, gate, results pages */
   .content-card {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
-    border-radius: calc(var(--radius) * 1.5);
+    border-radius: 0;
   }
 
   /* Warm divider */
   .warm-divider {
-    height: 2px;
+    height: 1px;
     width: 2.5rem;
     background: hsl(var(--primary));
-    border-radius: 9999px;
+    border-radius: 0;
   }
+
+  /* Floating text shadow — keeps HUD labels readable over any 3D background.
+     Mimics text sitting a few inches in front of the camera lens. */
+  .hud-float {
+    text-shadow:
+      0 0 32px rgba(0,0,0,1),
+      0 0 14px rgba(0,0,0,0.9),
+      0 0 5px  rgba(0,0,0,0.7),
+      0 2px 3px rgba(0,0,0,0.5);
+  }
+}
+
+/* ---------- Premium micro-interactions ---------- */
+/* Hover: text scales 3% + nudges right over 0.15s (ease-out cubic = lerp feel).
+   Active: fast scale-down snap to simulate physical press. */
+.hud-btn {
+  display: inline-block;
+  transition: transform 0.15s cubic-bezier(0.33, 1, 0.68, 1);
+  will-change: transform;
+}
+.hud-btn:hover {
+  transform: translateX(6px) scale(1.03);
+}
+.hud-btn:active {
+  transform: translateX(4px) scale(0.96);
+  transition-duration: 0.06s;
+  transition-timing-function: cubic-bezier(0.36, 0, 0.66, -0.4);
+}
+
+/* Choice buttons: full-width, so only a small nudge + scale — no large shift */
+.hud-choice {
+  transition: transform 0.15s cubic-bezier(0.33, 1, 0.68, 1);
+  will-change: transform;
+}
+.hud-choice:hover {
+  transform: translateX(4px) scale(1.03);
+}
+.hud-choice:active {
+  transform: translateX(2px) scale(0.97);
+  transition-duration: 0.06s;
+  transition-timing-function: cubic-bezier(0.36, 0, 0.66, -0.4);
 }
 
 /* ---------- Film grain overlay (mounted once in App) ---------- */

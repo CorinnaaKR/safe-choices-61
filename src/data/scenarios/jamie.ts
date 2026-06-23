@@ -2,68 +2,52 @@ import {
   Scenario,
   EvidenceCategory,
   EvidenceImportance,
-  SkillArea,
   SceneEnvironment,
 } from '@/types/simulation';
 import { safeguardingScenario as base } from '@/data/scenario';
 
 /**
- * Jamie's Story, migrated to the multi-scenario schema.
- * The narrative lives in `data/scenario.ts`; this module layers on the
- * metadata the engine needs (evidence weighting, skill areas, environments).
+ * Jamie's Story — Story / learning mode only.
+ *
+ * The player is a Year 7 classmate and friend of Jamie, returning from summer
+ * break and gradually noticing that something feels wrong. The narrative lives
+ * in `data/scenario.ts`; this module adds the engine metadata.
+ *
+ * Design principles (see memory/safeguarding-restructure-jamie-friend-pov.md):
+ *  - NOT a memory/completionism test — gut instinct and emotional resonance
+ *  - "Observations" not "Evidence" (soft, subjective, opt-in)
+ *  - Ending gated only on whether the player told a trusted adult — never on count
+ *  - No scoring, no skill-area mapping, no successCriteria
  */
 
 const evidenceMeta: Record<
   string,
   { category: EvidenceCategory; importance: EvidenceImportance; points: number }
 > = {
-  'obs-1': { category: 'behavioural', importance: 'major', points: 10 },
-  'obs-2': { category: 'behavioural', importance: 'major', points: 10 },
-  'vis-1': { category: 'physical', importance: 'major', points: 10 },
-  'vis-2': { category: 'physical', importance: 'critical', points: 25 },
-  'obs-3': { category: 'verbal', importance: 'critical', points: 20 },
-  'vis-3': { category: 'behavioural', importance: 'critical', points: 20 },
-  'msg-1': { category: 'documentation', importance: 'minor', points: 5 },
-  'obs-4': { category: 'behavioural', importance: 'major', points: 10 },
-  'msg-2': { category: 'documentation', importance: 'minor', points: 5 },
+  'obs-1':    { category: 'behavioural', importance: 'major',    points: 0 },
+  'obs-pe-1': { category: 'physical',    importance: 'major',    points: 0 },
+  'obs-2':    { category: 'behavioural', importance: 'major',    points: 0 },
+  'vis-1':    { category: 'physical',    importance: 'major',    points: 0 },
+  'vis-2':    { category: 'physical',    importance: 'critical', points: 0 },
+  'obs-3':    { category: 'verbal',      importance: 'critical', points: 0 },
+  'vis-3':    { category: 'behavioural', importance: 'critical', points: 0 },
 };
 
-const choiceSkillAreas: Record<string, SkillArea> = {
-  'c1-1': 'responding',
-  'c1-2': 'recognising-signs',
-  'c1-3': 'responding',
-  'c2-1': 'responding',
-  'c2-2': 'evidence-gathering',
-  'c2-3': 'record-keeping',
-  'c3a-1': 'escalation',
-  'c3a-2': 'escalation',
-  'c3a-3': 'escalation',
-  'c3b-1': 'escalation',
-  'c3b-2': 'escalation',
-  'c3b-3': 'escalation',
-  'c4-1': 'record-keeping',
-  'c4-2': 'record-keeping',
-  'c4-3': 'record-keeping',
-  'c4d-1': 'escalation',
-  'c4d-2': 'escalation',
-  'c4r-1': 'escalation',
-  'c4r-2': 'record-keeping',
-  'c5-1': 'responding',
-  'c5l-1': 'escalation',
-  'c5c-1': 'escalation',
-  'c5u-1': 'escalation',
-  'c5i-1': 'record-keeping',
-  'c5i-2': 'record-keeping',
-};
-
-/** Mirrors the old getSceneType() mapping exactly. */
 const sceneEnvironments: Record<string, SceneEnvironment> = {
-  'scene-1': 'classroom',
-  'scene-2': 'playground',
-  'scene-3a': 'classroom',
-  'scene-3b': 'classroom',
+  'scene-1':         'classroom',
+  'scene-2':         'playground',
+  'scene-3a':        'classroom',
+  'scene-3b':        'classroom',
+  'scene-4':         'home',
+  'scene-4-delayed': 'home',
+  'scene-4-risk':    'home',
+  'scene-4-silence': 'classroom',
+  'scene-5':         'classroom',
+  'scene-final-good':     'classroom',
+  'scene-final-sobering': 'classroom',
 };
-const defaultEnvironment: SceneEnvironment = 'office';
+
+const defaultEnvironment: SceneEnvironment = 'classroom';
 
 export const jamieScenario: Scenario = {
   ...base,
@@ -72,36 +56,91 @@ export const jamieScenario: Scenario = {
   difficulty: 1,
   durationMinutes: 20,
   status: 'available',
+  supportedModes: ['learning'],
   contentWarnings: [
     'This story is about a child who may be being hurt at home.',
     'It mentions bruises and a child being scared.',
-    'You can stop playing at any time.',
+    'You can stop at any time.',
   ],
-  successCriteria: {
-    minEvidence: 5,
-    requiredCriticalEvidence: 2,
-    maxPoorDecisions: 1,
-  },
   resources: [
-    { title: 'NSPCC - Spotting the signs of child abuse', url: 'https://www.nspcc.org.uk/what-is-child-abuse/spotting-signs-child-abuse/' },
+    { title: 'NSPCC — Spotting the signs of child abuse', url: 'https://www.nspcc.org.uk/what-is-child-abuse/spotting-signs-child-abuse/' },
     { title: 'Childline (for under 19s)', url: 'https://www.childline.org.uk/' },
-    { title: 'Gov.uk - Report child abuse', url: 'https://www.gov.uk/report-child-abuse' },
+    { title: 'Gov.uk — Report child abuse', url: 'https://www.gov.uk/report-child-abuse' },
   ],
   keyTakeaway:
-    'If you ever notice things like this in real life - someone with bruises, someone who has stopped talking or playing, someone who seems scared - you do not need to be sure about what it means. Tell an adult you trust: a teacher, a parent, or the safeguarding lead. Noticing and telling is how people get help.',
+    'You don\'t need to have all the answers. You just need to tell someone you trust. Noticing is enough.',
   completionFeedback: {
-    excellent:
-      'You noticed the signs, gathered evidence carefully, and reported to the right person at the right time. This is exactly how children get protected.',
-    good: 'You recognised that Jamie needed help and acted on it. Look at the timing of your decisions - earlier reporting makes children safer.',
-    poor: 'Jamie needed an adult to notice and act quickly. Review the signs you saw and remember: report concerns to the safeguarding lead on the same day.',
+    excellent: 'You trusted your instincts and spoke up. That\'s exactly what makes a difference.',
+    good: 'You noticed something was wrong and did something about it. That takes courage.',
+    poor: 'It can be hard to know what to do. The most important thing is telling an adult you trust — you don\'t need to be certain first.',
+  },
+  closingSequence: {
+    epilogueGood: [
+      'A few weeks later, Jamie\'s seat in form class is filled again.',
+      'You notice them walk in on a Tuesday morning — a bit quieter than before, but something has shifted. There\'s a lightness that wasn\'t there in September.',
+      'You don\'t know everything that happened. You probably never will. But you know that you said something when it mattered, and that the right people were able to help.',
+      'Jamie catches your eye across the classroom and gives you a small nod. That\'s enough.',
+    ],
+    epilogueSobering: [
+      'Weeks go by. Jamie is still in your form class, but you notice things stay the same.',
+      'The long sleeves. The way they wince sometimes. The lunches eaten alone.',
+      'You think about it a lot — the moments you noticed something and wondered if you should say something.',
+      'It\'s not too late. It never is. If something still doesn\'t feel right, telling a trusted adult — a teacher, a parent, a school counsellor — is always the right move.',
+    ],
+    reflection: {
+      manyThreshold: 3,
+      manyObservations: [
+        'You\'re the kind of person who pays attention.',
+        'While others moved on with the start of term, you kept noticing — small things that didn\'t quite add up. That instinct matters more than most people realise.',
+        'Here\'s what you picked up on:',
+      ],
+      fewObservationsToldAnyway: [
+        'You didn\'t catch every detail — but you didn\'t need to.',
+        'Something felt wrong, and you trusted that feeling enough to say something. That\'s harder than it sounds, and it\'s the most important thing anyone can do.',
+        'The signs of abuse aren\'t always obvious. They rarely are. What matters is that you acted on what you felt.',
+      ],
+      fewObservationsSilent: [
+        'Sometimes we notice things and don\'t quite know what to do with them.',
+        'That\'s not a failure — it\'s just how it works. These things are hard to name, and even harder to bring to someone else.',
+        'If you ever find yourself in this situation again, remember: you don\'t need to be sure. You just need to say "I\'m a bit worried about someone" to a teacher, a parent, or another trusted adult. They take it from there.',
+      ],
+    },
+    commonSigns: {
+      title: 'Recognising the signs',
+      intro: 'The signs of abuse at home aren\'t always obvious — and they\'re rarely just one thing. What you\'re looking for is a pattern of small changes that don\'t quite fit.',
+      signs: [
+        {
+          title: 'Withdrawal from friends and activities',
+          description: 'A child who used to be sociable becoming quiet or isolated — not because of a falling out, but in a more general way. They might stop joining in, stop talking, or seem distracted.',
+        },
+        {
+          title: 'Unexplained bruises or injuries',
+          description: 'Marks that don\'t match the explanation, or that a child is reluctant to talk about. On their own, bruises happen — but alongside other changes, they can be significant.',
+        },
+        {
+          title: 'Covering up — long sleeves, reluctance to change',
+          description: 'Choosing to hide skin that others wouldn\'t think to cover. Avoiding PE changing rooms, or changing somewhere private, can sometimes be a way of keeping injuries hidden.',
+        },
+        {
+          title: 'Changes in behaviour or mood',
+          description: 'Acting differently — more anxious, more jumpy, harder to reach. Sometimes this looks like daydreaming or being "elsewhere." It can also show up in drawings, stories, or play.',
+        },
+        {
+          title: 'Flinching or seeming scared',
+          description: 'Reacting to sudden movements or loud noises in a way that feels out of proportion. This can be a sign that a child is living somewhere unpredictable or frightening.',
+        },
+        {
+          title: 'Giving vague or rehearsed explanations',
+          description: '"I fell." "I bumped it." These explanations aren\'t always lies — but when they come quickly and without detail, or when the story doesn\'t quite match, it\'s worth paying attention.',
+        },
+      ],
+      closingLine: 'You don\'t need to diagnose anything. If something feels wrong, trust that feeling — and tell someone who can help.',
+    },
   },
   scenes: base.scenes.map((scene) => ({
     ...scene,
     environment: sceneEnvironments[scene.id] ?? defaultEnvironment,
     evidence: scene.evidence?.map((ev) => ({ ...ev, ...evidenceMeta[ev.id] })),
-    choices: scene.choices?.map((choice) => ({
-      ...choice,
-      skillArea: choiceSkillAreas[choice.id],
-    })),
+    choices: scene.choices?.map((choice) => ({ ...choice })),
   })),
 };

@@ -171,19 +171,27 @@ export function CameraController({
         playerPosition.y + Math.sin(pitch.current) * dist.current,
         playerPosition.z + Math.cos(yaw.current) * cosP * dist.current
       );
-      const posLerp = dragging.current ? 0.35 : 0.1;
-      camera.position.lerp(desiredPos.current, posLerp);
+      if (dragging.current) {
+        // Snap directly — no lerp while the player is actively dragging
+        camera.position.copy(desiredPos.current);
+      } else {
+        camera.position.lerp(desiredPos.current, 0.1);
+      }
 
       lookTarget.current.set(
         playerPosition.x,
         playerPosition.y + 0.9,
         playerPosition.z
       );
-      const currentLookAt = scratchA.current;
-      camera.getWorldDirection(currentLookAt);
-      currentLookAt.multiplyScalar(5).add(camera.position);
-      currentLookAt.lerp(lookTarget.current, dragging.current ? 0.4 : 0.12);
-      camera.lookAt(currentLookAt);
+      if (dragging.current) {
+        camera.lookAt(lookTarget.current);
+      } else {
+        const currentLookAt = scratchA.current;
+        camera.getWorldDirection(currentLookAt);
+        currentLookAt.multiplyScalar(5).add(camera.position);
+        currentLookAt.lerp(lookTarget.current, 0.12);
+        camera.lookAt(currentLookAt);
+      }
     } else {
       camera.position.lerp(
         desiredPos.current.set(defaultPosition[0], defaultPosition[1], defaultPosition[2]),

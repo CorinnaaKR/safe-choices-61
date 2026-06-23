@@ -1,3 +1,8 @@
+# Environment variables — never commit
+.env
+.env.local
+.env*.local
+
 # Logs
 logs
 *.log
@@ -11,6 +16,10 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Test artifacts
+test-results
+playwright-report
 
 # Editor directories and files
 .vscode/*

@@ -162,11 +162,15 @@ export function HomeScene({
       <CoffeeTable position={[0, 0, -1.1]} />
 
       {/* ── Lazlo NPC ─────────────────────────────────────────────────────── */}
+      {/* Rim light to pull Lazlo away from the dark wall */}
+      <pointLight position={[0, 2.2, -1.6]} intensity={1.8} distance={3.5} color="#B0A090" decay={2} />
+      <pointLight position={[1.2, 1.4, -2.0]} intensity={0.9} distance={3} color="#C8B080" decay={2} />
+
       <NPCCharacter
         position={[0, 0, -2.4]}
         rotation={Math.PI}
-        bodyColor="#3A3A4A"
-        skinColor="#C8A888"
+        bodyColor="#6B5C7A"
+        skinColor="#D4A87A"
         pose="hunched"
         name="Lazlo"
         behaviorHint="Not responding"

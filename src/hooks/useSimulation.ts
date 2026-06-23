@@ -5,19 +5,6 @@ import { getScenario, DEFAULT_SCENARIO_ID } from '@/data/scenarios';
 const storageKey = (scenarioId: string, mode: Mode) =>
   `heli-state:${scenarioId}:${mode}`;
 
-/**
- * Computes maxPossiblePoints from the decisions already made.
- * Only counts scenes the player actually visited — so the denominator
- * is always relative to the path taken, not all possible branches.
- */
-function computeMaxFromDecisions(decisions: GameState['decisions'], scenario: Scenario): number {
-  return decisions.reduce((total, d) => {
-    const scene = scenario.scenes.find((s) => s.id === d.sceneId);
-    if (!scene?.choices?.length) return total;
-    return total + Math.max(...scene.choices.map((c) => c.points));
-  }, 0);
-}
-
 function getInitialState(scenario: Scenario, mode: Mode): GameState {
   return {
     scenarioId: scenario.id,
@@ -26,7 +13,7 @@ function getInitialState(scenario: Scenario, mode: Mode): GameState {
     collectedEvidence: [],
     decisions: [],
     totalPoints: 0,
-    maxPossiblePoints: 0,
+    maxPossiblePoints: scenario.maxPoints ?? 0,
     isComplete: false,
     startedAt: new Date().toISOString(),
   };
@@ -48,10 +35,9 @@ export function useSimulation(
       try {
         const parsed = JSON.parse(saved) as GameState;
         if (parsed.scenarioId === scenario.id && parsed.mode === mode) {
-          // Recompute maxPossiblePoints to fix saves from the old all-branches calculation
           return {
             ...parsed,
-            maxPossiblePoints: computeMaxFromDecisions(parsed.decisions, scenario),
+            maxPossiblePoints: scenario.maxPoints ?? parsed.maxPossiblePoints,
           };
         }
       } catch {
@@ -73,7 +59,7 @@ export function useSimulation(
         if (parsed.scenarioId === scenario.id && parsed.mode === mode) {
           setGameState({
             ...parsed,
-            maxPossiblePoints: computeMaxFromDecisions(parsed.decisions, scenario),
+            maxPossiblePoints: scenario.maxPoints ?? parsed.maxPossiblePoints,
           });
           return;
         }
@@ -112,12 +98,6 @@ export function useSimulation(
       setLastChoice(choice);
       setShowFeedback(true);
       setGameState((prev) => {
-        // Add the max available in this scene to the running max — path-relative scoring
-        const scene = scenario.scenes.find((s) => s.id === prev.currentSceneId);
-        const sceneMax = scene?.choices?.length
-          ? Math.max(...scene.choices.map((c) => c.points))
-          : choice.points;
-
         const currentTrust = prev.trustLevel ?? 50;
         const newTrust = choice.trustDelta !== undefined
           ? Math.max(0, Math.min(100, currentTrust + choice.trustDelta))
@@ -137,7 +117,6 @@ export function useSimulation(
             },
           ],
           totalPoints: prev.totalPoints + choice.points,
-          maxPossiblePoints: prev.maxPossiblePoints + sceneMax,
           trustLevel: newTrust,
         };
       });
@@ -159,6 +138,30 @@ export function useSimulation(
         preVisitComplete: true,
         preVisitChoices: choiceIds,
         trustLevel: finalTrust,
+      }));
+    },
+    []
+  );
+
+  const completeLazloThread = useCallback(
+    (tone: string, followUp: 'wait' | 'message' | 'visit') => {
+      setGameState((prev) => ({
+        ...prev,
+        lazloThreadComplete: true,
+        lazloTone: tone,
+        lazloFollowUp: followUp,
+      }));
+    },
+    []
+  );
+
+  const completeCallScene = useCallback(
+    (scriptIds: string[], nextSceneId: string) => {
+      setGameState((prev) => ({
+        ...prev,
+        callSceneComplete: true,
+        callScript: scriptIds,
+        currentSceneId: nextSceneId,
       }));
     },
     []
@@ -241,6 +244,8 @@ export function useSimulation(
     makeChoice,
     completeTrainingGate,
     completePreVisit,
+    completeLazloThread,
+    completeCallScene,
     proceedToNextScene,
     completeFinalScene,
     resetSimulation,

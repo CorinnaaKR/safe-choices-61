@@ -6,8 +6,38 @@ import { Mode, SkillArea } from '@/types/simulation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SKILL_AREA_HINTS } from '@/lib/trainingHints';
+import Certificate from '@/components/Certificate';
+import { PostFeedbackForm } from '@/components/feedback/PostFeedbackForm';
+import { submitFeedback, PostFeedback, PreFeedback } from '@/lib/feedback';
+import { useToast } from '@/hooks/use-toast';
 
-const PASS_THRESHOLD = 75;
+const PRE_FEEDBACK_KEY = 'heli-pre-feedback';
+const COMPLETED_STORIES_KEY = 'heli-completed-stories';
+
+const OTHER_STORY: Record<string, { id: string; title: string; hook: string; mode: string }> = {
+  'jamie-case': {
+    id: 'lazlo-case',
+    title: "Lazlo's Story",
+    hook: "Now step into the professional's shoes. A youth worker notices something is wrong with one of his group. This time there's a score — and a certificate.",
+    mode: 'training',
+  },
+  'lazlo-case': {
+    id: 'jamie-case',
+    title: "Jamie's Story",
+    hook: "See it from a different angle. You're a classmate — not a professional. No score, no procedure. Just a gut feeling that something isn't right.",
+    mode: 'learning',
+  },
+};
+
+/** Register current story as completed and return all completed story IDs. */
+function registerStory(scenarioId: string): string[] {
+  const existing: string[] = JSON.parse(sessionStorage.getItem(COMPLETED_STORIES_KEY) || '[]');
+  if (!existing.includes(scenarioId)) existing.push(scenarioId);
+  sessionStorage.setItem(COMPLETED_STORIES_KEY, JSON.stringify(existing));
+  return existing;
+}
+
+const PASS_THRESHOLD = 85;
 
 const SKILL_AREA_LABELS: Record<SkillArea, string> = {
   'recognising-signs': 'Recognising signs',
@@ -26,16 +56,18 @@ export default function ResultsPage() {
   const { gameState, resetSimulation, getOptimalDecisionsCount, getSkillAreaBreakdown, scenario } =
     useSimulation(scenarioId, mode);
 
+  const { toast } = useToast();
+
   const scorePercentage =
     gameState.maxPossiblePoints > 0
-      ? Math.round((gameState.totalPoints / gameState.maxPossiblePoints) * 100)
+      ? Math.min(100, Math.round((gameState.totalPoints / gameState.maxPossiblePoints) * 100))
       : 0;
   const optimalCount = getOptimalDecisionsCount();
   const totalDecisions = gameState.decisions.length;
   const passed = scorePercentage >= PASS_THRESHOLD;
 
   const getGrade = () => {
-    if (scorePercentage >= 90) return { grade: 'Excellent', accent: true };
+    if (scorePercentage === 100) return { grade: 'Excellent', accent: true };
     if (scorePercentage >= PASS_THRESHOLD) return { grade: 'Pass', accent: true };
     if (scorePercentage >= 50) return { grade: 'Not yet passed', accent: false };
     return { grade: 'Retake required', accent: false };
@@ -54,7 +86,33 @@ export default function ResultsPage() {
 
   const [activeSkillArea, setActiveSkillArea] = useState<SkillArea | null>(null);
 
+  // Track completed stories and decide initial view
+  const completedStoryIds = registerStory(scenarioId);
+  const otherStory = OTHER_STORY[scenarioId];
+  const hasPlayedBoth = otherStory ? completedStoryIds.includes(otherStory.id) : true;
+  type View = 'other-story-prompt' | 'feedback-form' | 'results';
+  const [view, setView] = useState<View>(hasPlayedBoth ? 'feedback-form' : 'other-story-prompt');
+
   const profile = gameState.trainingProfile;
+
+  const handlePostFeedback = async (post: PostFeedback) => {
+    const preFeedbackRaw = sessionStorage.getItem(PRE_FEEDBACK_KEY);
+    const pre: PreFeedback = preFeedbackRaw
+      ? JSON.parse(preFeedbackRaw)
+      : { priorTraining: 'Unknown', confidenceBefore: 'Unknown' };
+
+    try {
+      await submitFeedback({
+        ...pre,
+        ...post,
+        storiesPlayed: completedStoryIds.join(', '),
+        submittedAt: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.error('Feedback submission failed:', e);
+    }
+    setView('results');
+  };
 
   const handleReplay = () => {
     resetSimulation();
@@ -85,21 +143,94 @@ export default function ResultsPage() {
       })
     : 'N/A';
 
-  const printCertificate = () => {
-    window.print();
+  const [downloadingCertificate, setDownloadingCertificate] = useState(false);
+
+  const downloadCertificate = async () => {
+    const node = document.getElementById('certificate');
+    if (!node) {
+      toast({ title: 'Certificate not ready', description: 'Please wait a moment and try again.', variant: 'destructive' });
+      return;
+    }
+    setDownloadingCertificate(true);
+    try {
+      // Wait for custom fonts (Archivo, JetBrains Mono) to fully render
+      await document.fonts.ready;
+
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+
+      const canvas = await html2canvas(node, {
+        scale: 2,
+        backgroundColor: '#2d2520', // match certificate background exactly
+        useCORS: true,
+        logging: false,
+      });
+
+      const w = canvas.width / 2;
+      const h = canvas.height / 2;
+      const imageData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [w, h] });
+      pdf.addImage(imageData, 'PNG', 0, 0, w, h);
+      const safeName = (profile?.name || 'participant').replace(/[^a-z0-9]+/gi, '_');
+      pdf.save(`Heli_Certificate_${safeName}.pdf`);
+    } catch (err) {
+      console.error('Certificate download failed:', err);
+      toast({ title: 'Download failed', description: 'Something went wrong generating the certificate. Please try again.', variant: 'destructive' });
+    } finally {
+      setDownloadingCertificate(false);
+    }
   };
+
+  if (view === 'other-story-prompt' && otherStory) {
+    return (
+      <div className="fixed inset-0 bg-background overflow-y-auto z-50">
+        <div className="min-h-full flex items-start justify-center px-5 py-10">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="content-card max-w-lg w-full p-7 md:p-9"
+          >
+            <p className="page-label mb-2">Before you give feedback</p>
+            <h2 className="font-sans text-2xl font-bold text-foreground mb-4 tracking-tight leading-snug">
+              Want to try {otherStory.title} first?
+            </h2>
+            <p className="text-sm text-foreground/70 leading-relaxed mb-8 border-l-2 border-primary/40 pl-4">
+              {otherStory.hook}
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => navigate(`/story/${otherStory.id}?mode=${otherStory.mode}`)}
+                className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-8 py-3.5 rounded-lg hover:bg-primary/90 transition-colors shadow-lg"
+              >
+                Play {otherStory.title}
+              </button>
+              <button
+                onClick={() => setView('feedback-form')}
+                className="border border-border text-foreground/70 font-sans text-sm px-8 py-3.5 rounded-lg hover:border-foreground/50 hover:text-foreground transition-colors"
+              >
+                Give feedback now
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'feedback-form') {
+    return (
+      <PostFeedbackForm
+        onComplete={handlePostFeedback}
+        onSkip={() => setView('results')}
+        completedStoryIds={completedStoryIds}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen relative">
-      {/* Certificate print styles */}
-      <style>{`
-        @media print {
-          body * { visibility: hidden; }
-          #certificate, #certificate * { visibility: visible; }
-          #certificate { position: fixed; inset: 0; padding: 60px; }
-          .no-print { display: none !important; }
-        }
-      `}</style>
 
       {/* Header */}
       <header className="no-print flex items-center justify-between px-5 md:px-10 py-4 border-b border-border">
@@ -121,7 +252,11 @@ export default function ResultsPage() {
               {mode === 'training' ? 'Case closed — Debrief' : 'Case closed'}
             </p>
             <h1 className="font-sans text-4xl font-bold text-foreground mb-2 tracking-tight leading-tight">
-              {mode === 'training' ? 'Simulation complete' : 'The end of the story'}
+              {mode === 'training'
+                ? profile?.name
+                  ? `Well done, ${profile.name.split(' ')[0]}.`
+                  : 'Simulation complete'
+                : 'The end of the story'}
             </h1>
             <p className="text-muted-foreground text-sm">
               {scenario.title} — {scenario.role}
@@ -478,12 +613,13 @@ export default function ResultsPage() {
             >
               {mode === 'training' ? 'Retake simulation' : 'Play again'}
             </button>
-            {mode === 'training' && passed && (
+            {mode === 'training' && passed && profile && (
               <button
-                onClick={printCertificate}
-                className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors w-full sm:w-auto"
+                onClick={downloadCertificate}
+                disabled={downloadingCertificate}
+                className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors w-full sm:w-auto disabled:opacity-60"
               >
-                Download certificate
+                {downloadingCertificate ? 'Preparing certificate…' : 'Download certificate'}
               </button>
             )}
             <button
@@ -498,113 +634,23 @@ export default function ResultsPage() {
         </motion.div>
       </div>
 
-      {/* Certificate — hidden normally, shown on print */}
+      {/* Certificate — rendered off-screen, captured to PDF on download */}
       {mode === 'training' && passed && profile && (
-        <div id="certificate" className="hidden print:block" style={{ fontFamily: 'Archivo, system-ui, sans-serif' }}>
-          <Certificate
-            name={profile.name}
-            organisation={profile.organisation}
-            scenarioTitle={scenario.title}
-            priorTraining={profile.priorTraining}
-            score={scorePercentage}
-            completedAt={completedAt}
-          />
+        <div style={{ position: 'absolute', top: 0, left: '-9999px', width: '1000px', overflow: 'hidden', pointerEvents: 'none', zIndex: -1 }}>
+          <div id="certificate">
+            <Certificate
+              name={profile.name}
+              organisation={profile.organisation}
+              scenarioTitle={scenario.title}
+              scenarioRole={scenario.role}
+              completedAt={completedAt}
+              score={scorePercentage}
+              grade={grade}
+              passThreshold={PASS_THRESHOLD}
+            />
+          </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function Certificate({
-  name,
-  organisation,
-  scenarioTitle,
-  priorTraining,
-  score,
-  completedAt,
-}: {
-  name: string;
-  organisation: string;
-  scenarioTitle: string;
-  priorTraining: string;
-  score: number;
-  completedAt: string;
-}) {
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'hsl(26 14% 19%)',
-      color: 'hsl(36 25% 91%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '60px',
-    }}>
-      <div style={{
-        maxWidth: '640px',
-        width: '100%',
-        border: '1px solid hsl(26 14% 38%)',
-        borderRadius: '12px',
-        padding: '56px 48px',
-        background: 'hsl(26 14% 30%)',
-      }}>
-        {/* Logo / brand */}
-        <div style={{ marginBottom: '40px' }}>
-          <p style={{ fontSize: '11px', fontFamily: '"JetBrains Mono", monospace', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(32 85% 58%)', marginBottom: '8px' }}>
-            Heli — Helping Everyone Learn Interactively
-          </p>
-          <div style={{ height: '2px', width: '40px', background: 'hsl(32 85% 58%)', borderRadius: '9999px' }} />
-        </div>
-
-        {/* Title */}
-        <h1 style={{ fontSize: '32px', fontWeight: '700', letterSpacing: '-0.02em', marginBottom: '6px', lineHeight: '1.1' }}>
-          Certificate of Completion
-        </h1>
-        <p style={{ fontSize: '14px', color: 'hsl(32 10% 62%)', marginBottom: '40px' }}>
-          Safeguarding simulation — training mode
-        </p>
-
-        {/* Recipient */}
-        <div style={{ marginBottom: '36px' }}>
-          <p style={{ fontSize: '11px', color: 'hsl(32 10% 62%)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-            Awarded to
-          </p>
-          <p style={{ fontSize: '28px', fontWeight: '700', color: 'hsl(32 85% 58%)' }}>{name}</p>
-          {organisation && (
-            <p style={{ fontSize: '14px', color: 'hsl(32 10% 62%)', marginTop: '4px' }}>{organisation}</p>
-          )}
-        </div>
-
-        {/* Body */}
-        <p style={{ fontSize: '14px', lineHeight: '1.7', marginBottom: '32px', color: 'hsl(36 25% 80%)' }}>
-          This certificate confirms that the above individual successfully completed the{' '}
-          <strong style={{ color: 'hsl(36 25% 91%)' }}>{scenarioTitle}</strong>{' '}
-          simulation on <strong style={{ color: 'hsl(36 25% 91%)' }}>{completedAt}</strong>,
-          achieving a score of{' '}
-          <strong style={{ color: 'hsl(32 85% 58%)' }}>{score}%</strong>.
-        </p>
-
-        {/* Details grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '40px' }}>
-          {[
-            { label: 'Score', value: `${score}%` },
-            { label: 'Pass mark', value: '75%' },
-            { label: 'Prior training declared', value: priorTraining },
-            { label: 'Completed', value: completedAt },
-          ].map(({ label, value }) => (
-            <div key={label} style={{ background: 'hsl(26 12% 26%)', borderRadius: '8px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '10px', color: 'hsl(32 10% 62%)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>{label}</p>
-              <p style={{ fontSize: '13px', fontWeight: '600', color: 'hsl(36 25% 91%)' }}>{value}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Footer note */}
-        <p style={{ fontSize: '11px', color: 'hsl(33 22% 55%)', lineHeight: '1.6', borderTop: '1px solid hsl(26 14% 38%)', paddingTop: '24px' }}>
-          This simulation validates applied awareness and professional judgement as a complement
-          to formal safeguarding and Prevent training. It does not replace statutory training requirements.
-        </p>
-      </div>
     </div>
   );
 }

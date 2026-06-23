@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lazlo's Story — Story Flow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0e0c; color: #e8e4dc; font-family: 'Courier New', monospace; padding: 32px; min-height: 100vh; }
+  h1 { font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; color: #a09070; margin-bottom: 4px; }
+  .subtitle { font-size: 11px; color: #5a5040; letter-spacing: 0.1em; margin-bottom: 32px; }
+  svg { display: block; overflow: visible; }
+  .key { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+  .key-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #7a7060; }
+  .key-swatch { width: 32px; height: 3px; }
+</style>
+</head>
+<body>
+<h1>Lazlo's Story — Story Flow Diagram</h1>
+<p class="subtitle">All scenes, choices, and paths. Optimal = amber solid · Acceptable = grey dashed · Closes down = red dotted</p>
+
+<div class="key">
+  <div class="key-item"><div class="key-swatch" style="background:#c8922a;border-radius:2px"></div>Optimal path</div>
+  <div class="key-item"><div class="key-swatch" style="background:#6a6050;border-style:dashed;border-top:2px dashed #6a6050;background:none"></div>Acceptable</div>
+  <div class="key-item"><div class="key-swatch" style="border-top:2px dotted #8b3030;background:none"></div>Closes conversation</div>
+  <div class="key-item"><span style="color:#c8922a">◆</span>&nbsp;Optimal choice&nbsp;&nbsp;<span style="color:#6a6050">◇</span>&nbsp;Sub-optimal</div>
+</div>
+
+<svg viewBox="0 0 1200 1020" width="100%" style="max-width:1200px">
+  <defs>
+    <marker id="ao" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#c8922a"/>
+    </marker>
+    <marker id="ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#6a6050"/>
+    </marker>
+    <marker id="ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#8b3030"/>
+    </marker>
+  </defs>
+
+  <!-- PRE-VISIT -->
+  <rect x="450" y="10" width="300" height="48" rx="6" fill="#1e1a14" stroke="#4a4030" stroke-width="1.5"/>
+  <text x="600" y="30" text-anchor="middle" fill="#a09070" font-size="9" font-family="Courier New" letter-spacing="2">PRE-VISIT</text>
+  <text x="600" y="48" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">SMS with Lilly (3 exchanges)</text>
+
+  <!-- SCENE 1 -->
+  <rect x="450" y="96" width="300" height="48" rx="6" fill="#1e1a14" stroke="#4a4030" stroke-width="1.5"/>
+  <text x="600" y="116" text-anchor="middle" fill="#5a8060" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 1</text>
+  <text x="600" y="133" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">Wednesday Afternoon</text>
+
+  <!-- Pre-visit → S1 -->
+  <line x1="600" y1="58" x2="600" y2="96" stroke="#c8922a" stroke-width="1.5" marker-end="url(#ao)"/>
+
+  <!-- SCENE 2 (coffee) -->
+  <rect x="250" y="210" width="260" height="48" rx="6" fill="#1e1a14" stroke="#4a4030" stroke-width="1.5"/>
+  <text x="380" y="230" text-anchor="middle" fill="#5a8060" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 2</text>
+  <text x="380" y="247" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">The Living Room (coffee)</text>
+
+  <!-- SCENE 2w (water) -->
+  <rect x="690" y="210" width="260" height="48" rx="6" fill="#1e1a14" stroke="#4a4030" stroke-width="1.5"/>
+  <text x="820" y="230" text-anchor="middle" fill="#5a8060" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 2W</text>
+  <text x="820" y="247" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">The Living Room (water)</text>
+
+  <!-- S1 → S2 optimal (coffee) -->
+  <path d="M 560 144 Q 440 175 380 210" fill="none" stroke="#c8922a" stroke-width="2" marker-end="url(#ao)"/>
+  <text x="455" y="172" fill="#c8922a" font-size="9" font-family="Courier New">coffee +10</text>
+
+  <!-- S1 → S2w (water/decline) -->
+  <path d="M 640 144 Q 760 175 820 210" fill="none" stroke="#6a6050" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ag)"/>
+  <text x="730" y="172" fill="#6a6050" font-size="9" font-family="Courier New">water +5 / decline 0</text>
+
+  <!-- SCENE 2b -->
+  <rect x="940" y="316" width="220" height="48" rx="6" fill="#2a1414" stroke="#5a2020" stroke-width="1.5"/>
+  <text x="1050" y="336" text-anchor="middle" fill="#8b5050" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 2B</text>
+  <text x="1050" y="353" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">Walls Up</text>
+
+  <!-- S2 → S3a optimal -->
+  <path d="M 330 258 Q 280 290 280 320" fill="none" stroke="#c8922a" stroke-width="2" marker-end="url(#ao)"/>
+
+  <!-- S2 → S3a mid -->
+  <path d="M 380 258 Q 380 290 380 320" fill="none" stroke="#6a6050" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ag)"/>
+
+  <!-- S2 → S2b -->
+  <path d="M 510 234 Q 780 234 940 340" fill="none" stroke="#8b3030" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#ar)"/>
+  <text x="680" y="228" fill="#8b3030" font-size="9" font-family="Courier New">push Lilly 0</text>
+
+  <!-- S2w → S3a optimal (two paths) -->
+  <path d="M 730 258 Q 600 290 430 320" fill="none" stroke="#c8922a" stroke-width="2" marker-end="url(#ao)"/>
+
+  <!-- S2w → S2b -->
+  <path d="M 910 258 Q 1000 290 1000 316" fill="none" stroke="#8b3030" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#ar)"/>
+  <text x="970" y="294" fill="#8b3030" font-size="9" font-family="Courier New">push Lilly 0</text>
+
+  <!-- SCENE 3a -->
+  <rect x="180" y="318" width="260" height="48" rx="6" fill="#1e1a14" stroke="#4a4030" stroke-width="1.5"/>
+  <text x="310" y="338" text-anchor="middle" fill="#5a8060" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 3A</text>
+  <text x="310" y="355" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">He Starts to Talk</text>
+
+  <!-- Choice labels from S2 to S3a -->
+  <text x="250" y="308" fill="#c8922a" font-size="9" font-family="Courier New">Joey +15</text>
+  <text x="340" y="308" fill="#6a6050" font-size="9" font-family="Courier New">symbol +10</text>
+
+  <!-- SCENE 3b -->
+  <rect x="880" y="420" width="220" height="48" rx="6" fill="#1e1a14" stroke="#4a4030" stroke-width="1.5"/>
+  <text x="990" y="440" text-anchor="middle" fill="#5a8060" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 3B</text>
+  <text x="990" y="457" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">The Quiet Room</text>
+
+  <!-- S2b → S3b (repair) -->
+  <path d="M 1000 364 Q 1000 400 990 420" fill="none" stroke="#6a6050" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ag)"/>
+  <text x="1010" y="400" fill="#6a6050" font-size="9" font-family="Courier New">sorry / sit +8</text>
+
+  <!-- S2b → S4b (push more) -->
+  <path d="M 1100 364 Q 1160 440 1150 520" fill="none" stroke="#8b3030" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#ar)"/>
+  <text x="1130" y="440" fill="#8b3030" font-size="9" font-family="Courier New">push 0</text>
+
+  <!-- SCENE 4a -->
+  <rect x="100" y="530" width="240" height="48" rx="6" fill="#1a1e14" stroke="#3a4a20" stroke-width="1.5"/>
+  <text x="220" y="550" text-anchor="middle" fill="#608050" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 4A</text>
+  <text x="220" y="567" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">What You Now Know</text>
+
+  <!-- SCENE 4b -->
+  <rect x="760" y="530" width="240" height="48" rx="6" fill="#1e1614" stroke="#4a3020" stroke-width="1.5"/>
+  <text x="880" y="550" text-anchor="middle" fill="#806050" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 4B</text>
+  <text x="880" y="567" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">Left With Questions</text>
+
+  <!-- S3a → S4a optimal -->
+  <path d="M 230 366 Q 200 450 200 530" fill="none" stroke="#c8922a" stroke-width="2" marker-end="url(#ao)"/>
+  <text x="150" y="460" fill="#c8922a" font-size="9" font-family="Courier New">tell me more +20</text>
+
+  <!-- S3a → S4a mid -->
+  <path d="M 310 366 Q 290 450 260 530" fill="none" stroke="#6a6050" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ag)"/>
+  <text x="280" y="460" fill="#6a6050" font-size="9" font-family="Courier New">sounds good +15</text>
+
+  <!-- S3a → S4b (warning) -->
+  <path d="M 390 366 Q 640 450 760 554" fill="none" stroke="#8b3030" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#ar)"/>
+  <text x="560" y="440" fill="#8b3030" font-size="9" font-family="Courier New">warning 0</text>
+
+  <!-- S3b → S4a -->
+  <path d="M 930 468 Q 700 500 340 530" fill="none" stroke="#6a6050" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ag)"/>
+  <text x="630" y="494" fill="#6a6050" font-size="9" font-family="Courier New">leave kindly +8 / suggest doctor +10</text>
+
+  <!-- S3b → S4b -->
+  <path d="M 990 468 Q 960 498 920 530" fill="none" stroke="#8b3030" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#ar)"/>
+  <text x="920" y="500" fill="#8b3030" font-size="9" font-family="Courier New">leave 0</text>
+
+  <!-- SCENE 5 -->
+  <rect x="450" y="680" width="300" height="48" rx="6" fill="#141a1e" stroke="#20304a" stroke-width="1.5"/>
+  <text x="600" y="700" text-anchor="middle" fill="#508060" font-size="9" font-family="Courier New" letter-spacing="2">SCENE 5 — FINAL</text>
+  <text x="600" y="717" text-anchor="middle" fill="#e8e4dc" font-size="12" font-family="Courier New">The End of Lazlo's Story</text>
+
+  <!-- S4a → S5 choices -->
+  <path d="M 170 578 Q 170 640 450 704" fill="none" stroke="#c8922a" stroke-width="2" marker-end="url(#ao)"/>
+  <text x="180" y="640" fill="#c8922a" font-size="9" font-family="Courier New">ACT Early +25</text>
+
+  <path d="M 220 578 Q 220 650 460 704" fill="none" stroke="#6a6050" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ag)"/>
+  <text x="225" y="662" fill="#6a6050" font-size="9" font-family="Courier New">trusted adult +15</text>
+
+  <path d="M 270 578 Q 280 650 470 704" fill="none" stroke="#8b3030" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#ar)"/>
+  <text x="310" y="648" fill="#8b3030" font-size="9" font-family="Courier New">do nothing 0</text>
+
+  <!-- S4b → S5 choices -->
+  <path d="M 830 578 Q 740 640 750 704" fill="none" stroke="#c8922a" stroke-width="2" marker-end="url(#ao)"/>
+  <text x="740" y="640" fill="#c8922a" font-size="9" font-family="Courier New">ACT Early +20</text>
+
+  <path d="M 880 578 Q 800 650 760 704" fill="none" stroke="#6a6050" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ag)"/>
+  <text x="798" y="660" fill="#6a6050" font-size="9" font-family="Courier New">tell Lilly +8</text>
+
+  <path d="M 930 578 Q 870 650 770 704" fill="none" stroke="#8b3030" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#ar)"/>
+  <text x="892" y="650" fill="#8b3030" font-size="9" font-family="Courier New">do nothing 0</text>
+
+  <!-- RESULTS -->
+  <rect x="450" y="780" width="300" height="48" rx="6" fill="#0f0e0c" stroke="#303028" stroke-width="1.5"/>
+  <text x="600" y="800" text-anchor="middle" fill="#7a7060" font-size="9" font-family="Courier New" letter-spacing="2">RESULTS</text>
+  <text x="600" y="817" text-anchor="middle" fill="#a09070" font-size="12" font-family="Courier New">Score · Certificate · Debrief</text>
+  <line x1="600" y1="728" x2="600" y2="780" stroke="#303028" stroke-width="1.5" marker-end="url(#ag)"/>
+
+  <!-- PATH TOTALS -->
+  <rect x="30" y="860" width="1140" height="130" rx="6" fill="#131210" stroke="#302e20" stroke-width="1"/>
+  <text x="50" y="886" fill="#a09070" font-size="11" font-family="Courier New" letter-spacing="2">PATH TOTALS (decisions only — evidence not counted)</text>
+
+  <text x="50" y="912" fill="#c8922a" font-size="11" font-family="Courier New">OPTIMAL:   coffee → Joey → tell me more → ACT Early   =   10+15+20+25 = 70 pts → 100%</text>
+  <text x="50" y="930" fill="#8aaa60" font-size="11" font-family="Courier New">GOOD (1):  coffee → symbol → sounds good → trusted adult = 10+10+15+15 = 50 pts → 71%</text>
+  <text x="50" y="948" fill="#8aaa60" font-size="11" font-family="Courier New">GOOD (2):  water → validate → tell me more → ACT Early  = 5+12+20+25 = 62 pts → 89%</text>
+  <text x="50" y="966" fill="#806050" font-size="11" font-family="Courier New">RECOVERY:  push → sorry → leave kindly → ACT Early     = 0+8+8+20  = 36 pts → 51%</text>
+  <text x="50" y="984" fill="#8b3030" font-size="11" font-family="Courier New">POOR:      push → push → leave silently → do nothing    = 0+0+0+0   = 0 pts  → 0%</text>
+</svg>
+</body>
+</html>

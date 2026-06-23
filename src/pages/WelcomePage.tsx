@@ -12,6 +12,10 @@ import { listScenarios } from '@/data/scenarios';
 import { Mode, Scenario } from '@/types/simulation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { PreFeedbackGate } from '@/components/feedback/PreFeedbackGate';
+import { PreFeedback } from '@/lib/feedback';
+
+const PRE_FEEDBACK_KEY = 'heli-pre-feedback';
 
 const MODE_STORAGE_KEY = 'heli-mode';
 
@@ -71,15 +75,46 @@ export default function WelcomePage() {
     localStorage.setItem(MODE_STORAGE_KEY, mode);
   }, [mode]);
 
+  /** A scenario with a fixed supportedModes list always launches in that mode,
+   *  regardless of the global toggle — e.g. Jamie's Story is Story-mode only. */
+  const modeForScenario = (scenario: Scenario): Mode =>
+    scenario.supportedModes?.[0] ?? mode;
+
+  const [pendingFeedbackScenario, setPendingFeedbackScenario] = useState<{ scenario: Scenario; fresh: boolean } | null>(null);
+
   const startScenario = (scenario: Scenario, fresh = false) => {
-    if (fresh) localStorage.removeItem(savedStateKey(scenario.id, mode));
-    navigate(`/story/${scenario.id}?mode=${mode}`);
+    // Show pre-feedback gate if we haven't collected it yet this session
+    const alreadyAnswered = sessionStorage.getItem(PRE_FEEDBACK_KEY);
+    if (!alreadyAnswered) {
+      setPendingFeedbackScenario({ scenario, fresh });
+      return;
+    }
+    launchScenario(scenario, fresh);
   };
 
+  const launchScenario = (scenario: Scenario, fresh = false) => {
+    const effectiveMode = modeForScenario(scenario);
+    if (fresh) localStorage.removeItem(savedStateKey(scenario.id, effectiveMode));
+    navigate(`/story/${scenario.id}?mode=${effectiveMode}`);
+  };
+
+  const handlePreFeedbackComplete = (data: PreFeedback) => {
+    sessionStorage.setItem(PRE_FEEDBACK_KEY, JSON.stringify(data));
+    if (pendingFeedbackScenario) {
+      const { scenario, fresh } = pendingFeedbackScenario;
+      setPendingFeedbackScenario(null);
+      launchScenario(scenario, fresh);
+    }
+  };
+
+  if (pendingFeedbackScenario) {
+    return <PreFeedbackGate onComplete={handlePreFeedbackComplete} />;
+  }
+
   return (
-    <div className="min-h-screen relative flex flex-col">
+    <div className="min-h-screen relative flex flex-col items-center">
       {/* Header */}
-      <header className="flex items-center justify-between px-5 md:px-10 py-4 border-b border-border">
+      <header className="w-full max-w-4xl flex items-center justify-between px-5 md:px-10 py-4 border-b border-border">
         <span className="font-sans text-sm font-semibold text-foreground/80 tracking-wide">Heli</span>
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground hidden sm:block">
           Prototype v0.1
@@ -87,19 +122,18 @@ export default function WelcomePage() {
       </header>
 
       {/* Hero */}
-      <section className="px-5 md:px-10 pt-16 md:pt-24 pb-12 md:pb-16">
+      <section className="w-full max-w-4xl px-5 md:px-10 pt-16 md:pt-24 pb-12 md:pb-16">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-2xl"
         >
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-8">
             Case file — open
           </p>
           <h1 className="font-sans text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight tracking-tight">
-            The signs were there.<br />
-            <span className="text-primary">Someone just had to see them.</span>
+            The signs are there.<br />
+            <span className="text-primary">Be the person who notices.</span>
           </h1>
           <p className="text-base text-muted-foreground max-w-lg leading-relaxed">
             Step into a real situation. Read the room. Make decisions under
@@ -109,14 +143,19 @@ export default function WelcomePage() {
       </section>
 
       {/* Scenario cards — lead with the stories */}
-      <section className="px-5 md:px-10 pb-12 flex-grow">
-        <div className="max-w-3xl">
+      <section className="w-full max-w-4xl px-5 md:px-10 pb-12 flex-grow">
+        <div>
           <p className="page-label mb-5">Choose a case</p>
           <div className="grid md:grid-cols-2 gap-4">
             {scenarios.map((scenario, index) => {
               const locked = scenario.status === 'in-development';
-              const inProgress = !locked && hasProgress(scenario.id, mode);
+              const modeMismatch = !locked && !!scenario.supportedModes && !scenario.supportedModes.includes(mode);
+              const effectiveMode = modeForScenario(scenario);
+              const inProgress = !locked && !modeMismatch && hasProgress(scenario.id, effectiveMode);
               const hook = scenarioHooks[scenario.id];
+              const fixedModeLabel = scenario.supportedModes?.length === 1
+                ? modeOptions.find((m) => m.id === scenario.supportedModes![0])?.title
+                : null;
               return (
                 <motion.article
                   key={scenario.id}
@@ -125,13 +164,18 @@ export default function WelcomePage() {
                   transition={{ delay: 0.15 + index * 0.1 }}
                   className={cn(
                     'content-card p-6 flex flex-col group',
-                    locked && 'opacity-40'
+                    (locked || modeMismatch) && 'opacity-40'
                   )}
                 >
                   <div className="flex items-center justify-between mb-5">
                     <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                       {scenario.domain?.replace(/-/g, ' ')}
                     </span>
+                    {fixedModeLabel && !locked && (
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-primary/80 border border-primary/30 rounded px-2 py-0.5">
+                        {fixedModeLabel}
+                      </span>
+                    )}
                     {locked ? (
                       <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground border border-border rounded px-2 py-0.5">
                         Coming soon
@@ -158,23 +202,28 @@ export default function WelcomePage() {
                     You play: {scenario.role}
                   </p>
 
-                  {!locked && (
+                  {!locked && !modeMismatch && (
                     <div className="flex items-center gap-3 flex-wrap">
                       <button
                         onClick={() => setPendingScenario(scenario)}
-                        className="bg-primary text-primary-foreground font-sans text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
+                        className="bg-primary text-primary-foreground font-sans text-sm font-medium px-5 py-2.5 hover:bg-primary/90 transition-colors hud-btn"
                       >
                         {inProgress ? 'Continue' : 'Enter the story'}
                       </button>
                       {inProgress && (
                         <button
                           onClick={() => startScenario(scenario, true)}
-                          className="border border-border text-foreground/60 font-sans text-sm px-4 py-2.5 rounded-lg hover:border-foreground/50 hover:text-foreground/80 transition-colors"
+                          className="border border-border text-foreground/60 font-sans text-sm px-4 py-2.5 hover:border-foreground/50 hover:text-foreground/80 transition-colors hud-btn"
                         >
                           Start over
                         </button>
                       )}
                     </div>
+                  )}
+                  {!locked && modeMismatch && (
+                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/60">
+                      Not available in {mode === 'training' ? 'training' : 'story'} mode
+                    </p>
                   )}
                 </motion.article>
               );

@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Evidence, EvidenceVisual } from '@/types/simulation';
+import { Evidence, EvidenceVisual, Mode } from '@/types/simulation';
 import { useTypewriter } from '@/hooks/useTypewriter';
 
 // ─── Phone message view ───────────────────────────────────────────────────────
@@ -209,54 +209,103 @@ function DocumentInspect({ visual }: { visual: EvidenceVisual }) {
   );
 }
 
+// ─── Log control: auto-logged badge (training) vs opt-in prompt (story mode) ──
+
+function LogControl({
+  mode,
+  collected,
+  onAddObservation,
+  onDismiss,
+}: {
+  mode?: Mode;
+  collected?: boolean;
+  onAddObservation?: () => void;
+  onDismiss: () => void;
+}) {
+  // Training mode (or no handler wired up): keep the original auto-collected badge.
+  if (mode !== 'learning' || !onAddObservation) {
+    return <span className="hud-label text-primary ml-auto">Logged ✓</span>;
+  }
+  if (collected) {
+    return <span className="hud-label text-primary ml-auto">Added to your observations ✓</span>;
+  }
+  return (
+    <div className="flex items-center gap-2 ml-auto">
+      <button
+        onClick={onDismiss}
+        className="text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 hud-btn"
+      >
+        Keep walking
+      </button>
+      <button
+        onClick={onAddObservation}
+        className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1.5 hover:bg-primary/90 transition-colors hud-btn"
+      >
+        Add to your observations
+      </button>
+    </div>
+  );
+}
+
 // ─── Default text inspect (existing case-file panel) ─────────────────────────
 
-function DefaultInspect({ evidence, evidenceNumber, onDismiss }: {
+function DefaultInspect({ evidence, evidenceNumber, onDismiss, mode, collected, onAddObservation }: {
   evidence: Evidence;
   evidenceNumber: number;
   onDismiss: () => void;
+  mode?: Mode;
+  collected?: boolean;
+  onAddObservation?: () => void;
 }) {
   const { text, done } = useTypewriter(evidence.content);
+  const label = mode === 'learning' ? 'Observation' : 'Evidence';
   return (
     <div className="case-panel">
+      {/* Header bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border">
         <span className="hud-label text-primary">
-          Case file — Evidence {String(evidenceNumber).padStart(2, '0')}
+          {label} {String(evidenceNumber).padStart(2, '0')}
         </span>
         <div className="flex items-center gap-3">
-          <span className="key-hint"><b>[SCROLL]</b> Zoom</span>
           <button
             onClick={onDismiss}
-            className="key-hint hover:text-foreground transition-colors"
-            aria-label="Close evidence panel"
+            className="key-hint hover:text-foreground transition-colors hud-btn"
+            aria-label="Close panel"
           >
             <b>[ESC]</b> Close
           </button>
         </div>
       </div>
 
-      <div className="px-5 py-4">
-        <h4 className="font-mono text-sm uppercase tracking-[0.15em] text-foreground mb-1">
+      {/* Title + timestamp — the "what you noticed" at a glance */}
+      <div className="px-5 pt-4 pb-3 border-b border-border/50">
+        <h4 className="font-mono text-base uppercase tracking-[0.14em] text-foreground leading-snug">
           {evidence.title}
         </h4>
-        <p className="hud-label mb-4">{evidence.timestamp}</p>
+        <p className="hud-label mt-1 opacity-60">{evidence.timestamp}</p>
+      </div>
+
+      {/* Filed note — styled as a case-file annotation, not flowing prose */}
+      <div className="px-5 py-4 border-l-2 border-primary/30 mx-5 my-3">
         <p
-          className={`text-sm text-foreground/85 leading-relaxed min-h-[3.5rem] ${done ? '' : 'type-caret'}`}
+          className={`font-mono text-[12px] leading-relaxed text-foreground/70 ${done ? '' : 'type-caret'}`}
           aria-label={evidence.content}
         >
           {text}
         </p>
-        <div className="flex flex-wrap items-center gap-2 mt-5">
-          {evidence.category && (
-            <span className="hud-label border border-border px-2 py-1">{evidence.category}</span>
-          )}
-          {evidence.importance && (
-            <span className={`hud-label border px-2 py-1 ${evidence.importance === 'critical' ? 'border-primary text-primary' : 'border-border'}`}>
-              {evidence.importance}
-            </span>
-          )}
-          <span className="hud-label text-primary ml-auto">Logged ✓</span>
-        </div>
+      </div>
+
+      {/* Tags + log control */}
+      <div className="flex flex-wrap items-center gap-2 px-5 pb-4">
+        {mode !== 'learning' && evidence.category && (
+          <span className="hud-label border border-border px-2 py-1">{evidence.category}</span>
+        )}
+        {mode !== 'learning' && evidence.importance && (
+          <span className={`hud-label border px-2 py-1 ${evidence.importance === 'critical' ? 'border-primary text-primary' : 'border-border'}`}>
+            {evidence.importance}
+          </span>
+        )}
+        <LogControl mode={mode} collected={collected} onAddObservation={onAddObservation} onDismiss={onDismiss} />
       </div>
     </div>
   );
@@ -268,14 +317,28 @@ interface InspectViewerProps {
   evidence: Evidence;
   evidenceNumber: number;
   onDismiss: () => void;
+  mode?: Mode;
+  collected?: boolean;
+  /** Story mode only: explicit opt-in to log this as an observation. */
+  onAddObservation?: () => void;
 }
 
-export function InspectViewer({ evidence, evidenceNumber, onDismiss }: InspectViewerProps) {
+export function InspectViewer({ evidence, evidenceNumber, onDismiss, mode, collected, onAddObservation }: InspectViewerProps) {
   const visual = evidence.visual;
   const titleRef = useRef<HTMLParagraphElement>(null);
+  const label = mode === 'learning' ? 'Observation' : 'Evidence';
 
   if (!visual) {
-    return <DefaultInspect evidence={evidence} evidenceNumber={evidenceNumber} onDismiss={onDismiss} />;
+    return (
+      <DefaultInspect
+        evidence={evidence}
+        evidenceNumber={evidenceNumber}
+        onDismiss={onDismiss}
+        mode={mode}
+        collected={collected}
+        onAddObservation={onAddObservation}
+      />
+    );
   }
 
   return (
@@ -283,7 +346,7 @@ export function InspectViewer({ evidence, evidenceNumber, onDismiss }: InspectVi
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border">
         <span className="hud-label text-primary">
-          Case file — Evidence {String(evidenceNumber).padStart(2, '0')}
+          Case file — {label} {String(evidenceNumber).padStart(2, '0')}
         </span>
         <button
           onClick={onDismiss}
@@ -304,20 +367,19 @@ export function InspectViewer({ evidence, evidenceNumber, onDismiss }: InspectVi
 
       {/* Evidence metadata strip */}
       <div className="px-5 py-3 border-t border-border">
-        <p ref={titleRef} className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-1">
+        <p ref={titleRef} className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-3">
           {evidence.title}
         </p>
-        <p className="text-xs text-foreground/70 leading-relaxed">{evidence.content}</p>
-        <div className="flex flex-wrap items-center gap-2 mt-3">
-          {evidence.category && (
+        <div className="flex flex-wrap items-center gap-2">
+          {mode !== 'learning' && evidence.category && (
             <span className="hud-label border border-border px-2 py-1">{evidence.category}</span>
           )}
-          {evidence.importance && (
+          {mode !== 'learning' && evidence.importance && (
             <span className={`hud-label border px-2 py-1 ${evidence.importance === 'critical' ? 'border-primary text-primary' : 'border-border'}`}>
               {evidence.importance}
             </span>
           )}
-          <span className="hud-label text-primary ml-auto">Logged ✓</span>
+          <LogControl mode={mode} collected={collected} onAddObservation={onAddObservation} onDismiss={onDismiss} />
         </div>
       </div>
     </div>

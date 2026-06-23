@@ -63,10 +63,10 @@ export function SceneTitleStamp({ index, title }: SceneTitleStampProps) {
       {visible && (
         <motion.div
           key={`${index}-${title}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.5 }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 6 }}
+          transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 24 }}
           className="absolute inset-x-0 top-[20%] z-20 flex justify-center pointer-events-none"
         >
           <div className="text-center">
@@ -74,7 +74,7 @@ export function SceneTitleStamp({ index, title }: SceneTitleStampProps) {
               Scene {String(index).padStart(2, '0')}
             </p>
             <div className="rule-h w-12 mx-auto mb-2 bg-primary" />
-            <h2 className="font-mono text-xl md:text-2xl uppercase tracking-[0.2em] text-foreground">
+            <h2 className="font-mono text-xl md:text-2xl uppercase tracking-[0.2em] text-foreground hud-float">
               {title}
             </h2>
           </div>
