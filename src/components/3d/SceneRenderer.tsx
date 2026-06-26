@@ -25,6 +25,8 @@ const ROOM_BOUNDS: Record<SceneType, [number, number, number, number, number, nu
 
 interface SceneRendererProps {
   sceneType: SceneType;
+  /** Which scenario is active — gates scenario-specific NPCs/props in shared environments (e.g. Lazlo's NPC only appears in his own story, even though Jamie's Story also uses the 'home' environment). */
+  scenarioId?: string;
   evidence: Evidence[];
   collectedIds: string[];
   focusedEvidenceId: string | null;
@@ -36,6 +38,7 @@ interface SceneRendererProps {
 
 export function SceneRenderer({
   sceneType,
+  scenarioId,
   evidence,
   collectedIds,
   focusedEvidenceId,
@@ -149,6 +152,7 @@ export function SceneRenderer({
           )}
           {sceneType === 'home' && (
             <HomeScene
+              showLazlo={scenarioId === 'lazlo-case'}
               evidence={evidence}
               collectedIds={collectedIds}
               focusedEvidenceId={focusedEvidenceId}

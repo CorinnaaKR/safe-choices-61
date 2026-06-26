@@ -231,6 +231,7 @@ export default function StoryPage() {
       {/* Full-screen 3D scene */}
       <SceneRenderer
         sceneType={sceneType}
+        scenarioId={scenarioId}
         evidence={sceneEvidence}
         collectedIds={collectedIds}
         focusedEvidenceId={focusedEvidenceId}

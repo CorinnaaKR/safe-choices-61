@@ -27,6 +27,12 @@ interface HomeSceneProps {
   focusedEvidenceId: string | null;
   onCollectEvidence: (evidence: Evidence) => void;
   onFocusEvidence: (evidence: Evidence) => void;
+  /** This room doubles as the 'home' environment for both Jamie's Story and
+   *  Lazlo's Story. Lazlo's NPC and his personal effects (the Uncle Joey
+   *  shrine, his photo) should only appear in his own story — otherwise a
+   *  Jamie's Story player visiting their own home scenes sees Lazlo sitting
+   *  on the sofa, which looks like the story switched to someone else's. */
+  showLazlo?: boolean;
 }
 
 /**
@@ -71,6 +77,7 @@ export function HomeScene({
   focusedEvidenceId,
   onCollectEvidence,
   onFocusEvidence,
+  showLazlo = true,
 }: HomeSceneProps) {
   const floorTex = useTileTexture('#6A5040', '#5A4030', 24, [3, 3]);
   const wallTex = useWallTexture('#2C2520', [2, 1]);
@@ -161,23 +168,27 @@ export function HomeScene({
       {/* ── Coffee table ─────────────────────────────────────────────────── */}
       <CoffeeTable position={[0, 0, -1.1]} />
 
-      {/* ── Lazlo NPC ─────────────────────────────────────────────────────── */}
-      {/* Rim light to pull Lazlo away from the dark wall */}
-      <pointLight position={[0, 2.2, -1.6]} intensity={1.8} distance={3.5} color="#B0A090" decay={2} />
-      <pointLight position={[1.2, 1.4, -2.0]} intensity={0.9} distance={3} color="#C8B080" decay={2} />
+      {/* ── Lazlo NPC — only in Lazlo's Story; Jamie's Story shares this room shell ── */}
+      {showLazlo && (
+        <>
+          {/* Rim light to pull Lazlo away from the dark wall */}
+          <pointLight position={[0, 2.2, -1.6]} intensity={1.8} distance={3.5} color="#B0A090" decay={2} />
+          <pointLight position={[1.2, 1.4, -2.0]} intensity={0.9} distance={3} color="#C8B080" decay={2} />
 
-      <NPCCharacter
-        position={[0, 0, -2.4]}
-        rotation={Math.PI}
-        bodyColor="#6B5C7A"
-        skinColor="#D4A87A"
-        pose="hunched"
-        name="Lazlo"
-        behaviorHint="Not responding"
-        fidget={0.15}
-        hotspots={lazloHotspots}
-        onHotspotClick={handleLazloHotspot}
-      />
+          <NPCCharacter
+            position={[0, 0, -2.4]}
+            rotation={Math.PI}
+            bodyColor="#6B5C7A"
+            skinColor="#D4A87A"
+            pose="hunched"
+            name="Lazlo"
+            behaviorHint="Not responding"
+            fidget={0.15}
+            hotspots={lazloHotspots}
+            onHotspotClick={handleLazloHotspot}
+          />
+        </>
+      )}
 
       {/* ── Television + stand (left wall) ───────────────────────────────── */}
       <Television position={[-3.6, 0, -0.4]} rotation={Math.PI / 2} />
@@ -199,13 +210,17 @@ export function HomeScene({
         <CurtainedWindow position={[0, 0, 0]} />
       </group>
 
-      {/* ── Uncle Joey shrine corner (left-back) ──────────────────────────── */}
-      <PhotoCluster position={[-3.7, 0.85, -2.6]} />
-      {/* Small shelf the shrine sits on */}
-      <mesh position={[-3.95, 0.72, -2.6]} castShadow>
-        <boxGeometry args={[0.08, 0.02, 0.55]} />
-        <meshStandardMaterial color="#3A2A18" roughness={0.7} />
-      </mesh>
+      {/* ── Uncle Joey shrine corner (left-back) — Lazlo's Story only ──────── */}
+      {showLazlo && (
+        <>
+          <PhotoCluster position={[-3.7, 0.85, -2.6]} />
+          {/* Small shelf the shrine sits on */}
+          <mesh position={[-3.95, 0.72, -2.6]} castShadow>
+            <boxGeometry args={[0.08, 0.02, 0.55]} />
+            <meshStandardMaterial color="#3A2A18" roughness={0.7} />
+          </mesh>
+        </>
+      )}
 
       {/* ── Flavour objects (non-evidence, rule-out clutter) ─────────────── */}
       <FlavourObject
@@ -244,28 +259,32 @@ export function HomeScene({
         </mesh>
       </FlavourObject>
 
-      <FlavourObject
-        position={[4.05, 0.55, -1.6]}
-        label="Photo"
-        note="A photo of Lazlo and his girlfriend at a festival. It has been turned face-down."
-        hitRadius={0.12}
-        hitY={0.06}
-      >
-        <WallFrame position={[0, 0, 0]} rotation={Math.PI / 2} />
-      </FlavourObject>
+      {showLazlo && (
+        <>
+          <FlavourObject
+            position={[4.05, 0.55, -1.6]}
+            label="Photo"
+            note="A photo of Lazlo and his girlfriend at a festival. It has been turned face-down."
+            hitRadius={0.12}
+            hitY={0.06}
+          >
+            <WallFrame position={[0, 0, 0]} rotation={Math.PI / 2} />
+          </FlavourObject>
 
-      <FlavourObject
-        position={[-3.5, 0.88, -2.0]}
-        label="Candle"
-        note="A half-burned candle. Part of the corner where the photos are arranged."
-        hitRadius={0.08}
-        hitY={0.06}
-      >
-        <mesh position={[0, 0.06, 0]} castShadow>
-          <cylinderGeometry args={[0.025, 0.028, 0.12, 10]} />
-          <meshStandardMaterial color="#EEE8DC" roughness={0.9} />
-        </mesh>
-      </FlavourObject>
+          <FlavourObject
+            position={[-3.5, 0.88, -2.0]}
+            label="Candle"
+            note="A half-burned candle. Part of the corner where the photos are arranged."
+            hitRadius={0.08}
+            hitY={0.06}
+          >
+            <mesh position={[0, 0.06, 0]} castShadow>
+              <cylinderGeometry args={[0.025, 0.028, 0.12, 10]} />
+              <meshStandardMaterial color="#EEE8DC" roughness={0.9} />
+            </mesh>
+          </FlavourObject>
+        </>
+      )}
 
       {/* ── Free evidence objects ─────────────────────────────────────────── */}
       {freeEvidence.map((ev) => {
