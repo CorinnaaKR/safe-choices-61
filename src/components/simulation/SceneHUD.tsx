@@ -59,6 +59,7 @@ export function SceneHUD({
   );
   const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
+  const [exploreAcknowledged, setExploreAcknowledged] = useState(false);
   const prevSceneId = useRef(currentScene.id);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -76,6 +77,7 @@ export function SceneHUD({
       setPendingChoice(null);
       setVisibleParagraph(currentScene.narrative.length > 0 ? 1 : 0);
       setSceneReady(false);
+      setExploreAcknowledged(false);
     }
     if (readyTimer.current) clearTimeout(readyTimer.current);
     readyTimer.current = setTimeout(() => setSceneReady(true), 1000);
@@ -89,8 +91,15 @@ export function SceneHUD({
 
   const allRevealed = visibleParagraph >= currentScene.narrative.length;
   const narrativeUnread = sceneReady && !allRevealed && visibleParagraph > 0;
-  const choicesReady = sceneReady && allRevealed && !!currentScene.isDecisionPoint;
-  const forceVisible = journalOpen || knowledgeOpen || !!inspectedEvidence || showFeedback || !!pendingChoice || narrativeUnread || choicesReady;
+  // Before showing the decision, give the player an explicit beat to explore
+  // the room if there's still something uncollected — otherwise it's easy to
+  // click straight through the narrative into a choice without ever looking
+  // around for what the scene actually has to offer.
+  const needsExplorePrompt =
+    sceneReady && allRevealed && !!currentScene.isDecisionPoint &&
+    uncollected.length > 0 && !exploreAcknowledged;
+  const choicesReady = sceneReady && allRevealed && !!currentScene.isDecisionPoint && !needsExplorePrompt;
+  const forceVisible = journalOpen || knowledgeOpen || !!inspectedEvidence || showFeedback || !!pendingChoice || narrativeUnread || choicesReady || needsExplorePrompt;
   const hudOpacity = forceVisible ? 1 : userActive ? 1 : 0.12;
 
   useEffect(() => {
@@ -300,8 +309,43 @@ export function SceneHUD({
         </div>
       )}
 
+      {/* ── EXPLORE PROMPT: bottom-right, gates the decision while clues remain ── */}
+      {!showFeedback && needsExplorePrompt && (
+        <div className="absolute bottom-4 left-4 right-4 md:left-auto md:w-[400px] pointer-events-auto">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
+            className="case-panel"
+          >
+            <div className="px-5 py-3 border-b border-border">
+              <span className="hud-label text-primary">Before you decide</span>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-foreground/85 leading-relaxed mb-4">
+                Take a moment to look around — there might be something here worth noticing.
+                {' '}
+                <span className="text-primary">
+                  {String(uncollected.length).padStart(2, '0')}&nbsp;{uncollected.length === 1 ? 'clue' : 'clues'}
+                </span>{' '}
+                still in this scene.
+              </p>
+              <motion.button
+                onClick={() => setExploreAcknowledged(true)}
+                whileHover={{ x: 4, scale: 1.03 }}
+                whileTap={{ scale: 0.97, x: 2 }}
+                transition={CHOICE_SPRING}
+                className="w-full bg-primary text-primary-foreground font-sans text-sm font-semibold px-5 py-3 hover:bg-primary/90 transition-colors"
+              >
+                I'm ready to decide
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* ── DECISION PANEL: bottom-right ─────────────────────────────────── */}
-      {!showFeedback && sceneReady && allRevealed && currentScene.isDecisionPoint && currentScene.choices && (
+      {!showFeedback && sceneReady && allRevealed && currentScene.isDecisionPoint && !needsExplorePrompt && currentScene.choices && (
         <div className="absolute bottom-4 left-4 right-4 md:left-auto md:w-[400px] pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
