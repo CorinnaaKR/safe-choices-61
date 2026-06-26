@@ -82,6 +82,8 @@ export interface PreVisitConversationData {
   contactSubtitle?: string;
   /** Starting trust level before any choices modify it */
   baseTrust: number;
+  /** Short scene-setting lines shown before the phone conversation opens. */
+  introNarrative?: string[];
   exchanges: PreVisitExchange[];
 }
 

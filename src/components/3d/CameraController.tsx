@@ -8,6 +8,10 @@ interface CameraControllerProps {
   offset?: [number, number, number];
   defaultPosition?: [number, number, number];
   onArrived?: () => void;
+  /** [minX, maxX, minZ, maxZ, minY, maxY] — keeps the free-roam orbit camera
+   *  physically inside the room, so it can never end up outside the walls
+   *  looking back through them at the void. */
+  roomBounds?: [number, number, number, number, number, number];
 }
 
 const prefersReducedMotion =
@@ -31,6 +35,7 @@ export function CameraController({
   offset = [0, 0.15, 0.6],
   defaultPosition = [0, 3, 6],
   onArrived,
+  roomBounds,
 }: CameraControllerProps) {
   const { camera, gl } = useThree();
   const arrivedRef = useRef(false);
@@ -166,10 +171,31 @@ export function CameraController({
     } else if (playerPosition) {
       // --- Free roam: orbit around the player ([DRAG] to look) ---
       const cosP = Math.cos(pitch.current);
+      const dirX = Math.sin(yaw.current) * cosP;
+      const dirY = Math.sin(pitch.current);
+      const dirZ = Math.cos(yaw.current) * cosP;
+
+      // Keep the camera physically inside the room by capping how far it can
+      // travel along the *current* viewing direction — this preserves the
+      // spherical orbit shape (no distortion), unlike clamping the final
+      // position per-axis, which squashes the orbit into a box and produces
+      // broken, too-close viewing angles near room edges.
+      let effectiveDist = dist.current;
+      if (roomBounds) {
+        const [minX, maxX, minZ, maxZ, minY, maxY] = roomBounds;
+        const maxDistX = dirX > 1e-4 ? (maxX - playerPosition.x) / dirX
+          : dirX < -1e-4 ? (minX - playerPosition.x) / dirX : Infinity;
+        const maxDistY = dirY > 1e-4 ? (maxY - playerPosition.y) / dirY
+          : dirY < -1e-4 ? (minY - playerPosition.y) / dirY : Infinity;
+        const maxDistZ = dirZ > 1e-4 ? (maxZ - playerPosition.z) / dirZ
+          : dirZ < -1e-4 ? (minZ - playerPosition.z) / dirZ : Infinity;
+        effectiveDist = Math.min(dist.current, maxDistX, maxDistY, maxDistZ);
+      }
+
       desiredPos.current.set(
-        playerPosition.x + Math.sin(yaw.current) * cosP * dist.current,
-        playerPosition.y + Math.sin(pitch.current) * dist.current,
-        playerPosition.z + Math.cos(yaw.current) * cosP * dist.current
+        playerPosition.x + dirX * effectiveDist,
+        playerPosition.y + dirY * effectiveDist,
+        playerPosition.z + dirZ * effectiveDist
       );
       if (dragging.current) {
         // Snap directly — no lerp while the player is actively dragging

@@ -76,7 +76,10 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
       const t = setTimeout(() => setStepIdx((i) => i + 1), delay);
       return () => clearTimeout(t);
     }
-    setWaitingForChoice(true);
+    // Give the player time to read the operator's line before choices appear
+    const readDelay = Math.max(900, step.operatorLine.split(' ').length * 150);
+    const t = setTimeout(() => setWaitingForChoice(true), readDelay);
+    return () => clearTimeout(t);
   }, [stepIdx, data.steps, data.closingLine, callEnded]);
 
   const availableChoices = (() => {

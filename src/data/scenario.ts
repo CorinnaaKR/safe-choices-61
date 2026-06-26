@@ -114,7 +114,7 @@ export const safeguardingScenario: Scenario = {
     // Scene 2: Break Time (PE + playground)
     {
       id: 'scene-2',
-      title: 'Break Time',
+      title: 'PE Day',
       environment: 'playground',
       narrative: [
         "It's a PE day. While everyone else gets changed in the usual chaos of the changing room — bags everywhere, someone always losing a trainer — Jamie slips off to use the toilets instead.",

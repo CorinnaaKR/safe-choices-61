@@ -225,12 +225,18 @@ export default function ResultsPage() {
         onComplete={handlePostFeedback}
         onSkip={() => setView('results')}
         completedStoryIds={completedStoryIds}
+        domain={scenario.domain}
       />
     );
   }
 
   return (
-    <div className="min-h-screen relative">
+    <motion.div
+      className="min-h-screen relative"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
 
       {/* Header */}
       <header className="no-print flex items-center justify-between px-5 md:px-10 py-4 border-b border-border">
@@ -651,6 +657,6 @@ export default function ResultsPage() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

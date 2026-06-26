@@ -108,7 +108,7 @@ export default function WelcomePage() {
   };
 
   if (pendingFeedbackScenario) {
-    return <PreFeedbackGate onComplete={handlePreFeedbackComplete} />;
+    return <PreFeedbackGate onComplete={handlePreFeedbackComplete} domain={pendingFeedbackScenario.scenario.domain} />;
   }
 
   return (

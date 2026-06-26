@@ -95,6 +95,11 @@ export const lazloScenario: Scenario = {
     contactInitial: 'L',
     contactSubtitle: "Lazlo's sister",
     baseTrust: 50,
+    introNarrative: [
+      "You've just got back from a semester abroad.",
+      "You messaged Lazlo, and a few others, asking to catch up — but you haven't heard anything back.",
+      "Then you get a message from Lazlo's sister, Lilly.",
+    ],
     exchanges: [
       {
         id: 'pv-1',
@@ -142,7 +147,7 @@ export const lazloScenario: Scenario = {
           },
           {
             id: 'pv-2b',
-            text: "Grief makes people say things they don't mean. He's probably mortified.",
+            text: "Grief makes people say things they don't mean. He probably didn't mean it.",
             response:
               "Maybe. But he hasn't apologised. Hasn't even acknowledged it. That's not like him either.",
             trustDelta: -5,
@@ -167,7 +172,7 @@ export const lazloScenario: Scenario = {
           },
           {
             id: 'pv-3b',
-            text: "I'll be honest — it felt off when he didn't reply to me either. Something in me's been nagging.",
+            text: "I did message him the other day, and he didn't respond. I thought it was a bit weird but I figured he was busy.",
             response:
               "Trust that. Please just go and see him.",
             trustDelta: 5,

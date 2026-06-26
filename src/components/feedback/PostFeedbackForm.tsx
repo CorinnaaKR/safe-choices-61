@@ -7,6 +7,8 @@ interface Props {
   onSkip: () => void;
   /** Which story IDs were completed this session — controls per-story sections */
   completedStoryIds?: string[];
+  /** Scenario domain — adapts the confidence question to what this story is actually about. */
+  domain?: string;
 }
 
 const CONFIDENCE_OPTIONS = [
@@ -16,6 +18,15 @@ const CONFIDENCE_OPTIONS = [
   'Very confident',
   'Completely confident',
 ];
+
+const CONFIDENCE_QUESTION_BY_DOMAIN: Record<string, string> = {
+  'anti-radicalisation':
+    'Having completed the scenario, how confident do you now feel in your ability to recognise the signs that someone may be being drawn into extremism?',
+  'child-safeguarding':
+    'Having completed the scenario, how confident do you now feel in your ability to recognise the signs that a child might be experiencing abuse at home?',
+};
+const DEFAULT_CONFIDENCE_QUESTION =
+  'Having completed the scenario, how confident do you now feel in your ability to recognise the signs that someone may be at risk?';
 
 const LIKERT_STATEMENTS = [
   { key: 'realisticScore',      label: 'The scenario felt realistic and true to life' },
@@ -55,7 +66,7 @@ const INTENT_OPTIONS = [
 
 type LikertKey = 'realisticScore' | 'toneScore' | 'engagingScore' | 'learnedScore' | 'seriousnessScore';
 
-export function PostFeedbackForm({ onComplete, onSkip, completedStoryIds = [] }: Props) {
+export function PostFeedbackForm({ onComplete, onSkip, completedStoryIds = [], domain }: Props) {
   const playedJamie = completedStoryIds.includes('jamie-case');
   const playedLazlo = completedStoryIds.includes('lazlo-case');
 
@@ -143,7 +154,7 @@ export function PostFeedbackForm({ onComplete, onSkip, completedStoryIds = [] }:
           )}
 
           {/* Confidence after */}
-          <Section label="Having completed the scenario, how confident do you now feel in your ability to recognise the signs that a child might be experiencing abuse at home?">
+          <Section label={(domain && CONFIDENCE_QUESTION_BY_DOMAIN[domain]) ?? DEFAULT_CONFIDENCE_QUESTION}>
             <div className="space-y-2">
               {CONFIDENCE_OPTIONS.map((opt) => (
                 <SelectButton key={opt} label={opt} selected={confidenceAfter === opt} onClick={() => setConfidenceAfter(opt)} />

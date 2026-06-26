@@ -161,12 +161,14 @@ function MiddleEpilogue({ data, onComplete }: { data: EpilogueMiddle; onComplete
       const t = setTimeout(() => setShowContinue(true), 800);
       return () => clearTimeout(t);
     }
+    const words = data.narrativeCard[cardShown]?.split(' ').length ?? 0;
+    const delay = cardShown === 0 ? 900 : Math.max(1200, words * 220);
     const t = setTimeout(() => {
       playUiTick();
       setCardShown((c) => c + 1);
-    }, cardShown === 0 ? 900 : 2000);
+    }, delay);
     return () => clearTimeout(t);
-  }, [cardShown, data.narrativeCard.length]);
+  }, [cardShown, data.narrativeCard]);
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 gap-6 px-4">
@@ -230,7 +232,9 @@ function SoberingEpilogue({ data, onComplete }: { data: EpilogueData['sobering']
       const t = setTimeout(() => setShowContinue(true), 600);
       return () => clearTimeout(t);
     }
-    const t = setTimeout(() => setCardShown((c) => c + 1), cardShown === 0 ? 1400 : 1600);
+    const words = data.narrativeCard[cardShown]?.split(' ').length ?? 0;
+    const delay = cardShown === 0 ? 1400 : Math.max(1200, words * 220);
+    const t = setTimeout(() => setCardShown((c) => c + 1), delay);
     return () => clearTimeout(t);
   }, [sentShown, cardShown, data]);
 

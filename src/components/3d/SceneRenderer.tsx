@@ -1,4 +1,4 @@
-import { Suspense, useRef, useCallback, useState } from 'react';
+import { Suspense, useRef, useCallback, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, ContactShadows } from '@react-three/drei';
 import { EffectComposer, DepthOfField, Vignette, Outline, Selection, N8AO, Bloom } from '@react-three/postprocessing';
@@ -12,6 +12,16 @@ import { Evidence } from '@/types/simulation';
 import * as THREE from 'three';
 
 export type SceneType = 'classroom' | 'playground' | 'office' | 'home';
+
+// [minX, maxX, minZ, maxZ, minY, maxY] — kept a little inside each room's
+// actual wall/ceiling positions so the orbit camera never ends up outside
+// the room looking back at the invisible backside of a wall.
+const ROOM_BOUNDS: Record<SceneType, [number, number, number, number, number, number]> = {
+  classroom:  [-5.6, 5.6, -4.6, 4.6, 0.3, 3.6],
+  office:     [-3.6, 3.6, -2.6, 2.6, 0.3, 3.6],
+  home:       [-4.1, 4.1, -3.6, 3.6, 0.3, 2.6],
+  playground: [-9.5, 9.5, -7.5, 7.5, 0.3, 6],
+};
 
 interface SceneRendererProps {
   sceneType: SceneType;
@@ -38,6 +48,24 @@ export function SceneRenderer({
   const playerPosRef = useRef(new THREE.Vector3(0, 0, 3));
   const [walkTarget, setWalkTarget] = useState<THREE.Vector3 | null>(null);
   const pendingEvidenceRef = useRef<Evidence | null>(null);
+
+  // R3F's Canvas sizes itself via a ResizeObserver on its container. If the
+  // container has no measurable size at the exact moment Canvas mounts (e.g.
+  // while a parent is still mid framer-motion fade-in), that first observation
+  // is missed and the canvas is stuck at the browser's default 300x150 buffer
+  // — the whole scene renders into a tiny corner while CSS stretches the
+  // empty backdrop colour to fill the screen, looking like a blank void.
+  // Firing a resize event after mount forces R3F to recompute against the
+  // now-settled layout.
+  useEffect(() => {
+    const fire = () => window.dispatchEvent(new Event('resize'));
+    const raf1 = requestAnimationFrame(() => requestAnimationFrame(fire));
+    const timeouts = [100, 400, 1100].map((ms) => setTimeout(fire, ms));
+    return () => {
+      cancelAnimationFrame(raf1);
+      timeouts.forEach(clearTimeout);
+    };
+  }, [sceneType]);
 
   const handlePlayerMove = useCallback((pos: THREE.Vector3) => {
     playerPosRef.current.copy(pos);
@@ -81,6 +109,7 @@ export function SceneRenderer({
             target={focusTarget}
             playerPosition={focusTarget ? null : playerPosRef.current}
             onArrived={() => {}}
+            roomBounds={ROOM_BOUNDS[sceneType]}
           />
 
           <PlayerCharacter

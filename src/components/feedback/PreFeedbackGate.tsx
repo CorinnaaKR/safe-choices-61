@@ -4,6 +4,8 @@ import { PreFeedback } from '@/lib/feedback';
 
 interface Props {
   onComplete: (data: PreFeedback) => void;
+  /** Scenario domain — adapts the confidence question to what this story is actually about. */
+  domain?: string;
 }
 
 const CONFIDENCE_OPTIONS = [
@@ -14,7 +16,16 @@ const CONFIDENCE_OPTIONS = [
   'Completely confident',
 ];
 
-export function PreFeedbackGate({ onComplete }: Props) {
+const CONFIDENCE_QUESTION_BY_DOMAIN: Record<string, string> = {
+  'anti-radicalisation':
+    'How confident do you feel in your ability to recognise the signs that someone may be being drawn into extremism?',
+  'child-safeguarding':
+    'How confident do you feel in your ability to recognise the signs that a child might be experiencing abuse at home?',
+};
+const DEFAULT_CONFIDENCE_QUESTION =
+  'How confident do you feel in your ability to recognise the signs that someone may be at risk?';
+
+export function PreFeedbackGate({ onComplete, domain }: Props) {
   const [priorTraining, setPriorTraining] = useState('');
   const [confidenceBefore, setConfidenceBefore] = useState('');
 
@@ -58,7 +69,7 @@ export function PreFeedbackGate({ onComplete }: Props) {
         {/* Q2 */}
         <div className="mb-8">
           <p className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-4">
-            How confident do you feel in your ability to recognise the signs that a child might be experiencing abuse at home?
+            {(domain && CONFIDENCE_QUESTION_BY_DOMAIN[domain]) ?? DEFAULT_CONFIDENCE_QUESTION}
           </p>
           <div className="space-y-2">
             {CONFIDENCE_OPTIONS.map((opt) => (

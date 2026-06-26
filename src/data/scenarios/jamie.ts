@@ -67,6 +67,43 @@ export const jamieScenario: Scenario = {
     { title: 'Childline (for under 19s)', url: 'https://www.childline.org.uk/' },
     { title: 'Gov.uk — Report child abuse', url: 'https://www.gov.uk/report-child-abuse' },
   ],
+  castOfCharacters: [
+    {
+      name: 'You',
+      role: "Jamie's friend",
+      details: "You and Jamie have been close since primary school. You've just come back from six weeks of summer holiday, and you've been looking forward to seeing them.",
+    },
+    {
+      name: 'Jamie',
+      role: 'Your friend',
+      details: "Jamie is in your form class. They're usually one of the first through the gate and always talking before you've even said hello — but they've come back from the summer different.",
+    },
+    {
+      name: 'Marcus',
+      role: "Jamie's neighbour, also your classmate",
+      details: "Marcus lives next door to Jamie, so he sometimes sees things from his garden or the street that you wouldn't otherwise know about.",
+    },
+    {
+      name: 'Your mum',
+      role: 'Your mum',
+      details: "You can talk to her about most things. She listens, but she'll also tell you honestly when she thinks you're overthinking something — and when she thinks you should tell someone at school.",
+    },
+    {
+      name: 'Your form tutor',
+      role: 'Teacher',
+      details: "Approachable and unhurried. If you tell them something's wrong, they won't make you feel like you've done anything wrong by telling.",
+    },
+    {
+      name: 'Mrs Okonkwo',
+      role: "The school's designated safeguarding lead",
+      details: "You don't know her directly, but she's the person whose job it is to take concerns like this forward properly once they're raised.",
+    },
+  ],
+  knownFacts: [
+    { label: 'First day back', detail: "It's the first day of term after six weeks of summer holiday — you haven't seen Jamie all summer." },
+    { label: "Jamie's mum has a boyfriend at home", detail: "Marcus mentioned he doesn't want Jamie going out after school, so Jamie's been going straight home instead of out with friends." },
+    { label: 'Jamie missed the last few days of last term', detail: 'No explanation was given. Marcus only knows because he lives next door.' },
+  ],
   keyTakeaway:
     'You don\'t need to have all the answers. You just need to tell someone you trust. Noticing is enough.',
   completionFeedback: {

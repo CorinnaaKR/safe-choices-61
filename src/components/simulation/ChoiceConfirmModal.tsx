@@ -30,7 +30,9 @@ export function ChoiceConfirmModal({ choice, onConfirm, onCancel }: ChoiceConfir
           <div className="px-6 py-5 border-b border-border">
             <p className="hud-label text-primary mb-3">Before you decide</p>
             <p className="text-base md:text-lg text-foreground leading-snug">
-              "{choice.text}"
+              {choice.text.startsWith('"') && choice.text.endsWith('"')
+                ? choice.text
+                : `"${choice.text}"`}
             </p>
           </div>
 

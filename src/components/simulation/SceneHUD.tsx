@@ -78,7 +78,7 @@ export function SceneHUD({
       setSceneReady(false);
     }
     if (readyTimer.current) clearTimeout(readyTimer.current);
-    readyTimer.current = setTimeout(() => setSceneReady(true), 2400);
+    readyTimer.current = setTimeout(() => setSceneReady(true), 1000);
     return () => { if (readyTimer.current) clearTimeout(readyTimer.current); };
   }, [currentScene.id, currentScene.narrative.length]);
 
@@ -101,6 +101,7 @@ export function SceneHUD({
         setJournalOpen(open => !open);
       } else if (e.key === 'Escape') {
         if (pendingChoice) setPendingChoice(null);
+        else if (knowledgeOpen) setKnowledgeOpen(false);
         else if (journalOpen) setJournalOpen(false);
         else if (focusedEvidenceId) onDismissEvidence();
         else onExit();
@@ -108,37 +109,59 @@ export function SceneHUD({
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [showFeedback, pendingChoice, journalOpen, focusedEvidenceId, onDismissEvidence, onExit]);
+  }, [showFeedback, pendingChoice, knowledgeOpen, journalOpen, focusedEvidenceId, onDismissEvidence, onExit]);
 
   const evidenceNumber = inspectedEvidence
     ? Math.max(1, gameState.collectedEvidence.findIndex(e => e.id === inspectedEvidence.id) + 1)
     : 1;
 
+  // Lazlo's Story, scene-l1: keep the room dark/veiled while the narrative is
+  // still describing the doorstep (knock → let in), so the visual matches the
+  // text instead of showing the full lit living room from the first frame.
+  const atLazloDoorstep = currentScene.id === 'scene-l1' && visibleParagraph <= 4;
+
   return (
-    <motion.div
-      className="absolute inset-0 pointer-events-none z-10"
-      animate={{ opacity: hudOpacity }}
-      transition={{ duration: forceVisible || userActive ? 0.25 : 2.0, ease: 'easeInOut' }}
-    >
+    <>
+      {/* ── DOORSTEP VEIL: independent of HUD fade, gated on narrative progress ── */}
+      <AnimatePresence>
+        {atLazloDoorstep && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none z-[5]"
+            style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.92) 80%)' }}
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.1, ease: 'easeInOut' }}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="absolute inset-0 pointer-events-none z-10"
+        animate={{ opacity: hudOpacity }}
+        transition={{ duration: forceVisible || userActive ? 0.25 : 2.0, ease: 'easeInOut' }}
+      >
       {/* ── TOP-CENTRE: scene identity + clue count ─────────────────────── */}
       {!inspectedEvidence && !showFeedback && (
         <div className="absolute top-6 inset-x-0 flex flex-col items-center gap-1.5 pointer-events-none">
-          <motion.p
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.1 }}
-            className="font-mono text-[9px] uppercase tracking-[0.45em] text-foreground/35 hud-float"
-          >
-            {scenarioTitle}
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.18 }}
-            className="font-mono text-[11px] uppercase tracking-[0.3em] text-foreground/65 hud-float"
-          >
-            {currentScene.title}
-          </motion.p>
+          <div className="bg-background/55 backdrop-blur-sm px-4 py-1.5 flex flex-col items-center gap-1 rounded-sm">
+            <motion.p
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.1 }}
+              className="font-mono text-[9px] uppercase tracking-[0.45em] text-foreground/70"
+            >
+              {scenarioTitle}
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.18 }}
+              className="font-mono text-[11px] uppercase tracking-[0.3em] text-foreground"
+            >
+              {currentScene.title}
+            </motion.p>
+          </div>
           <AnimatePresence>
             {uncollected.length > 0 && !focusedEvidenceId && (
               <motion.p
@@ -147,7 +170,7 @@ export function SceneHUD({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-                className="font-mono text-[9px] uppercase tracking-[0.35em] text-primary/50 hud-float mt-0.5"
+                className="font-mono text-[9px] uppercase tracking-[0.35em] text-primary bg-background/55 backdrop-blur-sm px-3 py-1 rounded-sm mt-1"
               >
                 {String(uncollected.length).padStart(2, '0')}&nbsp;
                 {uncollected.length === 1 ? 'clue' : 'clues'} in scene
@@ -453,6 +476,7 @@ export function SceneHUD({
           <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-foreground/80">What you know</span>
         </button>
       )}
-    </motion.div>
+      </motion.div>
+    </>
   );
 }

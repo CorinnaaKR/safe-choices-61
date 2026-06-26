@@ -38,6 +38,10 @@ type ThreadMessage = {
 };
 
 export function PreVisitConversation({ data, onComplete }: Props) {
+  const [introIdx, setIntroIdx] = useState(0);
+  const introLines = data.introNarrative ?? [];
+  const [introDone, setIntroDone] = useState(introLines.length === 0);
+
   const [thread, setThread] = useState<ThreadMessage[]>([]);
   // Drives the in-fiction clock — starts mid-afternoon, advances a little with each message.
   const clockRef = useRef(13 * 60 + 50); // 1:50 PM
@@ -167,7 +171,7 @@ export function PreVisitConversation({ data, onComplete }: Props) {
         setThread((prev) => [...prev, { sender: 'contact', text: choice.response!, time: replyTime }]);
         setPendingChoice(null);
         advanceExchange(choice, newTrust);
-      }, 1200);
+      }, 900);
       return () => clearTimeout(t);
     } else {
       markSeen(sentTime);
@@ -190,6 +194,52 @@ export function PreVisitConversation({ data, onComplete }: Props) {
   };
 
   const isChoosing = phase.kind === 'choosing' && !pendingChoice && !isTyping;
+
+  if (!introDone) {
+    const advanceIntro = () => {
+      playUiTick();
+      if (introIdx + 1 < introLines.length) {
+        setIntroIdx((i) => i + 1);
+      } else {
+        setIntroDone(true);
+      }
+    };
+
+    return (
+      <div
+        className="fixed inset-0 bg-background flex items-center justify-center z-50 px-6 cursor-pointer"
+        onClick={advanceIntro}
+      >
+        <div className="max-w-md w-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={introIdx}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="narrative-panel px-6 py-5"
+            >
+              <p className="narrative-text">{introLines[introIdx]}</p>
+              <div className="flex items-center justify-between mt-4">
+                <span className="hud-label opacity-50">
+                  {String(introIdx + 1).padStart(2, '0')} / {String(introLines.length).padStart(2, '0')}
+                </span>
+                <motion.span
+                  className="flex items-center gap-2 bg-primary/90 text-primary-foreground font-mono text-[11px] uppercase tracking-[0.14em] px-4 py-2"
+                  animate={{ opacity: [0.85, 1, 0.85] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  {introIdx + 1 >= introLines.length ? 'Continue' : 'Next'}
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M6 3l2 2-2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </motion.span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col md:flex-row items-center justify-center z-50 gap-3 md:gap-8 px-4 md:px-8 py-4 md:py-0">

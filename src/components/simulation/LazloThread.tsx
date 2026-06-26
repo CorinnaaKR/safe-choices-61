@@ -5,6 +5,11 @@ interface Props {
   onComplete: (tone: string, followUp: 'wait' | 'message' | 'visit') => void;
 }
 
+const INTRO_LINES = [
+  "You decide to try Lazlo one more time, just in case Lilly's misunderstanding the situation.",
+  "He's usually quick to reply.",
+];
+
 type Beat = 'beat1' | 'beat1-typing' | 'beat1-sent' | 'day-card' | 'beat2' | 'beat3-typing' | 'beat3-sent' | 'beat3-day' | 'done';
 
 const TONE_OPTIONS = [
@@ -107,12 +112,15 @@ function Bubble({ text, isYou, seen, seenTime }: { text: string; isYou: boolean;
 }
 
 export function LazloThread({ onComplete }: Props) {
+  const [introIdx, setIntroIdx] = useState(0);
+  const [introDone, setIntroDone] = useState(false);
   const [beat, setBeat] = useState<Beat>('beat1');
   const [selectedTone, setSelectedTone] = useState<typeof TONE_OPTIONS[0] | null>(null);
   const [typingText, setTypingText] = useState('');
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [sendReady, setSendReady] = useState(false);
   const [followUp, setFollowUp] = useState<'wait' | 'message' | 'visit' | null>(null);
+  const [beat3Seen, setBeat3Seen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const typingRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
@@ -172,7 +180,11 @@ export function LazloThread({ onComplete }: Props) {
           setSendReady(false);
           setTypingText('');
           setBeat('beat3-sent');
-          setTimeout(() => setBeat('beat3-day'), 2000);
+          setBeat3Seen(false);
+          // Show "seen" before the day transition, so the receipt matches
+          // what the following narration claims happened.
+          setTimeout(() => setBeat3Seen(true), 1200);
+          setTimeout(() => setBeat('beat3-day'), 2200);
         }, 500);
         return;
       }
@@ -197,18 +209,53 @@ export function LazloThread({ onComplete }: Props) {
     }
   };
 
-  // After beat3-day, auto-proceed
-  useEffect(() => {
-    if (beat === 'beat3-day') {
-      const t = setTimeout(() => {
-        onComplete(selectedTone!.id, 'message');
-      }, 3000);
-      return () => clearTimeout(t);
-    }
-  }, [beat]);
-
   const showTypingIndicator = beat === 'beat1-typing' || beat === 'beat3-typing';
   const isTypingBeat = beat === 'beat1-typing' || beat === 'beat3-typing';
+
+  if (!introDone) {
+    const advanceIntro = () => {
+      if (introIdx + 1 < INTRO_LINES.length) {
+        setIntroIdx((i) => i + 1);
+      } else {
+        setIntroDone(true);
+      }
+    };
+
+    return (
+      <div
+        className="fixed inset-0 bg-background flex items-center justify-center z-50 px-6 cursor-pointer"
+        onClick={advanceIntro}
+      >
+        <div className="max-w-md w-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={introIdx}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="narrative-panel px-6 py-5"
+            >
+              <p className="narrative-text">{INTRO_LINES[introIdx]}</p>
+              <div className="flex items-center justify-between mt-4">
+                <span className="hud-label opacity-50">
+                  {String(introIdx + 1).padStart(2, '0')} / {String(INTRO_LINES.length).padStart(2, '0')}
+                </span>
+                <motion.span
+                  className="flex items-center gap-2 bg-primary/90 text-primary-foreground font-mono text-[11px] uppercase tracking-[0.14em] px-4 py-2"
+                  animate={{ opacity: [0.85, 1, 0.85] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  {introIdx + 1 >= INTRO_LINES.length ? 'Continue' : 'Next'}
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M6 3l2 2-2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </motion.span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 px-4">
@@ -220,7 +267,7 @@ export function LazloThread({ onComplete }: Props) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 gap-6"
+            className="fixed inset-0 bg-background flex flex-col items-center justify-center z-[70] gap-6"
             onAnimationComplete={() => {
               if (beat === 'day-card') {
                 setTimeout(() => setBeat('beat2'), 1800);
@@ -241,13 +288,22 @@ export function LazloThread({ onComplete }: Props) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 gap-6"
+            className="fixed inset-0 bg-background flex flex-col items-center justify-center z-[70] gap-6"
           >
             <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">The next morning</p>
             <p className="text-foreground text-lg font-light" style={{ fontFamily: '-apple-system, sans-serif' }}>
               Still nothing. Both messages read. No reply.
             </p>
-            <p className="text-muted-foreground text-sm">You decide to go round.</p>
+            <p className="text-muted-foreground text-sm mb-2">You decide to go round.</p>
+            <motion.button
+              onClick={() => onComplete(selectedTone!.id, 'message')}
+              className="flex items-center gap-2 bg-primary/90 hover:bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-[0.14em] px-4 py-2 transition-colors"
+              animate={{ opacity: [0.85, 1, 0.85] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              Continue
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M6 3l2 2-2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -268,7 +324,7 @@ export function LazloThread({ onComplete }: Props) {
               <Bubble
                 text="Hey man, just got back from my semester abroad. We've got so much to catch up about! When you next free?"
                 isYou
-                seen={beat !== 'beat1' && beat !== 'beat1-typing'}
+                seen
                 seenTime={SEEN_TIME_LAST_WEEK}
               />
             </motion.div>
@@ -298,7 +354,8 @@ export function LazloThread({ onComplete }: Props) {
                 <Bubble
                   text="Still there mate?"
                   isYou
-                  seen={false}
+                  seen={beat3Seen}
+                  seenTime={SEEN_TIME_B3}
                 />
               </motion.div>
             )}
