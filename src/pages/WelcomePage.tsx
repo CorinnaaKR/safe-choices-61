@@ -30,7 +30,7 @@ const modeOptions: {
     title: 'Story mode',
     tagline: 'For everyone',
     description:
-      'Play through the story. Find clues, make choices, and see what happens because of them.',
+      'Play through the story. Notice what feels off, make choices, and see what happens because of them.',
   },
   {
     id: 'training',
@@ -136,7 +136,7 @@ export default function WelcomePage() {
             <span className="text-primary">Be the person who notices.</span>
           </h1>
           <p className="text-base text-muted-foreground max-w-lg leading-relaxed">
-            Step into a real situation. Read the room. Make decisions under
+            Step into a realistic simulation. Read the room. Make decisions under
             uncertainty. Find out what you missed — and what your choices meant.
           </p>
         </motion.div>

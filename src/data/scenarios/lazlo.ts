@@ -59,8 +59,8 @@ export const lazloScenario: Scenario = {
     },
     {
       name: 'Priya',
-      role: "Lazlo's girlfriend (ex?)",
-      details: "Priya and Lazlo were together for two years. Lazlo hasn't mentioned her since Joey died. A photo of them at a festival has been turned face-down in the flat.",
+      role: "Lilly's girlfriend",
+      details: "Priya and Lilly have been together a couple of years. You've met her a few times at family things — she's good fun, easy to talk to.",
     },
     {
       name: 'Uncle Joey',

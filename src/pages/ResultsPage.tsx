@@ -18,7 +18,7 @@ const OTHER_STORY: Record<string, { id: string; title: string; hook: string; mod
   'jamie-case': {
     id: 'lazlo-case',
     title: "Lazlo's Story",
-    hook: "Now step into the professional's shoes. A youth worker notices something is wrong with one of his group. This time there's a score — and a certificate.",
+    hook: "Now see it from a friend's side, with professional training stakes attached. Lazlo's sister calls you, worried — and something's clearly changed. This time there's a score — and a certificate.",
     mode: 'training',
   },
   'lazlo-case': {
@@ -64,11 +64,26 @@ export default function ResultsPage() {
       : 0;
   const optimalCount = getOptimalDecisionsCount();
   const totalDecisions = gameState.decisions.length;
-  const passed = scorePercentage >= PASS_THRESHOLD;
+
+  // A scenario can declare successCriteria (minimum evidence collected, a minimum
+  // number of critical-importance evidence items, and a cap on non-optimal
+  // decisions) — without this check, a player could pass purely by picking
+  // high-point choices while skipping the evidence the scenario is actually
+  // testing whether they noticed.
+  const criticalEvidenceCount = gameState.collectedEvidence.filter((e) => e.importance === 'critical').length;
+  const poorDecisionCount = gameState.decisions.filter((d) => !d.isOptimal).length;
+  const criteria = scenario.successCriteria;
+  const meetsCriteria = !criteria || (
+    gameState.collectedEvidence.length >= criteria.minEvidence &&
+    criticalEvidenceCount >= criteria.requiredCriticalEvidence &&
+    poorDecisionCount <= criteria.maxPoorDecisions
+  );
+  const passed = scorePercentage >= PASS_THRESHOLD && meetsCriteria;
 
   const getGrade = () => {
-    if (scorePercentage === 100) return { grade: 'Excellent', accent: true };
-    if (scorePercentage >= PASS_THRESHOLD) return { grade: 'Pass', accent: true };
+    if (passed && scorePercentage === 100) return { grade: 'Excellent', accent: true };
+    if (passed) return { grade: 'Pass', accent: true };
+    if (scorePercentage >= PASS_THRESHOLD && !meetsCriteria) return { grade: 'Not yet passed', accent: false };
     if (scorePercentage >= 50) return { grade: 'Not yet passed', accent: false };
     return { grade: 'Retake required', accent: false };
   };
@@ -466,10 +481,24 @@ export default function ResultsPage() {
             ) : !passed ? (
               <section className="content-card border-muted-foreground/20 mb-3">
                 <div className="px-6 py-5 space-y-2">
-                  <p className="text-sm text-foreground leading-relaxed">
-                    A score of <strong>{PASS_THRESHOLD}%</strong> or above is required to receive
-                    a completion certificate. You scored <strong>{scorePercentage}%</strong>.
-                  </p>
+                  {scorePercentage < PASS_THRESHOLD ? (
+                    <p className="text-sm text-foreground leading-relaxed">
+                      A score of <strong>{PASS_THRESHOLD}%</strong> or above is required to receive
+                      a completion certificate. You scored <strong>{scorePercentage}%</strong>.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-foreground leading-relaxed">
+                      Your score met the {PASS_THRESHOLD}% threshold, but a certificate also requires
+                      noticing enough of what the scenario was testing: at least{' '}
+                      <strong>{criteria?.minEvidence}</strong> pieces of evidence collected (you collected{' '}
+                      <strong>{gameState.collectedEvidence.length}</strong>), at least{' '}
+                      <strong>{criteria?.requiredCriticalEvidence}</strong> of critical importance (you found{' '}
+                      <strong>{criticalEvidenceCount}</strong>), and no more than{' '}
+                      <strong>{criteria?.maxPoorDecisions}</strong> non-optimal decision
+                      {criteria?.maxPoorDecisions === 1 ? '' : 's'} (you made{' '}
+                      <strong>{poorDecisionCount}</strong>).
+                    </p>
+                  )}
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Review the observations above, then retake the simulation. There is no limit
                     on attempts.
@@ -517,7 +546,7 @@ export default function ResultsPage() {
                     {citedEvidence.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-border/60">
                         <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                          {mode === 'training' ? 'Evidence you cited' : 'Clues you used'}
+                          {mode === 'training' ? 'Evidence you cited' : 'Observations you used'}
                         </p>
                         <div className="flex flex-wrap gap-1.5">
                           {citedEvidence.map((ev) => (
@@ -541,7 +570,7 @@ export default function ResultsPage() {
           <section className="content-card mb-3">
             <div className="px-6 py-3 border-b border-border flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">
-                {mode === 'training' ? 'Evidence collected' : 'Clues you found'}
+                {mode === 'training' ? 'Evidence collected' : 'Observations you found'}
               </span>
               <span className="font-mono text-xs text-primary">
                 {gameState.collectedEvidence.length}

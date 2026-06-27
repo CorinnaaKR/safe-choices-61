@@ -195,7 +195,7 @@ export const safeguardingScenario: Scenario = {
         "Jamie stops. A beat.",
         '"I slept funny. It\'s nothing."',
         "A ball bounces past somewhere nearby. Someone across the field shrieks with laughter.",
-        "Their eyes flick to yours for a second — like they're checking something. Whether it's safe, maybe. Then they look away.",
+        "Their eyes flick to yours for a second, like they're checking if you're going to say anything else. Then they look away.",
         '“You can talk to me, you know,” you say. “Whenever.”',
         "Jamie nods, small. The bell goes. As they stand up, their sleeve shifts — and there's a bruise on their forearm, dark, in an odd spot. Could be from football. Could be a dozen ordinary things. Jamie clocks that you've seen it and tugs the sleeve down without saying anything."
       ],
