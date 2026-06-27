@@ -29,7 +29,7 @@ export const safeguardingScenario: Scenario = {
       title: 'First Day Back',
       environment: 'classroom',
       narrative: [
-        "It's the first day of term. You've been looking forward to seeing Jamie all summer — six weeks apart, and there's a backlog of stuff to tell them.",
+        "It's the first day of term. You've been looking forward to seeing Jamie all summer — six weeks apart, and you've got loads to tell them.",
         "Jamie — always one of the first through the gate, always talking before you've even said hello — slips into the form room quietly, just as the bell goes. Their uniform looks slept-in, and there's a faint smell of unwashed clothes.",
         "They don't really look at you. They go straight to their seat, pulling their sleeves down over their hands even though the room's already warm.",
         "You've been friends with Jamie since Year 7 started. Something's different today. You just don't know what yet."
@@ -130,7 +130,7 @@ export const safeguardingScenario: Scenario = {
           type: 'observation',
           title: 'Changing room, again',
           description: 'PE lesson',
-          content: "Jamie changed in the toilets instead of with everyone else, then wore long sleeves on a hot, sweaty day when literally no one else did. Could just be self-conscious — that's normal at this age. But it's the kind of thing that's easy to explain away one at a time, and hard to explain away all together.",
+          content: "Jamie changed in the toilets instead of with everyone else, then wore long sleeves on a hot, sweaty day when literally no one else did. Could just be self-conscious about changing in front of people — loads of people are like that. But it's the kind of thing that's easy to explain away one at a time, and hard to explain away all together.",
           timestamp: 'Monday, PE lesson'
         },
         {
@@ -240,7 +240,7 @@ export const safeguardingScenario: Scenario = {
           id: 'c3a-3',
           text: 'Message the group chat — ask if anyone else has noticed Jamie being off',
           consequence: 'You type it out before you can think too hard about it. A few people reply. "Yeah a bit." "Why, what\'s happened?" You end up saying more than you meant to.',
-          feedback: 'Wanting to understand what\'s happening is natural. But going sideways to friends instead of up to a trusted adult means the information spreads the wrong way.',
+          feedback: 'Wanting to understand what\'s happening is natural. But telling your mates instead of an adult just makes it spread — it doesn\'t actually get Jamie any help.',
           isOptimal: false,
           nextSceneId: 'scene-4-risk',
           points: 0
@@ -279,7 +279,7 @@ export const safeguardingScenario: Scenario = {
           type: 'observation',
           title: 'Missing days',
           description: 'Something Marcus mentioned at lunch',
-          content: "Marcus said Jamie missed the last few days of last term. No real explanation, just gone. Absences on their own don't mean much — kids get ill, things come up. But unexplained gaps, especially when they line up with a change at home, are one of the things schools are specifically asked to notice. This one slipped through.",
+          content: "Marcus said Jamie missed the last few days of last term. No real explanation, just gone. Missing school on its own doesn't mean much — people get ill, stuff comes up. But it's another thing that lines up with everything else that's felt off since the summer.",
           timestamp: 'Monday, lunchtime'
         },
         {
@@ -287,7 +287,7 @@ export const safeguardingScenario: Scenario = {
           type: 'observation',
           title: "Can't go out after school",
           description: 'Something Marcus mentioned at lunch',
-          content: "Jamie's mum's boyfriend doesn't want them going out after school — so they go straight home. Strict parenting looks like this too, and most of the time that's all it is. But isolating a child from their friends — cutting off the relationships where they might say something — is also a pattern. It's worth holding alongside everything else.",
+          content: "Jamie's mum's boyfriend doesn't want them going out after school — so they go straight home. Strict parents are like that sometimes, and most of the time it's nothing more. But it also means Jamie's barely seeing anyone outside school anymore. That's worth remembering, alongside everything else.",
           timestamp: 'Monday, lunchtime'
         },
         {
@@ -295,7 +295,7 @@ export const safeguardingScenario: Scenario = {
           type: 'observation',
           title: 'Not in a hurry to leave',
           description: 'End of the school day',
-          content: "When the bell went, everyone moved. Jamie didn't. Still at their desk, slowly packing up while the corridor emptied around them. Kids who aren't in a hurry to go home usually have a reason. It's one of the quieter signs — easy to miss, easy to explain away. But you noticed it.",
+          content: "When the bell went, everyone moved. Jamie didn't. Still at their desk, slowly packing up while the corridor emptied around them. If you're not in a hurry to get home, there's usually a reason. Easy to miss, easy to explain away. But you noticed it.",
           timestamp: 'Monday, end of day'
         }
       ],
@@ -520,7 +520,7 @@ export const safeguardingScenario: Scenario = {
           type: 'observation',
           title: 'Word got around',
           description: 'The morning after the group chat',
-          content: 'Jamie knows someone was talking about them — and they\'re reading it as betrayal, not concern. Going sideways to friends instead of up to a trusted adult meant the information spread without reaching anyone who could actually help. Jamie may be harder to reach now than they were before.',
+          content: 'Jamie knows someone was talking about them — and they\'re taking it as betrayal, not someone caring. Telling your mates instead of a teacher or parent meant it just did the rounds instead of reaching anyone who could actually help. Jamie might be harder to talk to now than before.',
           timestamp: 'Tuesday morning'
         }
       ],
