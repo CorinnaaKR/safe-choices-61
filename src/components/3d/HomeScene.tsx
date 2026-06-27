@@ -63,7 +63,7 @@ export const HOME_EVIDENCE_POSITIONS: Record<string, [number, number, number]> =
   // Documentation
   'doc-l1': [3.1, 0.08, 2.4],     // mail pile near door
   // Digital
-  'dig-l1': [1.55, 0.75, -1.85],  // laptop on side table
+  'dig-l1': [1.55, 0.52, -1.95],  // laptop on side table (table surface height)
   'dig-l2': [-0.22, 0.55, -1.65], // phone (NPC hotspot offset, world approx)
   // Behavioural — NPC hotspot (beh-l3: mentions group)
   'beh-l3': [0.08, 1.15, -1.72],
@@ -247,13 +247,13 @@ export function HomeScene({
       </FlavourObject>
 
       <FlavourObject
-        position={[3.5, 0.55, -1.2]}
+        position={[3.5, 0, -1.2]}
         label="Gym bag"
         note="An old gym bag, unopened. Dust on the zip — hasn't been used in months."
         hitRadius={0.25}
-        hitY={0.2}
+        hitY={0.33}
       >
-        <mesh position={[0, 0.18, 0]} castShadow>
+        <mesh position={[0, 0.33, 0]} castShadow>
           <capsuleGeometry args={[0.18, 0.3, 6, 12]} />
           <meshStandardMaterial color="#2C3A2C" roughness={0.85} />
         </mesh>
@@ -272,7 +272,7 @@ export function HomeScene({
           </FlavourObject>
 
           <FlavourObject
-            position={[-3.5, 0.88, -2.0]}
+            position={[-3.85, 0.73, -2.4]}
             label="Candle"
             note="A half-burned candle. Part of the corner where the photos are arranged."
             hitRadius={0.08}
