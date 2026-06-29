@@ -189,7 +189,10 @@ export function CameraController({
           : dirY < -1e-4 ? (minY - playerPosition.y) / dirY : Infinity;
         const maxDistZ = dirZ > 1e-4 ? (maxZ - playerPosition.z) / dirZ
           : dirZ < -1e-4 ? (minZ - playerPosition.z) / dirZ : Infinity;
-        effectiveDist = Math.min(dist.current, maxDistX, maxDistY, maxDistZ);
+        // Floor at DIST_MIN so a player standing close to a wall (e.g. right
+        // at a doorway) doesn't collapse the camera into their back — a near
+        // wall is better clipped through than a view crushed to nothing.
+        effectiveDist = Math.max(DIST_MIN, Math.min(dist.current, maxDistX, maxDistY, maxDistZ));
       }
 
       desiredPos.current.set(
