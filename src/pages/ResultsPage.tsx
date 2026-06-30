@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const PRE_FEEDBACK_KEY = 'heli-pre-feedback';
 const COMPLETED_STORIES_KEY = 'heli-completed-stories';
+const POST_FEEDBACK_SUBMITTED_KEY = 'heli-post-feedback-submitted';
 
 const OTHER_STORY: Record<string, { id: string; title: string; hook: string; mode: string }> = {
   'jamie-case': {
@@ -105,8 +106,16 @@ export default function ResultsPage() {
   const completedStoryIds = registerStory(scenarioId);
   const otherStory = OTHER_STORY[scenarioId];
   const hasPlayedBoth = otherStory ? completedStoryIds.includes(otherStory.id) : true;
+  const feedbackAlreadySubmitted = sessionStorage.getItem(POST_FEEDBACK_SUBMITTED_KEY) === 'true';
   type View = 'other-story-prompt' | 'feedback-form' | 'results';
-  const [view, setView] = useState<View>(hasPlayedBoth ? 'feedback-form' : 'other-story-prompt');
+  // If they already submitted feedback after story 1 and are now finishing story 2,
+  // skip the form — we already have their data.
+  const initialView: View = hasPlayedBoth && feedbackAlreadySubmitted
+    ? 'results'
+    : hasPlayedBoth
+    ? 'feedback-form'
+    : 'other-story-prompt';
+  const [view, setView] = useState<View>(initialView);
 
   const profile = gameState.trainingProfile;
 
@@ -123,6 +132,7 @@ export default function ResultsPage() {
         storiesPlayed: completedStoryIds.join(', '),
         submittedAt: new Date().toISOString(),
       });
+      sessionStorage.setItem(POST_FEEDBACK_SUBMITTED_KEY, 'true');
     } catch (e) {
       console.error('Feedback submission failed:', e);
     }
@@ -240,7 +250,7 @@ export default function ResultsPage() {
         onComplete={handlePostFeedback}
         onSkip={() => setView('results')}
         completedStoryIds={completedStoryIds}
-        domain={scenario.domain}
+        domain={hasPlayedBoth ? undefined : scenario.domain}
       />
     );
   }
