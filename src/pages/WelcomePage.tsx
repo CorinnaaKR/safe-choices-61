@@ -113,29 +113,40 @@ export default function WelcomePage() {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center">
+      {/* Masthead */}
+      <div className="w-full border-b border-border">
+        <div className="max-w-4xl mx-auto px-5 md:px-10 py-6 md:py-10 flex flex-col items-center gap-1">
+          <h1 className="flex items-center gap-2 md:gap-3">
+            {['H','E','L','I'].map((letter, i) => (
+              <span key={letter} className="flex items-center gap-2 md:gap-3">
+                <span className="font-mono text-4xl md:text-5xl font-bold text-foreground">{letter}</span>
+                {i < 3 && <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary flex-shrink-0" />}
+              </span>
+            ))}
+          </h1>
+        </div>
+      </div>
+
       {/* Header */}
-      <header className="w-full max-w-4xl flex items-center justify-between px-5 md:px-10 py-4 border-b border-border">
-        <span className="font-sans text-sm font-semibold text-foreground/80 tracking-wide">Heli</span>
+      <header className="w-full max-w-4xl flex items-center justify-between px-5 md:px-10 py-3 border-b border-border">
+        <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-muted-foreground w-full text-center">Helping Everyone Learn Interactively</p>
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground hidden sm:block">
           Prototype v0.1
         </span>
       </header>
 
       {/* Hero */}
-      <section className="w-full max-w-4xl px-5 md:px-10 pt-16 md:pt-24 pb-12 md:pb-16">
+      <section id="main-content" className="w-full max-w-4xl px-5 md:px-10 pt-10 md:pt-16 pb-0">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-8">
-            Case file — open
-          </p>
-          <h1 className="font-sans text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight tracking-tight">
+          <h1 className="font-sans text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight tracking-tight text-center">
             The signs are there.<br />
             <span className="text-primary">Be the person who notices.</span>
           </h1>
-          <p className="text-base text-muted-foreground max-w-lg leading-relaxed">
+          <p className="text-base text-muted-foreground max-w-lg leading-relaxed text-center mx-auto">
             Step into a realistic simulation. Read the room. Make decisions under
             uncertainty. Find out what you missed — and what your choices meant.
           </p>
@@ -143,9 +154,9 @@ export default function WelcomePage() {
       </section>
 
       {/* Scenario cards — lead with the stories */}
-      <section className="w-full max-w-4xl px-5 md:px-10 pb-12 flex-grow">
+      <section className="w-full max-w-4xl px-5 md:px-10 pb-8 flex-grow">
         <div>
-          <p className="page-label mb-5">Choose a case</p>
+          <p className="font-mono text-[12px] uppercase tracking-[0.25em] text-muted-foreground my-6">Open case files</p>
           <div className="grid md:grid-cols-2 gap-4">
             {scenarios.map((scenario, index) => {
               const locked = scenario.status === 'in-development';
@@ -206,7 +217,8 @@ export default function WelcomePage() {
                     <div className="flex items-center gap-3 flex-wrap">
                       <button
                         onClick={() => setPendingScenario(scenario)}
-                        className="bg-primary text-primary-foreground font-sans text-sm font-medium px-5 py-2.5 hover:bg-primary/90 transition-colors hud-btn"
+                        aria-label={inProgress ? `Continue ${scenario.title}` : `Enter ${scenario.title}`}
+                        className="bg-primary text-primary-foreground font-sans text-sm font-medium px-5 py-3 hover:bg-primary/90 transition-colors hud-btn"
                       >
                         {inProgress ? 'Continue' : 'Enter the story'}
                       </button>

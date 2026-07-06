@@ -18,12 +18,13 @@ const prefersReducedMotion =
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-// Orbit limits (follow mode)
-const PITCH_MIN = 0.12;
-const PITCH_MAX = 1.25;
+// First-person look limits
+const FPS_PITCH_MIN = -Math.PI / 2.5; // look up ~72°
+const FPS_PITCH_MAX = Math.PI / 2.5;  // look down ~72°
 const DIST_MIN = 2.4;
 const DIST_MAX = 8;
 const ORBIT_SPEED = 0.005;
+const FPS_EYE_HEIGHT = 1.05;
 
 // Inspect dolly limits (multiplier on the base inspect offset)
 const INSPECT_ZOOM_MIN = 0.45;
@@ -43,7 +44,7 @@ export function CameraController({
 
   // Orbit state — yaw/pitch/distance around the player
   const yaw = useRef(0);
-  const pitch = useRef(0.64);
+  const pitch = useRef(0); // 0 = level, positive = look down
   const dist = useRef(5);
   const dragging = useRef(false);
 
@@ -92,8 +93,8 @@ export function CameraController({
       yaw.current -= dx * ORBIT_SPEED;
       pitch.current = THREE.MathUtils.clamp(
         pitch.current + dy * ORBIT_SPEED,
-        PITCH_MIN,
-        PITCH_MAX
+        FPS_PITCH_MIN,
+        FPS_PITCH_MAX
       );
     };
     const onPointerUp = () => {
@@ -169,58 +170,21 @@ export function CameraController({
         camera.position.y += Math.sin(timeRef.current * 2) * 0.002;
       }
     } else if (playerPosition) {
-      // --- Free roam: orbit around the player ([DRAG] to look) ---
-      const cosP = Math.cos(pitch.current);
-      const dirX = Math.sin(yaw.current) * cosP;
-      const dirY = Math.sin(pitch.current);
-      const dirZ = Math.cos(yaw.current) * cosP;
-
-      // Keep the camera physically inside the room by capping how far it can
-      // travel along the *current* viewing direction — this preserves the
-      // spherical orbit shape (no distortion), unlike clamping the final
-      // position per-axis, which squashes the orbit into a box and produces
-      // broken, too-close viewing angles near room edges.
-      let effectiveDist = dist.current;
-      if (roomBounds) {
-        const [minX, maxX, minZ, maxZ, minY, maxY] = roomBounds;
-        const maxDistX = dirX > 1e-4 ? (maxX - playerPosition.x) / dirX
-          : dirX < -1e-4 ? (minX - playerPosition.x) / dirX : Infinity;
-        const maxDistY = dirY > 1e-4 ? (maxY - playerPosition.y) / dirY
-          : dirY < -1e-4 ? (minY - playerPosition.y) / dirY : Infinity;
-        const maxDistZ = dirZ > 1e-4 ? (maxZ - playerPosition.z) / dirZ
-          : dirZ < -1e-4 ? (minZ - playerPosition.z) / dirZ : Infinity;
-        // Floor at DIST_MIN so a player standing close to a wall (e.g. right
-        // at a doorway) doesn't collapse the camera into their back — a near
-        // wall is better clipped through than a view crushed to nothing.
-        effectiveDist = Math.max(DIST_MIN, Math.min(dist.current, maxDistX, maxDistY, maxDistZ));
-      }
-
+      // --- First-person: camera sits at eye height, drag to look ---
       desiredPos.current.set(
-        playerPosition.x + dirX * effectiveDist,
-        playerPosition.y + dirY * effectiveDist,
-        playerPosition.z + dirZ * effectiveDist
-      );
-      if (dragging.current) {
-        // Snap directly — no lerp while the player is actively dragging
-        camera.position.copy(desiredPos.current);
-      } else {
-        camera.position.lerp(desiredPos.current, 0.1);
-      }
-
-      lookTarget.current.set(
         playerPosition.x,
-        playerPosition.y + 0.9,
-        playerPosition.z
+        playerPosition.y + FPS_EYE_HEIGHT,
+        playerPosition.z,
       );
-      if (dragging.current) {
-        camera.lookAt(lookTarget.current);
-      } else {
-        const currentLookAt = scratchA.current;
-        camera.getWorldDirection(currentLookAt);
-        currentLookAt.multiplyScalar(5).add(camera.position);
-        currentLookAt.lerp(lookTarget.current, 0.12);
-        camera.lookAt(currentLookAt);
-      }
+      // Snap immediately while dragging so view tracks the mouse 1:1;
+      // lerp for positional follow when walking to reduce judder
+      camera.position.lerp(desiredPos.current, dragging.current ? 1 : 0.2);
+
+      // Apply look rotation in YXZ order (standard FPS: pan then tilt)
+      camera.rotation.order = 'YXZ';
+      camera.rotation.y = yaw.current;
+      camera.rotation.x = pitch.current;
+      camera.rotation.z = 0;
     } else {
       camera.position.lerp(
         desiredPos.current.set(defaultPosition[0], defaultPosition[1], defaultPosition[2]),

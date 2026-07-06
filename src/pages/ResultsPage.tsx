@@ -11,6 +11,23 @@ import { PostFeedbackForm } from '@/components/feedback/PostFeedbackForm';
 import { submitFeedback, PostFeedback, PreFeedback } from '@/lib/feedback';
 import { useToast } from '@/hooks/use-toast';
 
+const EVIDENCE_MEANINGS: Record<string, string> = {
+  'beh-l1': 'Visible weight loss, poor sleep, and a flat affect are common stress responses in someone undergoing radicalisation. The isolation and intensity of extremist groups can displace normal routines and relationships, with physical deterioration often following.',
+  'beh-l0': 'Muting or concealing media consumption can indicate anxiety about being observed — or a shift in what content feels acceptable to share. It\'s a small action, but combined with other signs, it suggests compartmentalisation.',
+  'env-l1': 'Displaying extremist material openly — especially in a domestic space — indicates the ideology has become part of someone\'s identity, not just a passing interest. "Sons of Europa" is a fictional stand-in for far-right nationalist movements that use heritage framing to normalise exclusionary beliefs.',
+  'env-l2': 'Annotated news clippings are a marker of obsessive information-gathering around a grievance narrative. The red pen annotations suggest active engagement with a framework of blame — a common feature of radicalisation.',
+  'env-l3': 'Grief can be a significant vulnerability factor in radicalisation. An unprocessed bereavement — especially one framed around injustice — can become a focal point that extremist groups exploit to offer meaning, community, and a target for blame.',
+  'env-l4': 'Printed recruitment material in the home confirms active contact with an organisation, not just online exposure. Its presence on a shared surface may indicate the person wants others to engage with it, or has stopped hiding it.',
+  'env-l5': 'Social withdrawal and self-imposed isolation from the outside world are consistent with the "us vs. them" worldview that extremist groups cultivate. Closed curtains in daylight can also reflect heightened vigilance or shame.',
+  'doc-l1': 'Neglecting practical responsibilities like opening post is a sign of withdrawal from ordinary life. It may indicate depression, preoccupation, or that the person\'s focus has narrowed to activities within the group.',
+  'beh-l5': 'The language of belonging and purpose is central to extremist recruitment. When someone describes a group in those terms — especially after a period of isolation or loss — it\'s a significant warning sign that the group is meeting an emotional need.',
+  'beh-l6': 'Concealing communications is common in the later stages of radicalisation, when the person has been told their contact with outsiders is a threat to the group. It reflects both secrecy and divided loyalty.',
+  'beh-l2': 'Dismissing or attacking previous relationships is a tactic extremist groups actively encourage. It tightens the bond to the group by eliminating competing sources of support, identity, and challenge.',
+  'beh-l3': 'When someone repeatedly refers to a group without naming it, or avoids giving details, it can indicate they\'ve been coached to keep it private — or that they sense, on some level, that naming it would prompt concern.',
+  'beh-l8': 'Job loss, romantic rejection, and bereavement in close succession create a potent vulnerability. Extremist groups specifically recruit people at these points — offering explanation, identity, and community at the moment someone most needs them.',
+  'beh-l7': 'Derogatory or dismissive comments about women or specific ethnic groups that weren\'t present before are a significant behavioural change. Misogyny and ethnonationalism are closely intertwined in many far-right movements.',
+};
+
 const PRE_FEEDBACK_KEY = 'heli-pre-feedback';
 const COMPLETED_STORIES_KEY = 'heli-completed-stories';
 const POST_FEEDBACK_SUBMITTED_KEY = 'heli-post-feedback-submitted';
@@ -591,20 +608,32 @@ export default function ResultsPage() {
                 <p className="text-sm text-muted-foreground text-center py-6">No evidence collected.</p>
               ) : (
                 <div className="space-y-2">
-                  {gameState.collectedEvidence.map((evidence, i) => (
-                    <div
-                      key={evidence.id}
-                      className="p-3 bg-secondary/40 rounded-lg border border-border/60 flex items-baseline gap-3"
-                    >
-                      <span className="font-mono text-[10px] text-primary flex-shrink-0">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <div>
-                        <p className="text-sm text-foreground">{evidence.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5 capitalize">{evidence.type}</p>
+                  {gameState.collectedEvidence.map((evidence, i) => {
+                    const meaning = scenarioId === 'lazlo-case' && mode === 'training'
+                      ? EVIDENCE_MEANINGS[evidence.id]
+                      : undefined;
+                    return (
+                      <div
+                        key={evidence.id}
+                        className="p-3 bg-secondary/40 rounded-lg border border-border/60"
+                      >
+                        <div className="flex items-baseline gap-3">
+                          <span className="font-mono text-[10px] text-primary flex-shrink-0">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <div>
+                            <p className="text-sm text-foreground">{evidence.title}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 capitalize">{evidence.type}</p>
+                          </div>
+                        </div>
+                        {meaning && (
+                          <p className="text-xs text-foreground/65 leading-relaxed mt-2 pl-7 border-l-2 border-primary/30 ml-px">
+                            {meaning}
+                          </p>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -74,7 +74,7 @@ export function TrainingGate({ scenarioTitle, onComplete }: TrainingGateProps) {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="Your full name"
-                className="w-full bg-transparent font-sans text-sm text-foreground placeholder:text-muted-foreground/50 outline-none"
+                className="w-full bg-transparent font-sans text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-sm"
                 autoComplete="name"
               />
             </div>
@@ -92,7 +92,7 @@ export function TrainingGate({ scenarioTitle, onComplete }: TrainingGateProps) {
                 value={organisation}
                 onChange={e => setOrganisation(e.target.value)}
                 placeholder="School, hospital, local authority…"
-                className="w-full bg-transparent font-sans text-sm text-foreground placeholder:text-muted-foreground/50 outline-none"
+                className="w-full bg-transparent font-sans text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-sm"
                 autoComplete="organization"
               />
             </div>
@@ -108,7 +108,7 @@ export function TrainingGate({ scenarioTitle, onComplete }: TrainingGateProps) {
                 id="gate-training"
                 value={priorTraining}
                 onChange={e => setPriorTraining(e.target.value)}
-                className="w-full bg-transparent font-sans text-sm text-foreground outline-none appearance-none cursor-pointer"
+                className="w-full bg-transparent font-sans text-sm text-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-sm appearance-none cursor-pointer"
               >
                 <option value="" disabled className="bg-background text-muted-foreground">
                   Select the training you have completed…

@@ -19,9 +19,10 @@ import { ClosingSequence } from '@/components/simulation/ClosingSequence';
 import { TrainingGate } from '@/components/simulation/TrainingGate';
 import { SceneTitleStamp } from '@/components/LoadingSequence';
 import { PauseOverlay } from '@/components/simulation/PauseOverlay';
+import { GroupChatScene } from '@/components/simulation/GroupChatScene';
 
 function environmentToSceneType(env?: SceneEnvironment): SceneType {
-  if (env === 'classroom' || env === 'playground' || env === 'office' || env === 'home') return env;
+  if (env === 'classroom' || env === 'playground' || env === 'office' || env === 'home' || env === 'home-jamie') return env;
   return 'office';
 }
 
@@ -84,11 +85,9 @@ export default function StoryPage() {
     // Playground: Jamie at [-4, 0.45, 2.8]
     'obs-2': [-4, 1.1, 2.95],
     'vis-1': [-3.78, 0.6, 2.85],
-    // Scene 3a: bruise confirmation
-    'vis-2': [3.5, 0.6, 2.85],
-    'obs-3': [3.5, 1.1, 2.7],
-    // Scene 3b: drawing
-    'vis-3': [3.5, 0.8, 2.8],
+    // Scene 3a: bruise confirmation — playground, near Jamie on bench
+    'vis-2': [-3.78, 0.6, 2.8],
+    'obs-3': [-4, 1.1, 2.8],
   };
 
   // Build evidence position map
@@ -223,6 +222,16 @@ export default function StoryPage() {
     );
   }
 
+  // Group chat scene — "Asking Around" beat in Jamie's Story
+  if (currentScene.id === 'scene-4-risk' && currentScene.choices) {
+    return (
+      <GroupChatScene
+        choices={currentScene.choices}
+        onChoice={(choice) => makeChoice(choice, [])}
+      />
+    );
+  }
+
   const sceneNumber =
     scenario.scenes.findIndex((s) => s.id === currentScene.id) + 1;
 
@@ -232,6 +241,7 @@ export default function StoryPage() {
       <SceneRenderer
         sceneType={sceneType}
         scenarioId={scenarioId}
+        hidePlayer={true}
         evidence={sceneEvidence}
         collectedIds={collectedIds}
         focusedEvidenceId={focusedEvidenceId}

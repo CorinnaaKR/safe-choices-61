@@ -32,7 +32,7 @@ const LIKERT_STATEMENTS = [
   { key: 'realisticScore',      label: 'The scenario felt realistic and true to life' },
   { key: 'toneScore',           label: 'The tone felt appropriate for a difficult subject' },
   { key: 'engagingScore',       label: 'I found the experience engaging' },
-  { key: 'learnedScore',        label: 'I learned something I didn\'t already know' },
+  { key: 'learnedScore',        label: 'The experience taught me something new' },
   { key: 'seriousnessScore',    label: 'I felt the experience respected the seriousness of the topic' },
 ];
 

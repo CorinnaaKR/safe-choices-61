@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SceneType } from './SceneRenderer';
@@ -17,6 +17,7 @@ interface PlayerCharacterProps {
   obstacles?: [number, number, number, number][];
   moveTarget?: THREE.Vector3 | null;
   onArrived?: () => void;
+  visible?: boolean;
 }
 
 const SPEED = 3;
@@ -34,11 +35,11 @@ function hitsObstacle(x: number, z: number, obs: [number, number, number, number
 
 const UP = new THREE.Vector3(0, 1, 0);
 
-export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obstacles = [], moveTarget = null, onArrived }: PlayerCharacterProps) {
+export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obstacles = [], moveTarget = null, onArrived, visible = true }: PlayerCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const keys = useRef<Record<string, boolean>>({});
   const rotationY = useRef(0);
-  const [bobPhase, setBobPhase] = useState(0);
+  const bobPhaseRef = useRef(0);
   const { camera } = useThree();
   const arrivedRef = useRef(false);
   // Scratch vectors — reused every frame to avoid allocation
@@ -48,7 +49,12 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
   const toTarget = useRef(new THREE.Vector3());
 
   useEffect(() => {
-    const onDown = (e: KeyboardEvent) => { keys.current[e.key.toLowerCase()] = true; };
+    const onDown = (e: KeyboardEvent) => {
+      keys.current[e.key.toLowerCase()] = true;
+      if (['arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    };
     const onUp = (e: KeyboardEvent) => { keys.current[e.key.toLowerCase()] = false; };
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
@@ -93,8 +99,8 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
         if (!hitsObstacle(nextX, curZ, obstacles)) groupRef.current.position.x = nextX;
         if (!hitsObstacle(groupRef.current.position.x, nextZ, obstacles)) groupRef.current.position.z = nextZ;
 
-        setBobPhase(prev => prev + delta * 10);
-        groupRef.current.position.y = Math.abs(Math.sin(bobPhase)) * 0.06;
+        bobPhaseRef.current += delta * 10;
+        groupRef.current.position.y = Math.abs(Math.sin(bobPhaseRef.current)) * 0.06;
         onPositionChange(groupRef.current.position);
         return;
       }
@@ -142,8 +148,8 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
 
     // Walking bob
     if (isMoving) {
-      setBobPhase(prev => prev + delta * 10);
-      groupRef.current.position.y = Math.abs(Math.sin(bobPhase)) * 0.06;
+      bobPhaseRef.current += delta * 10;
+      groupRef.current.position.y = Math.abs(Math.sin(bobPhaseRef.current)) * 0.06;
     } else {
       groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, 0, 5 * delta);
     }
@@ -152,7 +158,7 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, 3]}>
+    <group ref={groupRef} position={[0, 0, 3]} visible={visible}>
       {/* Body — torso */}
       <mesh position={[0, 0.6, 0]} castShadow>
         <capsuleGeometry args={[0.16, 0.35, 8, 16]} />

@@ -160,7 +160,10 @@
 /* Hover: text scales 3% + nudges right over 0.15s (ease-out cubic = lerp feel).
    Active: fast scale-down snap to simulate physical press. */
 .hud-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   transition: transform 0.15s cubic-bezier(0.33, 1, 0.68, 1);
   will-change: transform;
 }

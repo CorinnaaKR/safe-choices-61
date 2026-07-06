@@ -32,6 +32,7 @@ function StudentNPC({ position, color, name }: { position: [number, number, numb
   return (
     <NPCCharacter
       position={position}
+      rotation={Math.PI}
       bodyColor={color}
       pose="sitting"
       name={name}
@@ -162,22 +163,22 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         [-1, 0.5, 2].map((z, i) => (
           <group key={`${x}-${i}`}>
             <Desk position={[x, 0, z]} />
-            <Chair position={[x, 0, z + 0.45]} />
+            <Chair position={[x, 0, z + 0.45]} rotation={Math.PI} />
           </group>
         ))
       )}
 
       {/* Background student NPCs for atmosphere */}
-      <StudentNPC position={[-2, 0.45, -0.55]} color="#e74c3c" name="Student" />
-      <StudentNPC position={[0, 0.45, -0.55]} color="#2ecc71" name="Student" />
-      <StudentNPC position={[2, 0.45, -0.55]} color="#9b59b6" name="Student" />
-      <StudentNPC position={[-2, 0.45, 0.95]} color="#e67e22" name="Student" />
-      <StudentNPC position={[0, 0.45, 0.95]} color="#1abc9c" name="Student" />
+      <StudentNPC position={[-2, 0.41, -0.55]} color="#e74c3c" name="Student" />
+      <StudentNPC position={[0, 0.41, -0.55]} color="#2ecc71" name="Student" />
+      <StudentNPC position={[2, 0.41, -0.55]} color="#9b59b6" name="Student" />
+      <StudentNPC position={[-2, 0.41, 0.95]} color="#e67e22" name="Student" />
+      <StudentNPC position={[0, 0.41, 0.95]} color="#1abc9c" name="Student" />
 
       {/* Jamie's desk — back corner, isolated */}
       <group>
         <Desk position={[3.5, 0, 2.5]} />
-        <Chair position={[3.5, 0, 2.95]} />
+        <Chair position={[3.5, 0, 2.95]} rotation={Math.PI} />
         {/* Subtle highlight ring */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3.5, 0.01, 2.5]}>
           <circleGeometry args={[0.8, 32]} />
@@ -185,9 +186,9 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         </mesh>
       </group>
 
-      {/* Jamie NPC — sitting withdrawn at their desk */}
+      {/* Jamie NPC — sitting withdrawn in their chair */}
       <NPCCharacter
-        position={[3.5, 0.45, 2.5]}
+        position={[3.5, 0.41, 2.95]}
         rotation={Math.PI}
         bodyColor="#6B8CA8"
         skinColor="#e8c4a0"

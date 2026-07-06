@@ -26,7 +26,7 @@ function PhoneShell({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
       width: 'min(360px, 82vw)',
-      height: 'min(780px, 92vh)',
+      height: 'min(580px, 82vh)',
       background: '#1c1c1e',
       borderRadius: 44,
       border: '10px solid #1a1a1a',
@@ -258,7 +258,7 @@ export function LazloThread({ onComplete }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 px-4">
+    <div className="fixed inset-0 bg-background flex flex-col md:flex-row items-center justify-center z-50 gap-4 md:gap-8 px-4 md:px-8 py-4 md:py-0">
 
       {/* Day transition card */}
       <AnimatePresence>
@@ -386,33 +386,18 @@ export function LazloThread({ onComplete }: Props) {
         </PhoneShell>
       )}
 
-      {/* Bottom sheet — tone choices (beat 1) and follow-up choices (beat 2) */}
+      {/* Side panel — choices beside the phone on desktop, below on mobile */}
       <AnimatePresence>
         {(beat === 'beat1' || beat === 'beat2') && (
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -16 }}
             transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-            style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'hsl(var(--background))',
-              borderTop: '1px solid hsl(var(--border))',
-              borderRadius: '20px 20px 0 0',
-              padding: '16px 20px 32px',
-              zIndex: 60,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8,
-            }}
+            className="flex flex-col gap-3 w-full md:w-auto order-1 md:order-none"
+            style={{ maxWidth: 'min(320px, 90vw)' }}
           >
-            {/* Drag handle */}
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'hsl(var(--border))', margin: '0 auto 12px' }} />
-
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground text-center mb-1">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
               {beat === 'beat1' ? 'Message Lazlo' : "He's seen it. No reply. What do you do?"}
             </p>
 
@@ -472,14 +457,13 @@ export function LazloThread({ onComplete }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Label */}
+      {/* Label shown when no choices are active */}
       {beat !== 'day-card' && beat !== 'beat3-day' && beat !== 'beat1' && beat !== 'beat2' && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground"
-          style={{ position: 'absolute', bottom: 24 }}
+          className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground order-1 md:order-none"
         >
           Before you arrive
         </motion.p>

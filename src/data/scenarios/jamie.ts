@@ -30,17 +30,16 @@ const evidenceMeta: Record<
   'vis-1':    { category: 'physical',    importance: 'major',    points: 0 },
   'vis-2':    { category: 'physical',    importance: 'critical', points: 0 },
   'obs-3':    { category: 'verbal',      importance: 'critical', points: 0 },
-  'vis-3':    { category: 'behavioural', importance: 'critical', points: 0 },
 };
 
 const sceneEnvironments: Record<string, SceneEnvironment> = {
   'scene-1':         'classroom',
   'scene-2':         'playground',
-  'scene-3a':        'classroom',
+  'scene-3a':        'playground',
   'scene-3b':        'classroom',
-  'scene-4':         'home',
-  'scene-4-delayed': 'home',
-  'scene-4-risk':    'home',
+  'scene-4':         'home-jamie',
+  'scene-4-delayed': 'home-jamie',
+  'scene-4-risk':    'home-jamie',
   'scene-4-silence': 'classroom',
   'scene-5':         'classroom',
   'scene-final-good':     'classroom',
@@ -85,7 +84,7 @@ export const jamieScenario: Scenario = {
     },
     {
       name: 'Your mum',
-      role: 'Your mum',
+      role: 'Parent',
       details: "You can talk to her about most things. She listens, but she'll also tell you honestly when she thinks you're overthinking something — and when she thinks you should tell someone at school.",
     },
     {
@@ -101,8 +100,6 @@ export const jamieScenario: Scenario = {
   ],
   knownFacts: [
     { label: 'First day back', detail: "It's the first day of term after six weeks of summer holiday — you haven't seen Jamie all summer." },
-    { label: "Jamie's mum has a boyfriend at home", detail: "Marcus mentioned he doesn't want Jamie going out after school, so Jamie's been going straight home instead of out with friends." },
-    { label: 'Jamie missed the last few days of last term', detail: 'No explanation was given. Marcus only knows because he lives next door.' },
   ],
   keyTakeaway:
     'You don\'t need to have all the answers. You just need to tell someone you trust. Noticing is enough.',

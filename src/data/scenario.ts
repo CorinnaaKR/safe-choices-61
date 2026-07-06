@@ -238,9 +238,9 @@ export const safeguardingScenario: Scenario = {
         },
         {
           id: 'c3a-3',
-          text: 'Message the group chat — ask if anyone else has noticed Jamie being off',
-          consequence: 'You type it out before you can think too hard about it. A few people reply. "Yeah a bit." "Why, what\'s happened?" You end up saying more than you meant to.',
-          feedback: 'Wanting to understand what\'s happening is natural. But telling your mates instead of an adult just makes it spread — it doesn\'t actually get Jamie any help.',
+          text: 'Message Marcus — ask if he\'s noticed anything from next door',
+          consequence: 'You type it out before you can think too hard about it. Marcus replies quickly. "Yeah a bit." Then: "Why, what\'s happened?" You end up saying more than you meant to.',
+          feedback: 'Wanting to understand what\'s happening is natural. But telling a classmate instead of a trusted adult just makes it spread — it doesn\'t actually get Jamie any help.',
           isOptimal: false,
           nextSceneId: 'scene-4-risk',
           points: 0
@@ -258,22 +258,10 @@ export const safeguardingScenario: Scenario = {
         "Marcus drops into the seat next to you. \"They were off for the last few days of last term — you know that?\" He's not gossiping, just mentioning it. \"I live next door so I noticed. And their mum's boyfriend doesn't want them going out after school, so they just go straight home now.\"",
         "He shrugs and goes back to his lunch. You sit with that for a moment.",
         "The afternoon drags. Jamie sits through lessons barely speaking — so unlike the person who normally can't stop talking.",
-        "In art, you notice Jamie drawing instead of doing the actual task. You drift past and catch a glimpse: a small figure standing alone, surrounded by dark scribbly lines. A much bigger figure looms in the corner, coloured in heavy red.",
-        "Jamie spots you looking and quickly screws the paper up, shoving it in their bag.",
-        '"Just doodling," they mutter.',
-        "It's just a drawing. You've scribbled worse in double maths. Probably.",
         "When the bell goes for the end of the day, the corridor fills fast — bags, chairs, the push for the door. You're halfway out before you notice Jamie is still at their desk. Slowly, slowly putting things away. Like there's no particular reason to be anywhere soon.",
         "By the end of the day, you've noticed a few things now, and they're starting to add up to a feeling you can't quite shake."
       ],
       evidence: [
-        {
-          id: 'vis-3',
-          type: 'visual',
-          title: 'Just a doodle',
-          description: 'Drawing in art',
-          content: "A small lonely figure, a much bigger one looming over it in red. On its own it's just a drawing — kids draw dark stuff sometimes and it means nothing. What stuck with you was how fast Jamie hid it the second they noticed you'd seen.",
-          timestamp: 'Monday, art lesson'
-        },
         {
           id: 'obs-attendance',
           type: 'observation',
@@ -321,7 +309,7 @@ export const safeguardingScenario: Scenario = {
         {
           id: 'c3b-3',
           text: 'Decide you\'ve seen enough — tell a trusted adult today',
-          consequence: 'You keep thinking about the drawing, the missed days, the way Jamie stayed behind when everyone else left. None of it is proof of anything. But it doesn\'t feel like nothing.',
+          consequence: 'You keep thinking about the missed days, the way Jamie stayed behind when everyone else left. None of it is proof of anything. But it doesn\'t feel like nothing.',
           feedback: 'You don\'t need a complete picture to know something\'s wrong.',
           isOptimal: true,
           nextSceneId: 'scene-4',
@@ -343,11 +331,11 @@ export const safeguardingScenario: Scenario = {
     {
       id: 'scene-4',
       title: 'Telling Your Mum',
-      environment: 'home',
+      environment: 'home-jamie',
       narrative: [
         "That evening you bring it up while your mum's making tea. The long sleeves. The way Jamie winced. The bruise you caught a glimpse of. And the image that keeps coming back — Jamie still at their desk when everyone else had gone, not in any hurry to go home.",
         "She's half-listening, stirring something on the hob.",
-        '"He\'s probably just having a hard adjustment," she says. "First few weeks back after summer are always tough. Give it a bit."',
+        '"They\'re probably just having a hard adjustment," she says. "First few weeks back after summer are always tough. Give it a bit."',
         "You're quiet for a moment.",
         '"I really don\'t think it\'s that," you say.',
         "She turns around properly now. Looks at you.",
@@ -448,7 +436,7 @@ export const safeguardingScenario: Scenario = {
       title: 'At Lunch',
       environment: 'classroom',
       narrative: [
-        "You tell them everything. The sleeves. The bruise. The way Jamie winced when Marcus grabbed their arm. The drawing in art. All the things that have been sitting in your chest.",
+        "You tell them everything. The sleeves. The bruise. The way Jamie winced when Marcus grabbed their arm. All the things that have been sitting in your chest.",
         "Your tutor listens without rushing you.",
         '"Thank you for telling me. I mean that." A pause. "I need to speak to Mrs Okonkwo — she\'s our designated safeguarding lead. It\'s her job to take this forward properly. I can\'t keep it between us, but it will be handled carefully. I promise you that."',
         "You nod.",
@@ -471,9 +459,9 @@ export const safeguardingScenario: Scenario = {
     {
       id: 'scene-4-delayed',
       title: 'A Sleepless Night',
-      environment: 'home',
+      environment: 'home-jamie',
       narrative: [
-        "That night you can't sleep. Jamie's face keeps surfacing — the wince, the hidden wrist, the screwed-up drawing.",
+        "That night you can't sleep. Jamie's face keeps surfacing — the wince, the hidden wrist.",
         "You tell yourself you'll wait, watch a bit longer, be sure before you say anything.",
         "But a question keeps circling: what if waiting means Jamie goes through more of this alone, for nothing?",
         "By morning, you've made up your mind."
@@ -504,10 +492,10 @@ export const safeguardingScenario: Scenario = {
     {
       id: 'scene-4-risk',
       title: 'Asking Around',
-      environment: 'home',
+      environment: 'home-jamie',
       narrative: [
-        "That evening you open the group chat and type it out: \"hey has anyone noticed jamie being a bit off lately? like really off? kinda worried\"",
-        "A few people reply quickly. \"Yeah a bit.\" \"Why, what's happened?\" \"Is everything okay?\"",
+        "That evening you open your messages and text Marcus — he lives next door, after all. Maybe he's noticed something too.",
+        "He messages back almost straight away. \"Yeah a bit.\" Then: \"Why, what's happened?\"",
         "You end up saying more than you meant to. The long sleeves. The way they winced. The bruise you thought you saw.",
         "You put your phone down and feel slightly better.",
         "Until the next morning.",
@@ -519,15 +507,15 @@ export const safeguardingScenario: Scenario = {
           id: 'obs-4',
           type: 'observation',
           title: 'Word got around',
-          description: 'The morning after the group chat',
-          content: 'Jamie knows someone was talking about them — and they\'re taking it as betrayal, not someone caring. Telling your mates instead of a teacher or parent meant it just did the rounds instead of reaching anyone who could actually help. Jamie might be harder to talk to now than before.',
+          description: 'The morning after you messaged Marcus',
+          content: 'Jamie knows someone was talking about them — and they\'re taking it as betrayal, not someone caring. Telling a classmate instead of a teacher or parent meant it got around instead of reaching anyone who could actually help. Jamie might be harder to talk to now than before.',
           timestamp: 'Tuesday morning'
         }
       ],
       choices: [
         {
           id: 'c4r-1',
-          text: 'Tell your mum what happened — all of it, including the group chat',
+          text: 'Tell your mum what happened — all of it, including messaging Marcus',
           consequence: '"That probably wasn\'t the best move," your mum says, not unkindly. "But the important thing is what you noticed. Tell your form tutor tomorrow — that\'s the right person for this."',
           feedback: 'Owning the part that didn\'t go well is hard. But it opened the right path again.',
           isOptimal: true,
@@ -538,7 +526,7 @@ export const safeguardingScenario: Scenario = {
           id: 'c4r-2',
           text: 'Say nothing more — hope it dies down',
           consequence: 'You tell yourself Jamie will get over it. The days go by. They don\'t.',
-          feedback: 'The group chat made things harder — and now the moment to put it right is passing too.',
+          feedback: 'Letting it drift made things harder — and now the moment to put it right is passing too.',
           isOptimal: false,
           nextSceneId: 'scene-4-silence',
           points: 0
@@ -585,6 +573,24 @@ export const safeguardingScenario: Scenario = {
           text: 'Keep being a normal friend',
           consequence: 'You don\'t make it a big thing. You just sit with Jamie at lunch, same as always, and let them set the pace.',
           feedback: 'Consistency matters as much as the original telling did — Jamie needs things to feel normal again.',
+          isOptimal: true,
+          nextSceneId: 'scene-final-good',
+          points: 10
+        },
+        {
+          id: 'c5-2',
+          text: 'Prompt Jamie to speak to a teacher themselves',
+          consequence: 'You say it quietly, almost offhand: "You know you can talk to your form tutor, right? If you ever wanted to." Jamie doesn\'t say much — just nods, slowly. But they heard it.',
+          feedback: 'You can\'t make someone ready to talk. But planting the idea — gently, without pressure — is still doing something.',
+          isOptimal: true,
+          nextSceneId: 'scene-final-good',
+          points: 10
+        },
+        {
+          id: 'c5-3',
+          text: 'Ask Jamie if a teacher has spoken to them',
+          consequence: '"Did anyone — like a teacher or anything — come and check in with you?" Jamie glances at you. "Mrs Okonkwo spoke to me. It was... okay, actually." A pause. "Thanks for, you know."',
+          feedback: 'Checking in — not to get information, but to let Jamie know you\'re still paying attention — is part of what being a good friend looks like after something like this.',
           isOptimal: true,
           nextSceneId: 'scene-final-good',
           points: 10

@@ -5,13 +5,14 @@ import { EffectComposer, DepthOfField, Vignette, Outline, Selection, N8AO, Bloom
 import { ClassroomScene } from './ClassroomScene';
 import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
-import { HomeScene, HOME_OBSTACLES } from './HomeScene';
+import { HomeScene, HOME_OBSTACLES, HOME_OBSTACLES_BASE } from './HomeScene';
+import { JamieHomeScene } from './JamieHomeScene';
 import { CameraController } from './CameraController';
 import { PlayerCharacter } from './PlayerCharacter';
 import { Evidence } from '@/types/simulation';
 import * as THREE from 'three';
 
-export type SceneType = 'classroom' | 'playground' | 'office' | 'home';
+export type SceneType = 'classroom' | 'playground' | 'office' | 'home' | 'home-jamie';
 
 // [minX, maxX, minZ, maxZ, minY, maxY] — kept a little inside each room's
 // actual wall/ceiling positions so the orbit camera never ends up outside
@@ -20,6 +21,7 @@ const ROOM_BOUNDS: Record<SceneType, [number, number, number, number, number, nu
   classroom:  [-5.6, 5.6, -4.6, 4.6, 0.3, 3.6],
   office:     [-3.6, 3.6, -2.6, 2.6, 0.3, 3.6],
   home:       [-4.1, 4.1, -3.6, 3.6, 0.3, 2.6],
+  'home-jamie': [-4.1, 4.1, -3.6, 3.6, 0.3, 3.0],
   playground: [-9.5, 9.5, -7.5, 7.5, 0.3, 6],
 };
 
@@ -27,6 +29,8 @@ interface SceneRendererProps {
   sceneType: SceneType;
   /** Which scenario is active — gates scenario-specific NPCs/props in shared environments (e.g. Lazlo's NPC only appears in his own story, even though Jamie's Story also uses the 'home' environment). */
   scenarioId?: string;
+  /** Hide the player avatar — used during dialogue/decision scenes so the character doesn't block NPC view. */
+  hidePlayer?: boolean;
   evidence: Evidence[];
   collectedIds: string[];
   focusedEvidenceId: string | null;
@@ -39,6 +43,7 @@ interface SceneRendererProps {
 export function SceneRenderer({
   sceneType,
   scenarioId,
+  hidePlayer = false,
   evidence,
   collectedIds,
   focusedEvidenceId,
@@ -96,14 +101,14 @@ export function SceneRenderer({
   return (
     <div className="absolute inset-0">
       <Canvas
-        camera={{ position: [0, 3, 6], fov: 50 }}
+        camera={{ position: [0, 1.05, 3], fov: 75 }}
         shadows
         gl={{
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: sceneType === 'playground' ? 1.2 : sceneType === 'home' ? 0.85 : 1.0,
+          toneMappingExposure: sceneType === 'playground' ? 1.2 : sceneType === 'home' ? 1.1 : sceneType === 'home-jamie' ? 1.4 : 1.0,
         }}
-        style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : '#211c19' }}
+        style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19' }}
       >
         <Suspense fallback={null}>
           <Selection>
@@ -118,9 +123,10 @@ export function SceneRenderer({
           <PlayerCharacter
             onPositionChange={handlePlayerMove}
             sceneType={sceneType}
-            obstacles={sceneType === 'home' ? HOME_OBSTACLES : undefined}
+            obstacles={sceneType === 'home' ? (scenarioId === 'lazlo-case' ? HOME_OBSTACLES : HOME_OBSTACLES_BASE) : undefined}
             moveTarget={walkTarget}
             onArrived={handlePlayerArrived}
+            visible={false}
           />
 
           {sceneType === 'classroom' && (
@@ -160,9 +166,10 @@ export function SceneRenderer({
               onFocusEvidence={handleFocusEvidence}
             />
           )}
+          {sceneType === 'home-jamie' && <JamieHomeScene />}
 
           {/* Environment-based lighting for realistic reflections */}
-          <Environment preset={sceneType === 'playground' ? 'park' : sceneType === 'home' ? 'night' : 'apartment'} />
+          <Environment preset={sceneType === 'playground' ? 'park' : sceneType === 'home' ? 'night' : sceneType === 'home-jamie' ? 'warehouse' : 'apartment'} />
 
           {/* Contact shadows for grounding objects */}
           <ContactShadows
@@ -207,9 +214,9 @@ export function SceneRenderer({
           </EffectComposer>
 
           <fog attach="fog" args={[
-            sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : '#211c19',
-            sceneType === 'home' ? 8 : 12,
-            sceneType === 'home' ? 18 : 30,
+            sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19',
+            sceneType === 'home' || sceneType === 'home-jamie' ? 8 : 12,
+            sceneType === 'home' || sceneType === 'home-jamie' ? 18 : 30,
           ]} />
           </Selection>
         </Suspense>

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CastMember, Evidence, KnownFact, Mode } from '@/types/simulation';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface KnowledgePanelProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface KnowledgePanelProps {
 
 export function KnowledgePanel({ open, onClose, cast, knownFacts, collectedEvidence, mode }: KnowledgePanelProps) {
   const evidenceLabel = mode === 'learning' ? 'Observations' : 'Evidence';
+  const trapRef = useFocusTrap(open);
 
   return (
     <AnimatePresence>
@@ -19,7 +21,7 @@ export function KnowledgePanel({ open, onClose, cast, knownFacts, collectedEvide
         <>
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-background/40 backdrop-blur-sm z-20 pointer-events-auto"
+            className="absolute inset-0 bg-background/70 z-20 pointer-events-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -28,6 +30,10 @@ export function KnowledgePanel({ open, onClose, cast, knownFacts, collectedEvide
 
           {/* Panel */}
           <motion.div
+            ref={trapRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="What you know"
             className="absolute top-0 right-0 h-full w-[min(360px,90vw)] bg-background border-l border-border z-30 pointer-events-auto flex flex-col overflow-hidden"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}

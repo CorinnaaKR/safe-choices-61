@@ -7,6 +7,7 @@ import { InspectViewer } from './InspectViewer';
 import { KnowledgePanel } from './KnowledgePanel';
 import { playUiTick } from '@/lib/sfx';
 import { useHudActivity } from '@/hooks/useHudActivity';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface SceneHUDProps {
   scenarioTitle: string;
@@ -52,6 +53,9 @@ export function SceneHUD({
   onComplete,
   onAddObservation,
 }: SceneHUDProps) {
+  const [onboardingDone, setOnboardingDone] = useState(() =>
+    !!localStorage.getItem('heli-onboarding-seen')
+  );
   const [journalOpen, setJournalOpen] = useState(false);
   const [knowledgeOpen, setKnowledgeOpen] = useState(false);
   const [visibleParagraph, setVisibleParagraph] = useState(() =>
@@ -60,9 +64,17 @@ export function SceneHUD({
   const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const [exploreAcknowledged, setExploreAcknowledged] = useState(false);
+  const [choicesInteractive, setChoicesInteractive] = useState(false);
   const prevSceneId = useRef(currentScene.id);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const choicesTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const dismissOnboarding = () => {
+    localStorage.setItem('heli-onboarding-seen', '1');
+    setOnboardingDone(true);
+  };
+
+  const journalTrapRef = useFocusTrap(journalOpen);
   const sceneEvidence = currentScene.evidence || [];
   const uncollected = sceneEvidence.filter(
     e => !gameState.collectedEvidence.some(c => c.id === e.id)
@@ -102,6 +114,21 @@ export function SceneHUD({
   const forceVisible = journalOpen || knowledgeOpen || !!inspectedEvidence || showFeedback || !!pendingChoice || narrativeUnread || choicesReady || needsExplorePrompt;
   const hudOpacity = forceVisible ? 1 : userActive ? 1 : 0.12;
 
+  // Delay pointer-event activation on the choices panel to prevent ghost taps:
+  // when the player clicks "Continue" on the last narrative paragraph, the narrative
+  // unmounts and choices render at the same position — without this delay the touch
+  // event can land on the first choice button before the player intends to choose.
+  useEffect(() => {
+    if (choicesTimer.current) clearTimeout(choicesTimer.current);
+    if (choicesReady) {
+      setChoicesInteractive(false);
+      choicesTimer.current = setTimeout(() => setChoicesInteractive(true), 450);
+    } else {
+      setChoicesInteractive(false);
+    }
+    return () => { if (choicesTimer.current) clearTimeout(choicesTimer.current); };
+  }, [choicesReady]);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (showFeedback) return;
@@ -124,10 +151,10 @@ export function SceneHUD({
     ? Math.max(1, gameState.collectedEvidence.findIndex(e => e.id === inspectedEvidence.id) + 1)
     : 1;
 
-  // Lazlo's Story, scene-l1: keep the room dark/veiled while the narrative is
+  // Lazlo's Story, scene-l0: keep the room dark/veiled while the narrative is
   // still describing the doorstep (knock → let in), so the visual matches the
   // text instead of showing the full lit living room from the first frame.
-  const atLazloDoorstep = currentScene.id === 'scene-l1' && visibleParagraph <= 4;
+  const atLazloDoorstep = currentScene.id === 'scene-l0';
 
   return (
     <>
@@ -152,7 +179,7 @@ export function SceneHUD({
       >
       {/* ── TOP-CENTRE: scene identity + clue count ─────────────────────── */}
       {!inspectedEvidence && !showFeedback && (
-        <div className="absolute top-6 inset-x-0 flex flex-col items-center gap-1.5 pointer-events-none">
+        <div className="absolute top-20 md:top-6 inset-x-0 flex flex-col items-center gap-1.5 pointer-events-none">
           <div className="bg-background/55 backdrop-blur-sm px-4 py-1.5 flex flex-col items-center gap-1 rounded-sm">
             <motion.p
               initial={{ opacity: 0, y: -6 }}
@@ -194,12 +221,14 @@ export function SceneHUD({
         <div className="absolute top-4 left-4 md:top-auto md:bottom-6 md:left-6 pointer-events-auto flex flex-col gap-2">
           <button
             onClick={onExit}
+            aria-label="Exit to menu"
             className="key-hint hover:text-foreground transition-colors hud-btn block text-left"
           >
             <span className="hidden md:inline"><b>[ESC]</b> </span>Menu
           </button>
           <button
             onClick={() => setJournalOpen(!journalOpen)}
+            aria-label={mode === 'learning' ? 'Open observations' : 'Open evidence'}
             className="key-hint hover:text-foreground transition-colors hud-btn block text-left"
           >
             <span className="hidden md:inline"><b>[TAB]</b> </span>
@@ -263,7 +292,7 @@ export function SceneHUD({
                     </span>
                     <motion.button
                       onClick={advanceNarrative}
-                      className="flex items-center gap-2 bg-primary/90 hover:bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-[0.14em] px-4 py-2 transition-colors pointer-events-auto"
+                      className="flex items-center gap-2 bg-primary/90 hover:bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-[0.14em] px-4 py-3 min-h-[44px] transition-colors pointer-events-auto"
                       animate={{ opacity: [0.85, 1, 0.85] }}
                       transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                     >
@@ -346,7 +375,10 @@ export function SceneHUD({
 
       {/* ── DECISION PANEL: bottom-right ─────────────────────────────────── */}
       {!showFeedback && sceneReady && allRevealed && currentScene.isDecisionPoint && !needsExplorePrompt && currentScene.choices && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-auto md:w-[400px] pointer-events-auto">
+        <div
+          className="absolute bottom-4 left-4 right-4 md:left-auto md:w-[400px] pointer-events-auto"
+          style={{ pointerEvents: choicesInteractive ? 'auto' : 'none' }}
+        >
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -435,7 +467,7 @@ export function SceneHUD({
       {/* ── FEEDBACK OVERLAY ─────────────────────────────────────────────── */}
       {showFeedback && lastChoice && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
-          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-background/80" />
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -451,6 +483,10 @@ export function SceneHUD({
       <AnimatePresence>
         {journalOpen && (
           <motion.div
+            ref={journalTrapRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={mode === 'learning' ? 'Observations' : 'Evidence'}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -494,6 +530,63 @@ export function SceneHUD({
         )}
       </AnimatePresence>
 
+      {/* ── ONBOARDING OVERLAY: shown once on first play ─────────────────── */}
+      <AnimatePresence>
+        {!onboardingDone && sceneReady && (
+          <motion.div
+            className="absolute inset-0 z-50 flex items-center justify-center pointer-events-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="absolute inset-0 bg-background/75" onClick={dismissOnboarding} />
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
+              className="relative z-10 w-[90vw] max-w-sm case-panel p-8 flex flex-col gap-5"
+            >
+              <div className="space-y-1">
+                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary">How to play</p>
+                <h2 className="font-sans text-lg font-bold text-foreground leading-snug">You're here. Look around.</h2>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  { key: mode === 'learning' ? 'Tap' : 'Click', label: 'objects and people to look closer' },
+                  { key: 'Drag', label: 'to turn and explore the room' },
+                  { key: 'Tap anything', label: 'that feels significant' },
+                ].map(({ key, label }) => (
+                  <li key={key} className="flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">{key}</span>
+                    <span>{label}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={dismissOnboarding}
+                className="w-full bg-primary text-primary-foreground font-sans text-sm font-semibold px-5 py-3 hover:bg-primary/90 transition-colors"
+                autoFocus
+              >
+                I'm ready
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── ARIA LIVE: evidence count announcements for screen readers ─── */}
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {gameState.collectedEvidence.length > 0 && (
+          `${mode === 'learning' ? 'Observation' : 'Evidence'} logged. ${gameState.collectedEvidence.length} collected so far.`
+        )}
+      </div>
+
       {/* ── WHAT YOU KNOW PANEL ──────────────────────────────────────────── */}
       <KnowledgePanel
         open={knowledgeOpen}
@@ -509,7 +602,7 @@ export function SceneHUD({
         <button
           onClick={() => setKnowledgeOpen(true)}
           aria-label="What you know"
-          className="absolute top-4 right-4 pointer-events-auto flex items-center gap-2 px-3 py-2 bg-background/90 border border-border hover:border-primary/70 hover:bg-background transition-colors backdrop-blur-sm"
+          className="absolute top-4 right-4 pointer-events-auto flex items-center gap-2 px-3 py-3 min-h-[44px] bg-background/90 border border-border hover:border-primary/70 hover:bg-background transition-colors"
           style={{ zIndex: 15 }}
         >
           <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary shrink-0">

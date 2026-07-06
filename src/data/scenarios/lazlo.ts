@@ -20,7 +20,7 @@ export const lazloScenario: Scenario = {
   difficulty: 2,
   durationMinutes: 20,
   status: 'available',
-  maxPoints: 70,
+  maxPoints: 80,
   // Demo scoping: Lazlo's Story is the training-mode story (scoring + certificate).
   // Jamie's Story covers the personal/Story-mode side. Long-term, each story
   // will have both POVs — see HANDOVER.md.
@@ -50,7 +50,7 @@ export const lazloScenario: Scenario = {
     {
       name: 'Lazlo',
       role: 'Your old friend',
-      details: "Lazlo is 24. His uncle Joey was the closest thing he had to a father figure. Since Joey died six months ago, Lazlo has withdrawn from almost everyone — changed his look, stopped replying, quit his job.",
+      details: "Lazlo is 24. His uncle Joey was the closest thing he had to a father figure. Since Joey died six months ago, Lazlo has withdrawn from almost everyone — changed his look, stopped replying, lost his job.",
     },
     {
       name: 'Lilly',
@@ -192,20 +192,18 @@ export const lazloScenario: Scenario = {
 
   // ── Scenes ────────────────────────────────────────────────────────────────
   scenes: [
-    // ── Scene 1: Arriving ─────────────────────────────────────────────────
+    // ── Scene 0: The doorstep ────────────────────────────────────────────
     {
-      id: 'scene-l1',
-      title: 'Wednesday Afternoon',
+      id: 'scene-l0',
+      title: 'Wednesday Afternoon — The Doorstep',
       environment: 'home',
       isDecisionPoint: true,
       narrative: [
-        'You knock. There is a pause before anything moves behind the door.',
-        'Lazlo opens it. He was not expecting you — you can see it in his face before his expression closes.',
-        "He has grown a beard since you last saw him. He looks thinner. The flat is dark behind him.",
-        "'Evan.' Not a question. He steps back to let you in.",
-        "The TV is on in the living room. A rolling news channel — something about national security legislation. Lazlo follows your eyes to the screen and picks up the remote. He mutes it.",
-        "He doesn't explain why. He sets the remote down and looks at you.",
-        "'You want something? Coffee? Water?'",
+        "You knock. There's a pause before anything moves behind the door.",
+        'A chain rattles, but the door only opens a few inches.',
+        "Lazlo looks out at you through the gap. He's grown a full beard since you last saw him — it changes his whole face. He looks thinner too.",
+        '\'Evan.\' Not a greeting. More like he\'s confirming it really is you.',
+        "He doesn't open the door any further.",
       ],
       evidence: [
         {
@@ -214,12 +212,63 @@ export const lazloScenario: Scenario = {
           title: 'Lazlo — First Impression',
           description: 'Appearance and immediate behaviour at the door',
           content:
-            "Lazlo has grown a full beard since you last saw him and appears to have lost weight. His eyes are alert but guarded. The flat behind him is dark in the middle of the afternoon. He lets you in without warmth — not hostile, just absent. The person who would normally have been halfway down the stairs before you knocked isn't here.",
-          timestamp: 'Wednesday, 2:14 PM',
+            "Lazlo has grown a full beard since you last saw him and appears to have lost weight. His eyes are alert but guarded, looking out at you through a few inches of door gap with the chain still on. The person who would normally have flung the door open before you finished knocking isn't here.",
+          timestamp: 'Wednesday, 2:13 PM',
           category: 'behavioural',
           importance: 'major',
           points: 10,
         },
+      ],
+      choices: [
+        {
+          id: 'c-l0-1',
+          text: '"I was just passing — thought I\'d see how you\'re doing."',
+          consequence: 'He looks at you a moment longer, then unhooks the chain and steps back to let you in.',
+          feedback: 'Gentle and low-pressure. It works, but doesn\'t tell Lazlo you\'ve actually noticed anything is different.',
+          isOptimal: false,
+          nextSceneId: 'scene-l1',
+          points: 5,
+          skillArea: 'recognising-signs',
+          trustDelta: 2,
+        },
+        {
+          id: 'c-l0-2',
+          text: '"You\'ve not been answering your phone. I was getting worried."',
+          consequence: 'Something shifts in his face. He unhooks the chain and steps back to let you in.',
+          feedback: 'Naming the worry directly, without accusation, is the strongest opener — it shows Lazlo you noticed his withdrawal, and gives him an easy way to let you in without losing face.',
+          isOptimal: true,
+          nextSceneId: 'scene-l1',
+          points: 10,
+          skillArea: 'recognising-signs',
+          trustDelta: 3,
+        },
+        {
+          id: 'c-l0-3',
+          text: '"Can I come in for a sec? It\'s freezing out here."',
+          consequence: 'He hesitates, then unhooks the chain — but he\'s more guarded than before.',
+          feedback: 'Practical, but it sidesteps the moment. Lazlo lets you in, but you\'ve missed a chance to show him you noticed something was wrong.',
+          isOptimal: false,
+          nextSceneId: 'scene-l1',
+          points: 0,
+          skillArea: 'recognising-signs',
+          trustDelta: 0,
+        },
+      ],
+    },
+
+    // ── Scene 1: Arriving ─────────────────────────────────────────────────
+    {
+      id: 'scene-l1',
+      title: 'Wednesday Afternoon',
+      environment: 'home',
+      isDecisionPoint: true,
+      narrative: [
+        'He steps back to let you in. The flat is dark behind him.',
+        "The TV is on in the living room. A rolling news channel — something about national security legislation. Lazlo follows your eyes to the screen and picks up the remote. He mutes it.",
+        "He doesn't explain why. He sets the remote down and looks at you.",
+        "'You want something? Coffee? Water?'",
+      ],
+      evidence: [
         {
           id: 'beh-l0',
           type: 'observation',

@@ -39,13 +39,19 @@ interface HomeSceneProps {
  * Axis-aligned bounding boxes for furniture the player cannot walk through.
  * Format: [minX, maxX, minZ, maxZ] in world space.
  */
-export const HOME_OBSTACLES: [number, number, number, number][] = [
+/** Furniture-only obstacles — used in Jamie's Story, where Lazlo's NPC is not present. */
+export const HOME_OBSTACLES_BASE: [number, number, number, number][] = [
   [-0.95, 0.95, -3.2, -2.45],   // sofa
   [-0.42, 0.42, -1.32, -0.88],  // coffee table
   [-4.15, -3.05, -1.05, 0.25],  // TV + stand (rotated against left wall)
   [2.35,  2.65,  -2.65, -2.35], // floor lamp (thin post)
   [3.65,  4.45,  -2.85, -1.55], // bookshelf (against right wall)
   [1.28,  1.82,  -2.38, -1.82], // side table
+];
+
+/** Furniture + Lazlo NPC — used only in Lazlo's Story. */
+export const HOME_OBSTACLES: [number, number, number, number][] = [
+  ...HOME_OBSTACLES_BASE,
   [-0.32, 0.32,  -2.72, -2.08], // Lazlo NPC
 ];
 
@@ -57,7 +63,7 @@ export const HOME_EVIDENCE_POSITIONS: Record<string, [number, number, number]> =
   // Environmental — free in room
   'env-l1': [-1.2, 2.1, -3.94],   // poster on back wall
   'env-l2': [2.2, 1.9, -3.94],    // newspaper clippings on back wall
-  'env-l3': [-3.7, 0.85, -2.6],   // Uncle Joey shrine
+  'env-l3': [-4.49, 0.85, -2.6],  // Uncle Joey shrine (left wall)
   'env-l4': [0, 0.36, -0.78],     // pamphlet on coffee table
   'env-l5': [-3.92, 1.5, 0.2],    // curtained window
   // Documentation
@@ -149,11 +155,11 @@ export function HomeScene({
 
       {/* ── Lighting ──────────────────────────────────────────────────────── */}
       {/* Ambient — curtains drawn but not pitch dark; enough to read the room */}
-      <ambientLight intensity={0.35} color="#3A3020" />
+      <ambientLight intensity={0.7} color="#5A4A30" />
       {/* Ceiling pendant — main source */}
-      <pointLight position={[0, 2.7, -0.5]} intensity={2.8} distance={10} color="#C08840" decay={2} castShadow shadow-mapSize={[512, 512]} />
+      <pointLight position={[0, 2.7, -0.5]} intensity={4.5} distance={12} color="#C08840" decay={2} castShadow shadow-mapSize={[512, 512]} />
       {/* Soft overhead fill to lift the whole room */}
-      <directionalLight position={[0, 4, 1]} intensity={0.4} color="#B89060" />
+      <directionalLight position={[0, 4, 1]} intensity={0.8} color="#B89060" />
       {/* Floor lamp fill — warm corner */}
       <pointLight position={[2.5, 1.6, -2.5]} intensity={1.4} distance={6} color="#D4A050" decay={2} />
       {/* TV screen fill */}
@@ -177,13 +183,14 @@ export function HomeScene({
 
           <NPCCharacter
             position={[0, 0, -2.4]}
-            rotation={Math.PI}
+            rotation={0}
             bodyColor="#6B5C7A"
             skinColor="#D4A87A"
             pose="hunched"
             name="Lazlo"
             behaviorHint="Not responding"
             fidget={0.15}
+            hasBeard
             hotspots={lazloHotspots}
             onHotspotClick={handleLazloHotspot}
           />
@@ -203,7 +210,7 @@ export function HomeScene({
       <SideTable position={[1.55, 0, -2.1]} />
 
       {/* ── Door (right wall, near front) ─────────────────────────────────── */}
-      <Door position={[3.8, 0, 2.4]} rotation={-Math.PI / 2} />
+      <Door position={[4.47, 0, 2.4]} rotation={-Math.PI / 2} />
 
       {/* ── Curtained window (left wall) ──────────────────────────────────── */}
       <group position={[-4.48, 1.5, 0.2]} rotation={[0, Math.PI / 2, 0]}>
@@ -213,12 +220,15 @@ export function HomeScene({
       {/* ── Uncle Joey shrine corner (left-back) — Lazlo's Story only ──────── */}
       {showLazlo && (
         <>
-          <PhotoCluster position={[-3.7, 0.85, -2.6]} />
-          {/* Small shelf the shrine sits on */}
-          <mesh position={[-3.95, 0.72, -2.6]} castShadow>
+          {/* Shelf mounted on left wall */}
+          <mesh position={[-4.46, 0.72, -2.6]} castShadow>
             <boxGeometry args={[0.08, 0.02, 0.55]} />
             <meshStandardMaterial color="#3A2A18" roughness={0.7} />
           </mesh>
+          {/* Photos face into the room from the left wall */}
+          <group position={[-4.49, 0.85, -2.6]} rotation={[0, -Math.PI / 2, 0]}>
+            <PhotoCluster position={[0, 0, 0]} />
+          </group>
         </>
       )}
 
@@ -227,8 +237,8 @@ export function HomeScene({
         position={[0, 0.35, -1.1]}
         label="Remote control"
         note="An old TV remote. The batteries have been left out beside it."
-        hitRadius={0.14}
-        hitY={0.05}
+        hitRadius={0.25}
+        hitY={0.08}
       >
         <mesh position={[0, 0.04, 0]} castShadow>
           <boxGeometry args={[0.06, 0.016, 0.14]} />
@@ -240,8 +250,8 @@ export function HomeScene({
         position={[-0.35, 0.35, -1.15]}
         label="Empty mug"
         note="A mug with dried coffee residue. It has been sitting here a while."
-        hitRadius={0.1}
-        hitY={0.06}
+        hitRadius={0.22}
+        hitY={0.1}
       >
         <Mug position={[0, 0, 0]} color="#3A3A3A" />
       </FlavourObject>
@@ -265,18 +275,18 @@ export function HomeScene({
             position={[4.05, 0.55, -1.6]}
             label="Photo"
             note="A photo of Lazlo and his girlfriend at a festival. It has been turned face-down."
-            hitRadius={0.12}
-            hitY={0.06}
+            hitRadius={0.28}
+            hitY={0.1}
           >
             <WallFrame position={[0, 0, 0]} rotation={Math.PI / 2} />
           </FlavourObject>
 
           <FlavourObject
-            position={[-3.85, 0.73, -2.4]}
+            position={[-4.44, 0.73, -2.35]}
             label="Candle"
             note="A half-burned candle. Part of the corner where the photos are arranged."
-            hitRadius={0.08}
-            hitY={0.06}
+            hitRadius={0.2}
+            hitY={0.1}
           >
             <mesh position={[0, 0.06, 0]} castShadow>
               <cylinderGeometry args={[0.025, 0.028, 0.12, 10]} />

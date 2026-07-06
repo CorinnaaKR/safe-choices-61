@@ -70,9 +70,6 @@ export function SceneTitleStamp({ index, title }: SceneTitleStampProps) {
           className="absolute inset-x-0 top-[20%] z-20 flex justify-center pointer-events-none"
         >
           <div className="text-center">
-            <p className="hud-label mb-2">
-              Scene {String(index).padStart(2, '0')}
-            </p>
             <div className="rule-h w-12 mx-auto mb-2 bg-primary" />
             <h2 className="font-mono text-xl md:text-2xl uppercase tracking-[0.2em] text-foreground hud-float">
               {title}

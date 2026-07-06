@@ -46,13 +46,15 @@ export function PreFeedbackGate({ onComplete, domain }: Props) {
 
         {/* Q1 */}
         <div className="mb-7">
-          <p className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-4">
+          <p id="q1-label" className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-4">
             Have you previously completed safeguarding training?
           </p>
-          <div className="space-y-2">
+          <div role="radiogroup" aria-labelledby="q1-label" className="space-y-2">
             {['Yes', 'No', "I'm not sure"].map((opt) => (
               <button
                 key={opt}
+                role="radio"
+                aria-checked={priorTraining === opt}
                 onClick={() => setPriorTraining(opt)}
                 className={`w-full text-left px-4 py-3 border transition-colors text-sm ${
                   priorTraining === opt
@@ -68,13 +70,15 @@ export function PreFeedbackGate({ onComplete, domain }: Props) {
 
         {/* Q2 */}
         <div className="mb-8">
-          <p className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-4">
+          <p id="q2-label" className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-4">
             {(domain && CONFIDENCE_QUESTION_BY_DOMAIN[domain]) ?? DEFAULT_CONFIDENCE_QUESTION}
           </p>
-          <div className="space-y-2">
+          <div role="radiogroup" aria-labelledby="q2-label" className="space-y-2">
             {CONFIDENCE_OPTIONS.map((opt) => (
               <button
                 key={opt}
+                role="radio"
+                aria-checked={confidenceBefore === opt}
                 onClick={() => setConfidenceBefore(opt)}
                 className={`w-full text-left px-4 py-3 border transition-colors text-sm ${
                   confidenceBefore === opt

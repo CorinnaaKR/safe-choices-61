@@ -58,7 +58,7 @@ export function InteractiveObject({
           }}
         >
           <boxGeometry args={[0.9, 1.2, 0.6]} />
-          <meshBasicMaterial transparent opacity={0} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       )}
 
@@ -83,7 +83,7 @@ export function InteractiveObject({
       {collected && (
         <Html position={[0, 1.1, 0]} center zIndexRange={[5, 0]}>
           <div className="bg-background/80 border border-border px-2 py-0.5 pointer-events-none whitespace-nowrap">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary">
               Logged ✓
             </p>
           </div>

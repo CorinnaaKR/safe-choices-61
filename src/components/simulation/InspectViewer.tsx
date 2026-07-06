@@ -175,6 +175,7 @@ function TVInspect({ visual }: { visual: EvidenceVisual }) {
         <div
           className="absolute bottom-0 left-0 right-0 overflow-hidden py-1 px-2"
           style={{ background: '#B91C1C' }}
+          aria-hidden="true"
         >
           <motion.p
             className="font-mono text-[9px] text-white whitespace-nowrap uppercase tracking-wider"

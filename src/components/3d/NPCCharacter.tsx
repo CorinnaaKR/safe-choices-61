@@ -43,6 +43,8 @@ interface NPCCharacterProps {
   pullsSleeves?: boolean;
   /** Path to a .glb model — when set, replaces the primitive geometry */
   modelUrl?: string | null;
+  /** Render a full beard on this NPC */
+  hasBeard?: boolean;
 }
 
 export function NPCCharacter({
@@ -58,6 +60,7 @@ export function NPCCharacter({
   fidget = 0.5,
   pullsSleeves = false,
   modelUrl = null,
+  hasBeard = false,
 }: NPCCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Group>(null);
@@ -161,6 +164,28 @@ export function NPCCharacter({
         <meshStandardMaterial color="#4A2E14" roughness={0.9} metalness={0} />
       </mesh>
 
+      {/* Full beard — chin, jaw, mustache */}
+      {hasBeard && (
+        <>
+          <mesh position={[0, headY - 0.10, 0.13]}>
+            <sphereGeometry args={[0.075, 10, 10]} />
+            <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
+          </mesh>
+          <mesh position={[0.10, headY - 0.05, 0.11]}>
+            <sphereGeometry args={[0.06, 10, 10]} />
+            <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
+          </mesh>
+          <mesh position={[-0.10, headY - 0.05, 0.11]}>
+            <sphereGeometry args={[0.06, 10, 10]} />
+            <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
+          </mesh>
+          <mesh position={[0, headY + 0.01, 0.15]}>
+            <sphereGeometry args={[0.045, 8, 8]} />
+            <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
+          </mesh>
+        </>
+      )}
+
       {/* Left arm */}
       <group ref={leftArmRef} position={[0.22, bodyY + 0.1 + shoulderDrop, 0]}>
         <mesh position={[0, -0.15, 0]} castShadow>
@@ -198,12 +223,22 @@ export function NPCCharacter({
       {/* Legs */}
       {isSitting ? (
         <>
-          <mesh position={[0.08, 0.18, 0.12]} rotation={[Math.PI / 4, 0, 0]} castShadow>
-            <capsuleGeometry args={[0.05, 0.2, 8, 10]} />
+          {/* Thighs — extend forward from hips */}
+          <mesh position={[0.08, 0.22, 0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <capsuleGeometry args={[0.05, 0.22, 8, 10]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
-          <mesh position={[-0.08, 0.18, 0.12]} rotation={[Math.PI / 4, 0, 0]} castShadow>
-            <capsuleGeometry args={[0.05, 0.2, 8, 10]} />
+          <mesh position={[-0.08, 0.22, 0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <capsuleGeometry args={[0.05, 0.22, 8, 10]} />
+            <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
+          </mesh>
+          {/* Shins — hang down from knees */}
+          <mesh position={[0.08, 0.09, 0.35]} castShadow>
+            <capsuleGeometry args={[0.045, 0.18, 8, 10]} />
+            <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
+          </mesh>
+          <mesh position={[-0.08, 0.09, 0.35]} castShadow>
+            <capsuleGeometry args={[0.045, 0.18, 8, 10]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
         </>
@@ -221,11 +256,11 @@ export function NPCCharacter({
       )}
 
       {/* Shoes */}
-      <mesh position={[0.07, 0.04, isSitting ? 0.28 : 0]} castShadow>
+      <mesh position={[0.08, 0.02, isSitting ? 0.38 : 0.02]} castShadow>
         <boxGeometry args={[0.065, 0.035, 0.11]} />
         <meshStandardMaterial color="#1A1A1A" roughness={0.5} metalness={0.1} />
       </mesh>
-      <mesh position={[-0.07, 0.04, isSitting ? 0.28 : 0]} castShadow>
+      <mesh position={[-0.08, 0.02, isSitting ? 0.38 : 0.02]} castShadow>
         <boxGeometry args={[0.065, 0.035, 0.11]} />
         <meshStandardMaterial color="#1A1A1A" roughness={0.5} metalness={0.1} />
       </mesh>
@@ -242,8 +277,8 @@ export function NPCCharacter({
       <mesh
         position={[0, bodyY, 0]}
         visible={false}
-        onPointerOver={(e) => { e.stopPropagation(); setNameVisible(true); }}
-        onPointerOut={() => { setNameVisible(false); }}
+        onPointerOver={() => setNameVisible(true)}
+        onPointerOut={() => setNameVisible(false)}
       >
         <sphereGeometry args={[0.35, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} />
@@ -301,7 +336,7 @@ function NPCHotspotMarker({
       <group position={hotspot.offset}>
         <Html center zIndexRange={[5, 0]}>
           <div className="bg-background/80 border border-border px-1.5 py-0.5 pointer-events-none">
-            <p className="font-mono text-[8px] text-muted-foreground">✓</p>
+            <p className="font-mono text-[8px] text-primary">✓</p>
           </div>
         </Html>
       </group>
@@ -332,8 +367,8 @@ function NPCHotspotMarker({
         onPointerOver={(e) => { e.stopPropagation(); onHover(true); playHoverTick(); setCrosshairActive(true); }}
         onPointerOut={() => { onHover(false); setCrosshairActive(false); }}
       >
-        <sphereGeometry args={[0.12, 8, 8]} />
-        <meshBasicMaterial transparent opacity={0} />
+        <sphereGeometry args={[0.35, 8, 8]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
       {/* Hover label with leader line */}
