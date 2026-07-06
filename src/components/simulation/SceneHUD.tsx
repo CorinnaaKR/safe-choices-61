@@ -554,9 +554,10 @@ export function SceneHUD({
               </div>
               <ul className="space-y-3">
                 {[
-                  { key: mode === 'learning' ? 'Tap' : 'Click', label: 'objects and people to look closer' },
-                  { key: 'Drag', label: 'to turn and explore the room' },
-                  { key: 'Tap anything', label: 'that feels significant' },
+                  { key: '↑ ↓', label: 'move forward and back' },
+                  { key: '← →', label: 'turn left and right' },
+                  { key: 'Drag', label: 'to look around freely' },
+                  { key: mode === 'learning' ? 'Tap' : 'Click', label: 'anything that feels significant' },
                 ].map(({ key, label }) => (
                   <li key={key} className="flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
                     <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">{key}</span>

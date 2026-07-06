@@ -98,15 +98,63 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         <meshStandardMaterial color="#FFFFFF" />
       </mesh>
 
-      {/* Fence */}
+      {/* Back fence (z = -5) */}
       {Array.from({ length: 15 }).map((_, i) => (
-        <group key={i}>
+        <group key={`bf-${i}`}>
           <mesh position={[-7 + i, 0.6, -5]}>
             <boxGeometry args={[0.04, 1.2, 0.04]} />
             <meshStandardMaterial color="#808080" />
           </mesh>
           {[0.3, 0.6, 0.9].map((y, j) => (
             <mesh key={j} position={[-6.5 + i, y, -5]}>
+              <boxGeometry args={[1, 0.03, 0.03]} />
+              <meshStandardMaterial color="#909090" />
+            </mesh>
+          ))}
+        </group>
+      ))}
+
+      {/* Left fence (x = -8) */}
+      {Array.from({ length: 11 }).map((_, i) => (
+        <group key={`lf-${i}`}>
+          <mesh position={[-8, 0.6, -5 + i]}>
+            <boxGeometry args={[0.04, 1.2, 0.04]} />
+            <meshStandardMaterial color="#808080" />
+          </mesh>
+          {[0.3, 0.6, 0.9].map((y, j) => (
+            <mesh key={j} position={[-8, y, -4.5 + i]}>
+              <boxGeometry args={[0.03, 0.03, 1]} />
+              <meshStandardMaterial color="#909090" />
+            </mesh>
+          ))}
+        </group>
+      ))}
+
+      {/* Right fence (x = 8) */}
+      {Array.from({ length: 11 }).map((_, i) => (
+        <group key={`rf-${i}`}>
+          <mesh position={[8, 0.6, -5 + i]}>
+            <boxGeometry args={[0.04, 1.2, 0.04]} />
+            <meshStandardMaterial color="#808080" />
+          </mesh>
+          {[0.3, 0.6, 0.9].map((y, j) => (
+            <mesh key={j} position={[8, y, -4.5 + i]}>
+              <boxGeometry args={[0.03, 0.03, 1]} />
+              <meshStandardMaterial color="#909090" />
+            </mesh>
+          ))}
+        </group>
+      ))}
+
+      {/* Front fence (z = 5.5) */}
+      {Array.from({ length: 15 }).map((_, i) => (
+        <group key={`ff-${i}`}>
+          <mesh position={[-7 + i, 0.6, 5.5]}>
+            <boxGeometry args={[0.04, 1.2, 0.04]} />
+            <meshStandardMaterial color="#808080" />
+          </mesh>
+          {[0.3, 0.6, 0.9].map((y, j) => (
+            <mesh key={j} position={[-6.5 + i, y, 5.5]}>
               <boxGeometry args={[1, 0.03, 0.03]} />
               <meshStandardMaterial color="#909090" />
             </mesh>
@@ -133,21 +181,150 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       <Tree position={[-8, 0, -2]} />
       <Tree position={[8, 0, -3]} />
 
-      {/* School building backdrop */}
-      <mesh position={[0, 2, -7]} receiveShadow castShadow>
-        <boxGeometry args={[14, 4, 0.5]} />
-        <meshStandardMaterial map={buildingTex} roughness={0.85} metalness={0.02} />
+      {/* ── School building — U-shaped, 2-storey ── */}
+      {/* Shared materials: brick #B8724A, trim #E8DCC8, roof #888880, glass #7BB8D4 */}
+
+      {/* ── MAIN BACK BLOCK ── */}
+      {/* Ground floor */}
+      <mesh position={[0, 1.5, -11]} receiveShadow castShadow>
+        <boxGeometry args={[22, 3, 5]} />
+        <meshStandardMaterial color="#B8724A" roughness={0.92} metalness={0} />
       </mesh>
-      {[-4, -2, 0, 2, 4].map((x, i) => (
-        <mesh key={i} position={[x, 2.5, -6.7]}>
-          <boxGeometry args={[0.8, 0.8, 0.1]} />
-          <meshPhysicalMaterial color="#8BBDE0" transmission={0.3} roughness={0.15} metalness={0} />
-        </mesh>
+      {/* Concrete band between floors */}
+      <mesh position={[0, 3.1, -11]}>
+        <boxGeometry args={[22, 0.25, 5.1]} />
+        <meshStandardMaterial color="#D8CDB8" roughness={0.85} />
+      </mesh>
+      {/* First floor */}
+      <mesh position={[0, 4.6, -11]} receiveShadow castShadow>
+        <boxGeometry args={[22, 3, 5]} />
+        <meshStandardMaterial color="#B8724A" roughness={0.92} metalness={0} />
+      </mesh>
+      {/* Roof parapet */}
+      <mesh position={[0, 6.3, -11]}>
+        <boxGeometry args={[22.4, 0.5, 5.4]} />
+        <meshStandardMaterial color="#888880" roughness={0.9} />
+      </mesh>
+      {/* Flat roof surface */}
+      <mesh position={[0, 6.52, -11]}>
+        <boxGeometry args={[22, 0.08, 5]} />
+        <meshStandardMaterial color="#777772" roughness={1} />
+      </mesh>
+
+      {/* Ground floor windows — main block */}
+      {[-8,-6,-4,-2,0,2,4,6,8].map((x, i) => (
+        <group key={`mgw-${i}`} position={[x, 1.7, -8.74]}>
+          <mesh>
+            <boxGeometry args={[1.1, 1.4, 0.15]} />
+            <meshStandardMaterial color="#D8CDB8" roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0, 0.08]}>
+            <boxGeometry args={[0.95, 1.25, 0.05]} />
+            <meshPhysicalMaterial color="#7BB8D4" transmission={0.5} roughness={0.05} metalness={0.1} />
+          </mesh>
+        </group>
       ))}
-      <mesh position={[0, 1.2, -6.7]} castShadow>
-        <boxGeometry args={[1, 2.2, 0.1]} />
-        <meshStandardMaterial color="#5C4033" roughness={0.7} metalness={0.05} />
+      {/* First floor windows — main block */}
+      {[-8,-6,-4,-2,0,2,4,6,8].map((x, i) => (
+        <group key={`mfw-${i}`} position={[x, 4.8, -8.74]}>
+          <mesh>
+            <boxGeometry args={[1.1, 1.4, 0.15]} />
+            <meshStandardMaterial color="#D8CDB8" roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0, 0.08]}>
+            <boxGeometry args={[0.95, 1.25, 0.05]} />
+            <meshPhysicalMaterial color="#7BB8D4" transmission={0.5} roughness={0.05} metalness={0.1} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Central entrance — double doors + canopy */}
+      <mesh position={[0, 1.15, -8.7]}>
+        <boxGeometry args={[2.4, 2.3, 0.15]} />
+        <meshStandardMaterial color="#D8CDB8" roughness={0.7} />
       </mesh>
+      <mesh position={[-0.55, 1.15, -8.64]}>
+        <boxGeometry args={[1.0, 2.1, 0.06]} />
+        <meshPhysicalMaterial color="#7BB8D4" transmission={0.35} roughness={0.1} />
+      </mesh>
+      <mesh position={[0.55, 1.15, -8.64]}>
+        <boxGeometry args={[1.0, 2.1, 0.06]} />
+        <meshPhysicalMaterial color="#7BB8D4" transmission={0.35} roughness={0.1} />
+      </mesh>
+      {/* Canopy */}
+      <mesh position={[0, 2.55, -8.2]}>
+        <boxGeometry args={[3.2, 0.12, 1.2]} />
+        <meshStandardMaterial color="#888880" roughness={0.85} />
+      </mesh>
+      <mesh position={[-1.4, 2.1, -8.2]}>
+        <boxGeometry args={[0.08, 0.9, 0.08]} />
+        <meshStandardMaterial color="#999990" roughness={0.6} metalness={0.3} />
+      </mesh>
+      <mesh position={[1.4, 2.1, -8.2]}>
+        <boxGeometry args={[0.08, 0.9, 0.08]} />
+        <meshStandardMaterial color="#999990" roughness={0.6} metalness={0.3} />
+      </mesh>
+
+      {/* ── LEFT WING ── (x = -11 to -13.5, z = -13.5 to -2) */}
+      <mesh position={[-12.25, 1.5, -7.75]} receiveShadow castShadow>
+        <boxGeometry args={[5, 3, 11.5]} />
+        <meshStandardMaterial color="#B8724A" roughness={0.92} metalness={0} />
+      </mesh>
+      <mesh position={[-12.25, 3.1, -7.75]}>
+        <boxGeometry args={[5, 0.25, 11.6]} />
+        <meshStandardMaterial color="#D8CDB8" roughness={0.85} />
+      </mesh>
+      <mesh position={[-12.25, 4.6, -7.75]} receiveShadow castShadow>
+        <boxGeometry args={[5, 3, 11.5]} />
+        <meshStandardMaterial color="#B8724A" roughness={0.92} metalness={0} />
+      </mesh>
+      <mesh position={[-12.25, 6.3, -7.75]}>
+        <boxGeometry args={[5.4, 0.5, 11.9]} />
+        <meshStandardMaterial color="#888880" roughness={0.9} />
+      </mesh>
+      {/* Left wing inner-face windows (facing playground) */}
+      {[-10, -7.5, -5].map((z, i) => (
+        <group key={`lgw-${i}`} position={[-9.74, 1.7, z]}>
+          <mesh><boxGeometry args={[0.15, 1.4, 1.1]} /><meshStandardMaterial color="#D8CDB8" roughness={0.7} /></mesh>
+          <mesh position={[-0.08, 0, 0]}><boxGeometry args={[0.05, 1.25, 0.95]} /><meshPhysicalMaterial color="#7BB8D4" transmission={0.5} roughness={0.05} /></mesh>
+        </group>
+      ))}
+      {[-10, -7.5, -5].map((z, i) => (
+        <group key={`lfw-${i}`} position={[-9.74, 4.8, z]}>
+          <mesh><boxGeometry args={[0.15, 1.4, 1.1]} /><meshStandardMaterial color="#D8CDB8" roughness={0.7} /></mesh>
+          <mesh position={[-0.08, 0, 0]}><boxGeometry args={[0.05, 1.25, 0.95]} /><meshPhysicalMaterial color="#7BB8D4" transmission={0.5} roughness={0.05} /></mesh>
+        </group>
+      ))}
+
+      {/* ── RIGHT WING ── (mirror of left) */}
+      <mesh position={[12.25, 1.5, -7.75]} receiveShadow castShadow>
+        <boxGeometry args={[5, 3, 11.5]} />
+        <meshStandardMaterial color="#B8724A" roughness={0.92} metalness={0} />
+      </mesh>
+      <mesh position={[12.25, 3.1, -7.75]}>
+        <boxGeometry args={[5, 0.25, 11.6]} />
+        <meshStandardMaterial color="#D8CDB8" roughness={0.85} />
+      </mesh>
+      <mesh position={[12.25, 4.6, -7.75]} receiveShadow castShadow>
+        <boxGeometry args={[5, 3, 11.5]} />
+        <meshStandardMaterial color="#B8724A" roughness={0.92} metalness={0} />
+      </mesh>
+      <mesh position={[12.25, 6.3, -7.75]}>
+        <boxGeometry args={[5.4, 0.5, 11.9]} />
+        <meshStandardMaterial color="#888880" roughness={0.9} />
+      </mesh>
+      {[-10, -7.5, -5].map((z, i) => (
+        <group key={`rgw-${i}`} position={[9.74, 1.7, z]}>
+          <mesh><boxGeometry args={[0.15, 1.4, 1.1]} /><meshStandardMaterial color="#D8CDB8" roughness={0.7} /></mesh>
+          <mesh position={[0.08, 0, 0]}><boxGeometry args={[0.05, 1.25, 0.95]} /><meshPhysicalMaterial color="#7BB8D4" transmission={0.5} roughness={0.05} /></mesh>
+        </group>
+      ))}
+      {[-10, -7.5, -5].map((z, i) => (
+        <group key={`rfw-${i}`} position={[9.74, 4.8, z]}>
+          <mesh><boxGeometry args={[0.15, 1.4, 1.1]} /><meshStandardMaterial color="#D8CDB8" roughness={0.7} /></mesh>
+          <mesh position={[0.08, 0, 0]}><boxGeometry args={[0.05, 1.25, 0.95]} /><meshPhysicalMaterial color="#7BB8D4" transmission={0.5} roughness={0.05} /></mesh>
+        </group>
+      ))}
 
       {/* ===== NPC Characters ===== */}
 
@@ -297,7 +474,24 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         <group />
       </FlavourObject>
 
-      {/* Realistic outdoor lighting */}
+      {/* Extended ground plane so the grass reaches the horizon */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+        <planeGeometry args={[80, 80]} />
+        <meshStandardMaterial color="#4A7C2E" roughness={1} />
+      </mesh>
+
+      {/* Dense tree line along all four edges to block sky/ground join */}
+      {[-9,-7,-5,-3,-1,1,3,5,7,9].map((x, i) => (
+        <Tree key={`ts-${i}`} position={[x, 0, 7.5]} />
+      ))}
+      {[-7,-5,-3,-1,1,3,5,7].map((z, i) => (
+        <Tree key={`tw-${i}`} position={[-9.5, 0, z]} />
+      ))}
+      {[-7,-5,-3,-1,1,3,5,7].map((z, i) => (
+        <Tree key={`te-${i}`} position={[9.5, 0, z]} />
+      ))}
+
+{/* Realistic outdoor lighting */}
       <ambientLight intensity={0.3} color="#E0E8F0" />
       <directionalLight
         position={[5, 10, 3]}

@@ -129,6 +129,21 @@ export function SceneRenderer({
             visible={false}
           />
 
+          {/* Double-click anywhere on the floor to walk there */}
+          {!focusTarget && (
+            <mesh
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[0, 0.005, 0]}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                setWalkTarget(new THREE.Vector3(e.point.x, 0, e.point.z));
+              }}
+            >
+              <planeGeometry args={[40, 40]} />
+              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+            </mesh>
+          )}
+
           {sceneType === 'classroom' && (
             <ClassroomScene
               evidence={evidence}

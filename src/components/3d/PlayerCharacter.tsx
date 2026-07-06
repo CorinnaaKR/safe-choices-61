@@ -110,7 +110,7 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
 
     const k = keys.current;
     const forward = (k['w'] || k['arrowup'] ? 1 : 0) - (k['s'] || k['arrowdown'] ? 1 : 0);
-    const strafe = (k['d'] || k['arrowright'] ? 1 : 0) - (k['a'] || k['arrowleft'] ? 1 : 0);
+    const strafe = (k['d'] ? 1 : 0) - (k['a'] ? 1 : 0);
 
     const isMoving = forward !== 0 || strafe !== 0;
 

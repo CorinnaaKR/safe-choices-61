@@ -20,11 +20,12 @@ const prefersReducedMotion =
 
 // First-person look limits
 const FPS_PITCH_MIN = -Math.PI / 2.5; // look up ~72°
-const FPS_PITCH_MAX = Math.PI / 2.5;  // look down ~72°
+const FPS_PITCH_MAX = Math.PI * 0.47; // look down ~85°
 const DIST_MIN = 2.4;
 const DIST_MAX = 8;
 const ORBIT_SPEED = 0.005;
-const FPS_EYE_HEIGHT = 1.05;
+const FPS_EYE_HEIGHT = 1.62;
+const KEYBOARD_TURN_SPEED = 1.8; // radians per second
 
 // Inspect dolly limits (multiplier on the base inspect offset)
 const INSPECT_ZOOM_MIN = 0.45;
@@ -47,6 +48,7 @@ export function CameraController({
   const pitch = useRef(0); // 0 = level, positive = look down
   const dist = useRef(5);
   const dragging = useRef(false);
+  const turnKeys = useRef({ left: false, right: false });
 
   // Inspect state — scroll-wheel dolly toward/away from the focus target
   const inspectZoom = useRef(1);
@@ -115,15 +117,28 @@ export function CameraController({
       }
     };
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') turnKeys.current.left = true;
+      if (e.key === 'ArrowRight') turnKeys.current.right = true;
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') turnKeys.current.left = false;
+      if (e.key === 'ArrowRight') turnKeys.current.right = false;
+    };
+
     el.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     el.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
     return () => {
       el.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       el.removeEventListener('wheel', onWheel);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
     };
   }, [gl]);
 
@@ -179,6 +194,10 @@ export function CameraController({
       // Snap immediately while dragging so view tracks the mouse 1:1;
       // lerp for positional follow when walking to reduce judder
       camera.position.lerp(desiredPos.current, dragging.current ? 1 : 0.2);
+
+      // Arrow left/right turn the view
+      if (turnKeys.current.left) yaw.current += KEYBOARD_TURN_SPEED * delta;
+      if (turnKeys.current.right) yaw.current -= KEYBOARD_TURN_SPEED * delta;
 
       // Apply look rotation in YXZ order (standard FPS: pan then tilt)
       camera.rotation.order = 'YXZ';
