@@ -211,9 +211,10 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         <meshStandardMaterial color="#777772" roughness={1} />
       </mesh>
 
-      {/* Ground floor windows — main block */}
-      {[-8,-6,-4,-2,0,2,4,6,8].map((x, i) => (
-        <group key={`mgw-${i}`} position={[x, 1.7, -8.74]}>
+      {/* Ground floor windows — main block (5 evenly spaced, matching wing rhythm) */}
+      {/* Front face of main block is at z=-8.5; windows protrude slightly proud at z=-8.42 */}
+      {[-7, -3.5, 0, 3.5, 7].map((x, i) => (
+        <group key={`mgw-${i}`} position={[x, 1.7, -8.42]}>
           <mesh>
             <boxGeometry args={[1.1, 1.4, 0.15]} />
             <meshStandardMaterial color="#D8CDB8" roughness={0.7} />
@@ -225,8 +226,8 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         </group>
       ))}
       {/* First floor windows — main block */}
-      {[-8,-6,-4,-2,0,2,4,6,8].map((x, i) => (
-        <group key={`mfw-${i}`} position={[x, 4.8, -8.74]}>
+      {[-7, -3.5, 0, 3.5, 7].map((x, i) => (
+        <group key={`mfw-${i}`} position={[x, 4.8, -8.42]}>
           <mesh>
             <boxGeometry args={[1.1, 1.4, 0.15]} />
             <meshStandardMaterial color="#D8CDB8" roughness={0.7} />
@@ -238,31 +239,18 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         </group>
       ))}
 
-      {/* Central entrance — double doors + canopy */}
-      <mesh position={[0, 1.15, -8.7]}>
+      {/* Central entrance — double doors */}
+      <mesh position={[0, 1.15, -8.42]}>
         <boxGeometry args={[2.4, 2.3, 0.15]} />
         <meshStandardMaterial color="#D8CDB8" roughness={0.7} />
       </mesh>
-      <mesh position={[-0.55, 1.15, -8.64]}>
+      <mesh position={[-0.55, 1.15, -8.35]}>
         <boxGeometry args={[1.0, 2.1, 0.06]} />
         <meshPhysicalMaterial color="#7BB8D4" transmission={0.35} roughness={0.1} />
       </mesh>
-      <mesh position={[0.55, 1.15, -8.64]}>
+      <mesh position={[0.55, 1.15, -8.35]}>
         <boxGeometry args={[1.0, 2.1, 0.06]} />
         <meshPhysicalMaterial color="#7BB8D4" transmission={0.35} roughness={0.1} />
-      </mesh>
-      {/* Canopy */}
-      <mesh position={[0, 2.55, -8.2]}>
-        <boxGeometry args={[3.2, 0.12, 1.2]} />
-        <meshStandardMaterial color="#888880" roughness={0.85} />
-      </mesh>
-      <mesh position={[-1.4, 2.1, -8.2]}>
-        <boxGeometry args={[0.08, 0.9, 0.08]} />
-        <meshStandardMaterial color="#999990" roughness={0.6} metalness={0.3} />
-      </mesh>
-      <mesh position={[1.4, 2.1, -8.2]}>
-        <boxGeometry args={[0.08, 0.9, 0.08]} />
-        <meshStandardMaterial color="#999990" roughness={0.6} metalness={0.3} />
       </mesh>
 
       {/* ── LEFT WING ── (x = -11 to -13.5, z = -13.5 to -2) */}
