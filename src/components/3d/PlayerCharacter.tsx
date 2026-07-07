@@ -5,10 +5,11 @@ import { SceneType } from './SceneRenderer';
 
 // Room boundaries per scene type: [minX, maxX, minZ, maxZ]
 const SCENE_BOUNDS: Record<SceneType, [number, number, number, number]> = {
-  classroom: [-5.5, 5.5, -4.5, 4.5],
-  playground: [-11, 11, -6, 7],
-  office: [-3.5, 3.5, -2.5, 2.5],
-  home: [-4.2, 4.2, -3.6, 3.6],
+  classroom:    [-5.5, 5.5, -4.5, 4.5],
+  playground:   [-11, 11, -6, 7],
+  office:       [-3.5, 3.5, -2.5, 2.5],
+  home:         [-4.2, 4.2, -3.6, 3.6],
+  'home-jamie': [-4.1, 4.1, -3.6, 3.6],
 };
 
 interface PlayerCharacterProps {
