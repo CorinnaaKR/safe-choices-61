@@ -78,35 +78,35 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
 
   return (
     <group>
-      {/* Ground */}
+      {/* Ground — expanded grass + tarmac */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[20, 16]} />
+        <planeGeometry args={[28, 20]} />
         <meshStandardMaterial map={grassTex} roughness={0.95} metalness={0} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
-        <planeGeometry args={[8, 6]} />
+        <planeGeometry args={[14, 10]} />
         <meshStandardMaterial map={tarmacTex} roughness={0.9} metalness={0.05} />
       </mesh>
 
       {/* Football pitch lines */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3, 0.02, -1]}>
-        <planeGeometry args={[4, 0.05]} />
+        <planeGeometry args={[6, 0.05]} />
         <meshStandardMaterial color="#FFFFFF" />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3, 0.02, 1]}>
-        <planeGeometry args={[4, 0.05]} />
+        <planeGeometry args={[6, 0.05]} />
         <meshStandardMaterial color="#FFFFFF" />
       </mesh>
 
-      {/* Back fence (z = -5) */}
-      {Array.from({ length: 15 }).map((_, i) => (
+      {/* Back fence (z = -7) */}
+      {Array.from({ length: 25 }).map((_, i) => (
         <group key={`bf-${i}`}>
-          <mesh position={[-7 + i, 0.6, -5]}>
+          <mesh position={[-12 + i, 0.6, -7]}>
             <boxGeometry args={[0.04, 1.2, 0.04]} />
             <meshStandardMaterial color="#808080" />
           </mesh>
           {[0.3, 0.6, 0.9].map((y, j) => (
-            <mesh key={j} position={[-6.5 + i, y, -5]}>
+            <mesh key={j} position={[-11.5 + i, y, -7]}>
               <boxGeometry args={[1, 0.03, 0.03]} />
               <meshStandardMaterial color="#909090" />
             </mesh>
@@ -114,15 +114,15 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         </group>
       ))}
 
-      {/* Left fence (x = -8) */}
-      {Array.from({ length: 11 }).map((_, i) => (
+      {/* Left fence (x = -12) */}
+      {Array.from({ length: 16 }).map((_, i) => (
         <group key={`lf-${i}`}>
-          <mesh position={[-8, 0.6, -5 + i]}>
+          <mesh position={[-12, 0.6, -7 + i]}>
             <boxGeometry args={[0.04, 1.2, 0.04]} />
             <meshStandardMaterial color="#808080" />
           </mesh>
           {[0.3, 0.6, 0.9].map((y, j) => (
-            <mesh key={j} position={[-8, y, -4.5 + i]}>
+            <mesh key={j} position={[-12, y, -6.5 + i]}>
               <boxGeometry args={[0.03, 0.03, 1]} />
               <meshStandardMaterial color="#909090" />
             </mesh>
@@ -130,15 +130,15 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         </group>
       ))}
 
-      {/* Right fence (x = 8) */}
-      {Array.from({ length: 11 }).map((_, i) => (
+      {/* Right fence (x = 12) */}
+      {Array.from({ length: 16 }).map((_, i) => (
         <group key={`rf-${i}`}>
-          <mesh position={[8, 0.6, -5 + i]}>
+          <mesh position={[12, 0.6, -7 + i]}>
             <boxGeometry args={[0.04, 1.2, 0.04]} />
             <meshStandardMaterial color="#808080" />
           </mesh>
           {[0.3, 0.6, 0.9].map((y, j) => (
-            <mesh key={j} position={[8, y, -4.5 + i]}>
+            <mesh key={j} position={[12, y, -6.5 + i]}>
               <boxGeometry args={[0.03, 0.03, 1]} />
               <meshStandardMaterial color="#909090" />
             </mesh>
@@ -146,15 +146,15 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         </group>
       ))}
 
-      {/* Front fence (z = 5.5) */}
-      {Array.from({ length: 15 }).map((_, i) => (
+      {/* Front fence (z = 8) */}
+      {Array.from({ length: 25 }).map((_, i) => (
         <group key={`ff-${i}`}>
-          <mesh position={[-7 + i, 0.6, 5.5]}>
+          <mesh position={[-12 + i, 0.6, 8]}>
             <boxGeometry args={[0.04, 1.2, 0.04]} />
             <meshStandardMaterial color="#808080" />
           </mesh>
           {[0.3, 0.6, 0.9].map((y, j) => (
-            <mesh key={j} position={[-6.5 + i, y, 5.5]}>
+            <mesh key={j} position={[-11.5 + i, y, 8]}>
               <boxGeometry args={[1, 0.03, 0.03]} />
               <meshStandardMaterial color="#909090" />
             </mesh>
@@ -162,9 +162,9 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
         </group>
       ))}
 
-      {/* Benches */}
-      <Bench position={[-4, 0, -3.5]} />
-      <Bench position={[4.5, 0, -3.5]} />
+      {/* Benches — spread wider to use extra space */}
+      <Bench position={[-7, 0, -5]} />
+      <Bench position={[7, 0, -5]} />
 
       {/* Jamie's bench — isolated, with glow */}
       <group>
@@ -176,10 +176,12 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       </group>
 
       {/* Trees */}
-      <Tree position={[-7, 0, 4]} />
-      <Tree position={[7, 0, 3]} />
-      <Tree position={[-8, 0, -2]} />
-      <Tree position={[8, 0, -3]} />
+      <Tree position={[-10, 0, 5]} />
+      <Tree position={[10, 0, 4]} />
+      <Tree position={[-11, 0, -3]} />
+      <Tree position={[11, 0, -4]} />
+      <Tree position={[-9, 0, 2]} />
+      <Tree position={[9, 0, 1]} />
 
       {/* ── School building — U-shaped, 2-storey ── */}
       {/* Shared materials: brick #B8724A, trim #E8DCC8, roof #888880, glass #7BB8D4 */}
@@ -469,14 +471,14 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
       </mesh>
 
       {/* Dense tree line along all four edges to block sky/ground join */}
-      {[-9,-7,-5,-3,-1,1,3,5,7,9].map((x, i) => (
-        <Tree key={`ts-${i}`} position={[x, 0, 7.5]} />
+      {[-12,-10,-8,-6,-4,-2,0,2,4,6,8,10,12].map((x, i) => (
+        <Tree key={`ts-${i}`} position={[x, 0, 10.5]} />
       ))}
-      {[-7,-5,-3,-1,1,3,5,7].map((z, i) => (
-        <Tree key={`tw-${i}`} position={[-9.5, 0, z]} />
+      {[-8,-6,-4,-2,0,2,4,6,8].map((z, i) => (
+        <Tree key={`tw-${i}`} position={[-13.5, 0, z]} />
       ))}
-      {[-7,-5,-3,-1,1,3,5,7].map((z, i) => (
-        <Tree key={`te-${i}`} position={[9.5, 0, z]} />
+      {[-8,-6,-4,-2,0,2,4,6,8].map((z, i) => (
+        <Tree key={`te-${i}`} position={[13.5, 0, z]} />
       ))}
 
 {/* Realistic outdoor lighting */}

@@ -22,7 +22,7 @@ const ROOM_BOUNDS: Record<SceneType, [number, number, number, number, number, nu
   office:     [-3.6, 3.6, -2.6, 2.6, 0.3, 3.6],
   home:       [-4.1, 4.1, -3.6, 3.6, 0.3, 2.6],
   'home-jamie': [-4.1, 4.1, -3.6, 3.6, 0.3, 3.0],
-  playground: [-9.5, 9.5, -7.5, 7.5, 0.3, 6],
+  playground: [-13, 13, -8, 9, 0.3, 6],
 };
 
 interface SceneRendererProps {
