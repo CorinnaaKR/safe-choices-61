@@ -70,7 +70,7 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
 
     // Keep the player inside the room even before first input (spawn may
     // sit outside tighter scenes like the office)
-    const [bMinX, bMaxX, bMinZ, bMaxZ] = SCENE_BOUNDS[sceneType];
+    const [bMinX, bMaxX, bMinZ, bMaxZ] = SCENE_BOUNDS[sceneType] ?? SCENE_BOUNDS['classroom'] ?? SCENE_BOUNDS['classroom'];
     groupRef.current.position.x = THREE.MathUtils.clamp(
       groupRef.current.position.x, bMinX + WALL_MARGIN, bMaxX - WALL_MARGIN);
     groupRef.current.position.z = THREE.MathUtils.clamp(
@@ -92,7 +92,7 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
         rotationY.current += diff * Math.min(1, ROTATION_SPEED * delta * 3);
         groupRef.current.rotation.y = rotationY.current;
 
-        const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType];
+        const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType] ?? SCENE_BOUNDS['classroom'];
         const curX = groupRef.current.position.x;
         const curZ = groupRef.current.position.z;
         const nextX = THREE.MathUtils.clamp(curX + toTarget.current.x * SPEED * delta, minX + WALL_MARGIN, maxX - WALL_MARGIN);
@@ -137,7 +137,7 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
       rotationY.current += diff * Math.min(1, ROTATION_SPEED * delta * 3);
       groupRef.current.rotation.y = rotationY.current;
 
-      const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType];
+      const [minX, maxX, minZ, maxZ] = SCENE_BOUNDS[sceneType] ?? SCENE_BOUNDS['classroom'];
       const curX = groupRef.current.position.x;
       const curZ = groupRef.current.position.z;
       const nextX = THREE.MathUtils.clamp(curX + moveVec.current.x * SPEED * delta, minX + WALL_MARGIN, maxX - WALL_MARGIN);
