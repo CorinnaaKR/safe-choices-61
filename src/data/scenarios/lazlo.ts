@@ -259,7 +259,7 @@ export const lazloScenario: Scenario = {
     // ── Scene 1: Arriving ─────────────────────────────────────────────────
     {
       id: 'scene-l1',
-      title: 'Wednesday Afternoon',
+      title: 'Wednesday Afternoon — Inside',
       environment: 'home',
       isDecisionPoint: true,
       narrative: [

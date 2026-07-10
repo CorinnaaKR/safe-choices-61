@@ -598,20 +598,20 @@ export function SceneHUD({
         mode={mode}
       />
 
-      {/* ── WHAT YOU KNOW BUTTON: always visible, top-right ─────────────── */}
+      {/* ── WHAT YOU KNOW BUTTON: icon-only, top-right ─────────────── */}
       {!inspectedEvidence && !showFeedback && !knowledgeOpen && (
         <button
           onClick={() => setKnowledgeOpen(true)}
           aria-label="What you know"
-          className="absolute top-4 right-4 pointer-events-auto flex items-center gap-2 px-3 py-3 min-h-[44px] bg-background/90 border border-border hover:border-primary/70 hover:bg-background transition-colors"
+          title="What you know"
+          className="absolute top-4 right-4 pointer-events-auto flex items-center justify-center w-10 h-10 bg-background/70 border border-border/60 hover:border-primary/70 hover:bg-background transition-colors"
           style={{ zIndex: 15 }}
         >
-          <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary shrink-0">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-foreground/60 hover:text-primary shrink-0">
             <path d="M9 4C9 4 6.5 3 3 3.5V14.5C6.5 14 9 15 9 15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M9 4C9 4 11.5 3 15 3.5V14.5C11.5 14 9 15 9 15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M9 4V15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
           </svg>
-          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-foreground/80">What you know</span>
         </button>
       )}
       </motion.div>

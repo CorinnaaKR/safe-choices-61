@@ -96,12 +96,11 @@ export default function ResultsPage() {
     criticalEvidenceCount >= criteria.requiredCriticalEvidence &&
     poorDecisionCount <= criteria.maxPoorDecisions
   );
-  const passed = scorePercentage >= PASS_THRESHOLD && meetsCriteria;
+  const passed = scorePercentage >= PASS_THRESHOLD;
 
   const getGrade = () => {
     if (passed && scorePercentage === 100) return { grade: 'Excellent', accent: true };
     if (passed) return { grade: 'Pass', accent: true };
-    if (scorePercentage >= PASS_THRESHOLD && !meetsCriteria) return { grade: 'Not yet passed', accent: false };
     if (scorePercentage >= 50) return { grade: 'Not yet passed', accent: false };
     return { grade: 'Retake required', accent: false };
   };
@@ -327,7 +326,7 @@ export default function ResultsPage() {
                     transition={{ delay: 0.2 }}
                     className="font-mono text-7xl font-bold text-foreground leading-none"
                   >
-                    {String(scorePercentage).padStart(3, '0')}
+                    {scorePercentage}
                     <span className="text-2xl text-muted-foreground">%</span>
                   </motion.span>
                   <div className="pb-1.5 space-y-1">
@@ -508,24 +507,10 @@ export default function ResultsPage() {
             ) : !passed ? (
               <section className="content-card border-muted-foreground/20 mb-3">
                 <div className="px-6 py-5 space-y-2">
-                  {scorePercentage < PASS_THRESHOLD ? (
-                    <p className="text-sm text-foreground leading-relaxed">
-                      A score of <strong>{PASS_THRESHOLD}%</strong> or above is required to receive
-                      a completion certificate. You scored <strong>{scorePercentage}%</strong>.
-                    </p>
-                  ) : (
-                    <p className="text-sm text-foreground leading-relaxed">
-                      Your score met the {PASS_THRESHOLD}% threshold, but a certificate also requires
-                      noticing enough of what the scenario was testing: at least{' '}
-                      <strong>{criteria?.minEvidence}</strong> pieces of evidence collected (you collected{' '}
-                      <strong>{gameState.collectedEvidence.length}</strong>), at least{' '}
-                      <strong>{criteria?.requiredCriticalEvidence}</strong> of critical importance (you found{' '}
-                      <strong>{criticalEvidenceCount}</strong>), and no more than{' '}
-                      <strong>{criteria?.maxPoorDecisions}</strong> non-optimal decision
-                      {criteria?.maxPoorDecisions === 1 ? '' : 's'} (you made{' '}
-                      <strong>{poorDecisionCount}</strong>).
-                    </p>
-                  )}
+                  <p className="text-sm text-foreground leading-relaxed">
+                    A score of <strong>{PASS_THRESHOLD}%</strong> or above is required to receive
+                    a completion certificate. You scored <strong>{scorePercentage}%</strong>.
+                  </p>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Review the observations above, then retake the simulation. There is no limit
                     on attempts.

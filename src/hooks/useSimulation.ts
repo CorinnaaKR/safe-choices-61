@@ -169,16 +169,45 @@ export function useSimulation(
 
   const proceedToNextScene = useCallback(() => {
     if (!lastChoice) return;
-    const nextScene = scenario.scenes.find((s) => s.id === lastChoice.nextSceneId);
     setGameState((prev) => ({
       ...prev,
       currentSceneId: lastChoice.nextSceneId,
-      // Don't mark complete yet — let the final scene play through first.
-      // completeFinalScene() is called when the player clicks "View results".
     }));
     setShowFeedback(false);
     setLastChoice(null);
   }, [lastChoice, scenario]);
+
+  // Like makeChoice but skips the feedback panel and advances the scene immediately.
+  // Use in self-contained scenes (e.g. GroupChatScene) that have no SceneHUD.
+  const makeChoiceAndAdvance = useCallback(
+    (choice: Choice, supportingEvidenceIds: string[] = []) => {
+      setGameState((prev) => {
+        const currentTrust = prev.trustLevel ?? 50;
+        const newTrust = choice.trustDelta !== undefined
+          ? Math.max(0, Math.min(100, currentTrust + choice.trustDelta))
+          : currentTrust;
+        return {
+          ...prev,
+          decisions: [
+            ...prev.decisions,
+            {
+              sceneId: prev.currentSceneId,
+              choiceId: choice.id,
+              isOptimal: choice.isOptimal,
+              points: choice.points,
+              skillArea: choice.skillArea,
+              supportingEvidenceIds,
+              trustDelta: choice.trustDelta,
+            },
+          ],
+          totalPoints: prev.totalPoints + choice.points,
+          trustLevel: newTrust,
+          currentSceneId: choice.nextSceneId,
+        };
+      });
+    },
+    [scenario]
+  );
 
   /** Call when the player clicks "View results" on the final scene. */
   const completeFinalScene = useCallback(() => {
@@ -242,6 +271,7 @@ export function useSimulation(
     lastChoice,
     collectEvidence,
     makeChoice,
+    makeChoiceAndAdvance,
     completeTrainingGate,
     completePreVisit,
     completeLazloThread,

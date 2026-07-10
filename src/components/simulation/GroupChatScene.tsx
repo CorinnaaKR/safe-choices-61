@@ -43,6 +43,7 @@ export function GroupChatScene({ choices, onChoice }: Props) {
   const [chatDone, setChatDone] = useState(false);
   const [morningIdx, setMorningIdx] = useState(-1); // -1 = not started
   const [showChoices, setShowChoices] = useState(false);
+  const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-reveal messages one by one
@@ -77,6 +78,56 @@ export function GroupChatScene({ choices, onChoice }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col md:flex-row items-center md:items-center justify-center z-50 px-4 py-6 gap-6">
+
+      {/* Feedback card — shown after a choice, before advancing */}
+      <AnimatePresence>
+        {pendingChoice && (
+          <motion.div
+            key="feedback"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-60 flex items-center justify-center bg-black/80 px-6"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              style={{
+                maxWidth: 480, width: '100%',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                borderRadius: 20, padding: '28px 26px',
+              }}
+            >
+              {pendingChoice.consequence && (
+                <p style={{ color: '#e5e5ea', fontFamily: '-apple-system, sans-serif', fontSize: 15, lineHeight: 1.6, marginBottom: 16 }}>
+                  {pendingChoice.consequence}
+                </p>
+              )}
+              {pendingChoice.feedback && (
+                <p style={{ color: '#8e8e93', fontFamily: '-apple-system, sans-serif', fontSize: 13, lineHeight: 1.6, fontStyle: 'italic', marginBottom: 24 }}>
+                  {pendingChoice.feedback}
+                </p>
+              )}
+              <button
+                onClick={() => { onChoice(pendingChoice); setPendingChoice(null); }}
+                style={{
+                  width: '100%', padding: '12px 16px',
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: 12, color: '#fff',
+                  fontFamily: 'monospace', fontSize: 11,
+                  textTransform: 'uppercase', letterSpacing: '0.14em',
+                  cursor: 'pointer',
+                }}
+              >
+                Continue →
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat panel — fixed height, never shrinks */}
       <motion.div
@@ -226,7 +277,7 @@ export function GroupChatScene({ choices, onChoice }: Props) {
                 {choices.map((choice) => (
                   <button
                     key={choice.id}
-                    onClick={() => onChoice(choice)}
+                    onClick={() => setPendingChoice(choice)}
                     style={{
                       display: 'block', width: '100%', textAlign: 'left',
                       padding: '13px 16px', background: 'rgba(255,255,255,0.07)',

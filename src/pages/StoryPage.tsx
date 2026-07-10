@@ -41,6 +41,7 @@ export default function StoryPage() {
     lastChoice,
     collectEvidence,
     makeChoice,
+    makeChoiceAndAdvance,
     completeTrainingGate,
     completePreVisit,
     completeLazloThread,
@@ -227,7 +228,7 @@ export default function StoryPage() {
     return (
       <GroupChatScene
         choices={currentScene.choices}
-        onChoice={(choice) => makeChoice(choice, [])}
+        onChoice={(choice) => makeChoiceAndAdvance(choice, [])}
       />
     );
   }
