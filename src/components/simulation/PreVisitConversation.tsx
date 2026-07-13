@@ -242,69 +242,17 @@ export function PreVisitConversation({ data, onComplete }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col md:flex-row items-center justify-center z-50 gap-2 md:gap-8 px-4 md:px-8 pt-2 pb-3 md:py-0">
+    <div className="fixed inset-0 bg-background z-50 md:flex md:flex-row md:items-center md:justify-center md:gap-8 md:px-8">
 
-      {/* Left panel on desktop / bottom panel on mobile: choices or scene label */}
-      <div className="flex flex-col justify-center w-full md:shrink-0 md:w-auto order-2 md:order-1" style={{ maxWidth: 'min(320px, 90vw)' }}>
-        <AnimatePresence>
-          {isChoosing && (
-            <motion.div
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -12 }}
-              className="space-y-2"
-            >
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-4">
-                Choose your reply
-              </p>
-              {data.exchanges[
-                (phase as { exchangeIdx: number }).exchangeIdx
-              ]?.choices.map((choice) => (
-                <button
-                  key={choice.id}
-                  onClick={() => handleChoice(choice)}
-                  onPointerEnter={() => playHoverTick()}
-                  className="w-full text-left transition-colors"
-                  style={{
-                    padding: '11px 16px',
-                    background: 'hsl(var(--secondary))',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 14,
-                    color: 'hsl(var(--foreground))',
-                    fontSize: 14,
-                    fontFamily: '-apple-system, sans-serif',
-                    lineHeight: 1.45,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {choice.text}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {!isChoosing && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground"
-          >
-            Before you arrive
-          </motion.p>
-        )}
-      </div>
-
-      {/* Right: Phone frame */}
+      {/* Phone — full-screen on mobile, framed on desktop */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col bg-background relative overflow-hidden order-1 md:order-2 max-h-[68vh] md:max-h-[95vh]"
+        className="absolute inset-0 flex flex-col overflow-hidden bg-background
+                   md:relative md:inset-auto md:order-2 md:max-h-[95vh]
+                   md:w-[min(360px,82vw)] md:rounded-[3rem] md:border-[10px] md:border-[#1a1a1a]"
         style={{
-          width: 'min(360px, 82vw)',
           height: isTyping ? 'min(880px, 95vh)' : 'min(780px, 92vh)',
-          borderRadius: '3rem',
-          border: '10px solid #1a1a1a',
           boxShadow: '0 0 0 1px #333, 0 32px 80px rgba(0,0,0,0.8), inset 0 0 0 1.5px rgba(255,255,255,0.12), inset 0 0 0 4px rgba(0,0,0,0.95)',
           transition: 'height 0.3s ease',
         }}
@@ -550,6 +498,65 @@ export function PreVisitConversation({ data, onComplete }: Props) {
           <div className="w-28 h-1 bg-foreground/20 rounded-full" />
         </div>
       </motion.div>
+
+      {/* Choices — bottom sheet on mobile, side panel on desktop */}
+      <div
+        className="absolute bottom-0 left-0 right-0 z-10
+                   md:relative md:inset-auto md:z-auto md:order-1 md:shrink-0 md:w-auto"
+        style={{ maxWidth: undefined }}
+      >
+        <AnimatePresence>
+          {isChoosing && (
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 32 }}
+              className="bg-background/95 backdrop-blur-md border-t border-border/40
+                         px-5 pt-4 pb-10 space-y-2
+                         md:bg-transparent md:backdrop-blur-none md:border-0
+                         md:px-0 md:py-0 md:space-y-2"
+              style={{ maxWidth: 'min(320px, 100vw)' }}
+            >
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-4">
+                Choose your reply
+              </p>
+              {data.exchanges[
+                (phase as { exchangeIdx: number }).exchangeIdx
+              ]?.choices.map((choice) => (
+                <button
+                  key={choice.id}
+                  onClick={() => handleChoice(choice)}
+                  onPointerEnter={() => playHoverTick()}
+                  className="w-full text-left transition-colors"
+                  style={{
+                    padding: '11px 16px',
+                    background: 'hsl(var(--secondary))',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 14,
+                    color: 'hsl(var(--foreground))',
+                    fontSize: 14,
+                    fontFamily: '-apple-system, sans-serif',
+                    lineHeight: 1.45,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {choice.text}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {!isChoosing && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="hidden md:block font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground px-0 py-4"
+          >
+            Before you arrive
+          </motion.p>
+        )}
+      </div>
 
     </div>
   );
