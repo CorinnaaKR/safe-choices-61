@@ -242,7 +242,7 @@ export function PreVisitConversation({ data, onComplete }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col md:flex-row items-center justify-center z-50 gap-3 md:gap-8 px-4 md:px-8 py-4 md:py-0">
+    <div className="fixed inset-0 bg-background flex flex-col md:flex-row items-center justify-center z-50 gap-2 md:gap-8 px-4 md:px-8 pt-2 pb-3 md:py-0">
 
       {/* Left panel on desktop / bottom panel on mobile: choices or scene label */}
       <div className="flex flex-col justify-center w-full md:shrink-0 md:w-auto order-2 md:order-1" style={{ maxWidth: 'min(320px, 90vw)' }}>
@@ -299,7 +299,7 @@ export function PreVisitConversation({ data, onComplete }: Props) {
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col bg-background relative overflow-hidden order-1 md:order-2 max-h-[48vh] md:max-h-[95vh]"
+        className="flex flex-col bg-background relative overflow-hidden order-1 md:order-2 max-h-[68vh] md:max-h-[95vh]"
         style={{
           width: 'min(360px, 82vw)',
           height: isTyping ? 'min(880px, 95vh)' : 'min(780px, 92vh)',
