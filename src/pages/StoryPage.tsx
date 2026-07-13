@@ -75,6 +75,19 @@ export default function StoryPage() {
     setInspectedEvidence(null);
   }, [gameState.currentSceneId, showFeedback]);
 
+  // If the player chose to go straight over (pv-3a), skip the Lazlo text thread —
+  // messaging him before visiting contradicts that choice.
+  useEffect(() => {
+    if (
+      scenarioId === 'lazlo-case' &&
+      gameState.preVisitComplete &&
+      !gameState.lazloThreadComplete &&
+      gameState.preVisitChoices?.includes('pv-3a')
+    ) {
+      completeLazloThread('direct', 'visit');
+    }
+  }, [scenarioId, gameState.preVisitComplete, gameState.lazloThreadComplete, gameState.preVisitChoices, completeLazloThread]);
+
   const sceneType = environmentToSceneType(currentScene?.environment);
   const sceneEvidence = currentScene?.evidence || [];
   const collectedIds = gameState.collectedEvidence.map(e => e.id);
