@@ -40,6 +40,12 @@ interface SceneRendererProps {
   onCameraReset: () => void;
 }
 
+// Mobile = narrow viewport or touch-primary device. We skip heavy GPU
+// postprocessing (N8AO, Bloom, DoF) on mobile to avoid black screens.
+const isMobile = typeof window !== 'undefined' && (
+  window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+);
+
 export function SceneRenderer({
   sceneType,
   scenarioId,
@@ -53,6 +59,8 @@ export function SceneRenderer({
   onCameraReset,
 }: SceneRendererProps) {
   const focusTarget = focusedEvidenceId ? evidencePositions.get(focusedEvidenceId) ?? null : null;
+  // Wider FOV on portrait mobile so the room fills the screen horizontally
+  const fov = isMobile && window.innerHeight > window.innerWidth ? 90 : 75;
   const playerPosRef = useRef(new THREE.Vector3(0, 0, 3));
   const [walkTarget, setWalkTarget] = useState<THREE.Vector3 | null>(null);
   const pendingEvidenceRef = useRef<Evidence | null>(null);
@@ -101,12 +109,13 @@ export function SceneRenderer({
   return (
     <div className="absolute inset-0">
       <Canvas
-        camera={{ position: [0, 1.05, 3], fov: 75 }}
-        shadows
+        camera={{ position: [0, 1.05, 3], fov }}
+        shadows={!isMobile}
         gl={{
-          antialias: true,
+          antialias: !isMobile,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: sceneType === 'playground' ? 1.2 : sceneType === 'home' ? 1.1 : sceneType === 'home-jamie' ? 1.4 : 1.0,
+          powerPreference: isMobile ? 'low-power' : 'high-performance',
         }}
         style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19' }}
       >
@@ -196,37 +205,36 @@ export function SceneRenderer({
             frames={1}
           />
 
-          {/* Always-on realism passes: ambient occlusion grounds objects in
-              their corners, subtle bloom lifts emissives (screens, sky).
-              Outline = basement-style edge highlight on hovered evidence.
-              DoF + vignette join only while inspecting. */}
-          <EffectComposer multisampling={0} autoClear={false}>
-            <N8AO
-              halfRes
-              quality="performance"
-              intensity={2}
-              aoRadius={0.5}
-              distanceFalloff={0.75}
-            />
-            <Outline
-              blur
-              edgeStrength={4}
-              visibleEdgeColor={0xffffff}
-              hiddenEdgeColor={0x555555}
-            />
-            <Bloom mipmapBlur intensity={0.25} luminanceThreshold={0.9} />
-            {focusTarget != null && (
-              <DepthOfField
-                target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])}
-                focalLength={0.02}
-                bokehScale={4}
-                height={480}
+          {/* Postprocessing: skip on mobile to avoid GPU black screens */}
+          {!isMobile && (
+            <EffectComposer multisampling={0} autoClear={false}>
+              <N8AO
+                halfRes
+                quality="performance"
+                intensity={2}
+                aoRadius={0.5}
+                distanceFalloff={0.75}
               />
-            )}
-            {focusTarget != null && (
-              <Vignette eskil={false} offset={0.2} darkness={0.55} />
-            )}
-          </EffectComposer>
+              <Outline
+                blur
+                edgeStrength={4}
+                visibleEdgeColor={0xffffff}
+                hiddenEdgeColor={0x555555}
+              />
+              <Bloom mipmapBlur intensity={0.25} luminanceThreshold={0.9} />
+              {focusTarget != null && (
+                <DepthOfField
+                  target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])}
+                  focalLength={0.02}
+                  bokehScale={4}
+                  height={480}
+                />
+              )}
+              {focusTarget != null && (
+                <Vignette eskil={false} offset={0.2} darkness={0.55} />
+              )}
+            </EffectComposer>
+          )}
 
           <fog attach="fog" args={[
             sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19',
