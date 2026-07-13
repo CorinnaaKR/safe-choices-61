@@ -43,7 +43,7 @@ interface SceneRendererProps {
 // Mobile = narrow viewport or touch-primary device. We skip heavy GPU
 // postprocessing (N8AO, Bloom, DoF) on mobile to avoid black screens.
 const isMobile = typeof window !== 'undefined' && (
-  window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+  window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent)
 );
 
 export function SceneRenderer({
