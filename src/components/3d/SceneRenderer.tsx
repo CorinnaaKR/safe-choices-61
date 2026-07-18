@@ -120,7 +120,6 @@ export function SceneRenderer({
         style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19' }}
       >
         <Suspense fallback={null}>
-          <Selection>
 
           <CameraController
             target={focusTarget}
@@ -138,7 +137,7 @@ export function SceneRenderer({
             visible={false}
           />
 
-          {/* Double-click anywhere on the floor to walk there */}
+          {/* Double-click/tap anywhere on the floor to walk there */}
           {!focusTarget && (
             <mesh
               rotation={[-Math.PI / 2, 0, 0]}
@@ -153,95 +152,40 @@ export function SceneRenderer({
             </mesh>
           )}
 
-          {sceneType === 'classroom' && (
-            <ClassroomScene
-              evidence={evidence}
-              collectedIds={collectedIds}
-              focusedEvidenceId={focusedEvidenceId}
-              onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={handleFocusEvidence}
-            />
-          )}
-          {sceneType === 'playground' && (
-            <PlaygroundScene
-              evidence={evidence}
-              collectedIds={collectedIds}
-              focusedEvidenceId={focusedEvidenceId}
-              onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={handleFocusEvidence}
-            />
-          )}
-          {sceneType === 'office' && (
-            <OfficeScene
-              evidence={evidence}
-              collectedIds={collectedIds}
-              focusedEvidenceId={focusedEvidenceId}
-              onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={handleFocusEvidence}
-            />
-          )}
-          {sceneType === 'home' && (
-            <HomeScene
-              showLazlo={scenarioId === 'lazlo-case'}
-              evidence={evidence}
-              collectedIds={collectedIds}
-              focusedEvidenceId={focusedEvidenceId}
-              onCollectEvidence={onCollectEvidence}
-              onFocusEvidence={handleFocusEvidence}
-            />
-          )}
-          {sceneType === 'home-jamie' && <JamieHomeScene />}
-
-          {/* Environment-based lighting for realistic reflections */}
-          <Environment preset={sceneType === 'playground' ? 'park' : sceneType === 'home' ? 'night' : sceneType === 'home-jamie' ? 'warehouse' : 'apartment'} />
-
-          {/* Contact shadows for grounding objects */}
-          <ContactShadows
-            position={[0, 0.01, 0]}
-            opacity={0.4}
-            scale={sceneType === 'playground' ? 20 : 12}
-            blur={2}
-            far={4}
-            frames={1}
-          />
-
-          {/* Postprocessing: skip on mobile to avoid GPU black screens */}
-          {!isMobile && (
-            <EffectComposer multisampling={0} autoClear={false}>
-              <N8AO
-                halfRes
-                quality="performance"
-                intensity={2}
-                aoRadius={0.5}
-                distanceFalloff={0.75}
-              />
-              <Outline
-                blur
-                edgeStrength={4}
-                visibleEdgeColor={0xffffff}
-                hiddenEdgeColor={0x555555}
-              />
-              <Bloom mipmapBlur intensity={0.25} luminanceThreshold={0.9} />
-              {focusTarget != null && (
-                <DepthOfField
-                  target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])}
-                  focalLength={0.02}
-                  bokehScale={4}
-                  height={480}
-                />
-              )}
-              {focusTarget != null && (
-                <Vignette eskil={false} offset={0.2} darkness={0.55} />
-              )}
-            </EffectComposer>
+          {/* Scene geometry — wrapped in Selection only on desktop for Outline effect */}
+          {isMobile ? (
+            <>
+              {sceneType === 'classroom' && <ClassroomScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'playground' && <PlaygroundScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'office' && <OfficeScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'home' && <HomeScene showLazlo={scenarioId === 'lazlo-case'} evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'home-jamie' && <JamieHomeScene />}
+              {/* Mobile lighting — simple, no HDR, no render targets */}
+              <ambientLight intensity={sceneType === 'playground' ? 1.8 : sceneType === 'home-jamie' ? 1.4 : 1.2} />
+              <directionalLight position={[5, 8, 5]} intensity={1.2} />
+              <directionalLight position={[-4, 4, -4]} intensity={0.4} />
+            </>
+          ) : (
+            <Selection>
+              {sceneType === 'classroom' && <ClassroomScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'playground' && <PlaygroundScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'office' && <OfficeScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'home' && <HomeScene showLazlo={scenarioId === 'lazlo-case'} evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'home-jamie' && <JamieHomeScene />}
+              {/* Desktop: full HDR environment + contact shadows + postprocessing */}
+              <Environment preset={sceneType === 'playground' ? 'park' : sceneType === 'home' ? 'night' : sceneType === 'home-jamie' ? 'warehouse' : 'apartment'} />
+              <ContactShadows position={[0, 0.01, 0]} opacity={0.4} scale={sceneType === 'playground' ? 20 : 12} blur={2} far={4} frames={1} />
+              <EffectComposer multisampling={0} autoClear={false}>
+                <N8AO halfRes quality="performance" intensity={2} aoRadius={0.5} distanceFalloff={0.75} />
+                <Outline blur edgeStrength={4} visibleEdgeColor={0xffffff} hiddenEdgeColor={0x555555} />
+                <Bloom mipmapBlur intensity={0.25} luminanceThreshold={0.9} />
+                {focusTarget != null && <DepthOfField target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])} focalLength={0.02} bokehScale={4} height={480} />}
+                {focusTarget != null && <Vignette eskil={false} offset={0.2} darkness={0.55} />}
+              </EffectComposer>
+              <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19', sceneType === 'home' || sceneType === 'home-jamie' ? 8 : 12, sceneType === 'home' || sceneType === 'home-jamie' ? 18 : 30]} />
+            </Selection>
           )}
 
-          <fog attach="fog" args={[
-            sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19',
-            sceneType === 'home' || sceneType === 'home-jamie' ? 8 : 12,
-            sceneType === 'home' || sceneType === 'home-jamie' ? 18 : 30,
-          ]} />
-          </Selection>
         </Suspense>
       </Canvas>
     </div>
