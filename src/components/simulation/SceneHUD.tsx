@@ -270,7 +270,7 @@ export function SceneHUD({
 
       {/* ── NARRATIVE: progressive reveal, bottom-centre ─────────────────── */}
       {!showFeedback && sceneReady && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl pointer-events-auto">
+        <div className="absolute left-1/2 -translate-x-1/2 w-[90vw] max-w-xl pointer-events-auto" style={{ bottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))' }}>
           <AnimatePresence mode="wait">
             {!allRevealed && visibleParagraph > 0 && (
               <motion.div
@@ -296,7 +296,11 @@ export function SceneHUD({
                       animate={{ opacity: [0.85, 1, 0.85] }}
                       transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                     >
-                      {visibleParagraph >= currentScene.narrative.length - 1 ? 'Continue' : 'Next'}
+                      {visibleParagraph >= currentScene.narrative.length - 1 && currentScene.isDecisionPoint && uncollected.length > 0
+                        ? 'Look around →'
+                        : visibleParagraph >= currentScene.narrative.length - 1
+                        ? 'Continue'
+                        : 'Next'}
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M6 3l2 2-2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </motion.button>
                   </div>
@@ -340,7 +344,7 @@ export function SceneHUD({
 
       {/* ── EXPLORE PROMPT: bottom-right, gates the decision while clues remain ── */}
       {!showFeedback && needsExplorePrompt && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-auto md:w-[400px] pointer-events-auto">
+        <div className="absolute bottom-safe left-4 right-4 md:left-auto md:bottom-4 md:w-[400px] pointer-events-auto" style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -348,16 +352,20 @@ export function SceneHUD({
             className="case-panel"
           >
             <div className="px-5 py-3 border-b border-border">
-              <span className="hud-label text-primary">Before you decide</span>
+              <span className="hud-label text-primary">Look around</span>
             </div>
             <div className="p-5">
-              <p className="text-sm text-foreground/85 leading-relaxed mb-4">
-                Take a moment to look around — there might be something here worth noticing.
-                {' '}
-                <span className="text-primary">
-                  {String(uncollected.length).padStart(2, '0')}&nbsp;{uncollected.length === 1 ? 'clue' : 'clues'}
+              <p className="text-base md:text-sm text-foreground/85 leading-relaxed mb-1">
+                Look around before you decide.
+              </p>
+              <p className="text-sm text-foreground/60 leading-relaxed mb-4">
+                {mode === 'learning' ? 'Swipe' : 'Drag'} to look around the room.{' '}
+                Tap anything that catches your attention.{' '}
+                There {uncollected.length === 1 ? 'is' : 'are'}{' '}
+                <span className="text-primary font-medium">
+                  {uncollected.length === 1 ? 'something' : `${uncollected.length} things`}
                 </span>{' '}
-                still in this scene.
+                here worth noticing.
               </p>
               <motion.button
                 onClick={() => setExploreAcknowledged(true)}
@@ -366,7 +374,7 @@ export function SceneHUD({
                 transition={CHOICE_SPRING}
                 className="w-full bg-primary text-primary-foreground font-sans text-sm font-semibold px-5 py-3 hover:bg-primary/90 transition-colors"
               >
-                I'm ready to decide
+                I've seen enough — show me the choices
               </motion.button>
             </div>
           </motion.div>
@@ -376,8 +384,8 @@ export function SceneHUD({
       {/* ── DECISION PANEL: bottom-right ─────────────────────────────────── */}
       {!showFeedback && sceneReady && allRevealed && currentScene.isDecisionPoint && !needsExplorePrompt && currentScene.choices && (
         <div
-          className="absolute bottom-4 left-4 right-4 md:left-auto md:w-[400px] pointer-events-auto"
-          style={{ pointerEvents: choicesInteractive ? 'auto' : 'none' }}
+          className="absolute left-4 right-4 md:left-auto md:w-[400px] pointer-events-auto"
+          style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))', pointerEvents: choicesInteractive ? 'auto' : 'none' }}
         >
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -412,7 +420,7 @@ export function SceneHUD({
                     <span className="font-mono text-xs text-muted-foreground group-hover:text-primary mt-0.5 transition-colors">
                       [{String.fromCharCode(65 + i)}]
                     </span>
-                    <p className="text-sm text-foreground/85 group-hover:text-foreground leading-relaxed">
+                    <p className="text-base md:text-sm text-foreground/85 group-hover:text-foreground leading-relaxed">
                       {choice.text}
                     </p>
                   </div>
@@ -491,7 +499,7 @@ export function SceneHUD({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-            className="absolute top-0 right-0 bottom-0 w-80 case-panel border-l border-border pointer-events-auto overflow-y-auto"
+            className="absolute top-0 right-0 bottom-0 w-full md:w-80 case-panel border-l border-border pointer-events-auto overflow-y-auto"
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 bg-background/90">
               <span className="hud-label text-primary">
@@ -521,7 +529,7 @@ export function SceneHUD({
                     <h5 className="font-mono text-xs uppercase tracking-[0.15em] text-foreground mb-1.5">
                       {ev.title}
                     </h5>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{ev.content}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{ev.content}</p>
                   </div>
                 ))
               )}

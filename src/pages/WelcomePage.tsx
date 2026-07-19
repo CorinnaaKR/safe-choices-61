@@ -160,9 +160,8 @@ export default function WelcomePage() {
           <div className="grid md:grid-cols-2 gap-4">
             {scenarios.map((scenario, index) => {
               const locked = scenario.status === 'in-development';
-              const modeMismatch = !locked && !!scenario.supportedModes && !scenario.supportedModes.includes(mode);
               const effectiveMode = modeForScenario(scenario);
-              const inProgress = !locked && !modeMismatch && hasProgress(scenario.id, effectiveMode);
+              const inProgress = !locked && hasProgress(scenario.id, effectiveMode);
               const hook = scenarioHooks[scenario.id];
               const fixedModeLabel = scenario.supportedModes?.length === 1
                 ? modeOptions.find((m) => m.id === scenario.supportedModes![0])?.title
@@ -173,31 +172,30 @@ export default function WelcomePage() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + index * 0.1 }}
-                  className={cn(
-                    'content-card p-6 flex flex-col group',
-                    (locked || modeMismatch) && 'opacity-40'
-                  )}
+                  className={cn('content-card p-6 flex flex-col group', locked && 'opacity-40')}
                 >
                   <div className="flex items-center justify-between mb-5">
                     <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                       {scenario.domain?.replace(/-/g, ' ')}
                     </span>
-                    {fixedModeLabel && !locked && (
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-primary/80 border border-primary/30 rounded px-2 py-0.5">
-                        {fixedModeLabel}
-                      </span>
-                    )}
-                    {locked ? (
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground border border-border rounded px-2 py-0.5">
-                        Coming soon
-                      </span>
-                    ) : (
-                      scenario.durationMinutes && (
-                        <span className="text-[10px] font-mono text-muted-foreground">
-                          ~{scenario.durationMinutes} min
+                    <div className="flex items-center gap-2">
+                      {fixedModeLabel && !locked && (
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-primary/80 border border-primary/30 rounded px-2 py-0.5">
+                          {fixedModeLabel}
                         </span>
-                      )
-                    )}
+                      )}
+                      {locked ? (
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground border border-border rounded px-2 py-0.5">
+                          Coming soon
+                        </span>
+                      ) : (
+                        scenario.durationMinutes && (
+                          <span className="text-[10px] font-mono text-muted-foreground">
+                            ~{scenario.durationMinutes} min
+                          </span>
+                        )
+                      )}
+                    </div>
                   </div>
 
                   {hook && (
@@ -213,7 +211,7 @@ export default function WelcomePage() {
                     You play: {scenario.role}
                   </p>
 
-                  {!locked && !modeMismatch && (
+                  {!locked && (
                     <div className="flex items-center gap-3 flex-wrap">
                       <button
                         onClick={() => setPendingScenario(scenario)}
@@ -231,11 +229,6 @@ export default function WelcomePage() {
                         </button>
                       )}
                     </div>
-                  )}
-                  {!locked && modeMismatch && (
-                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/60">
-                      Not available in {mode === 'training' ? 'training' : 'story'} mode
-                    </p>
                   )}
                 </motion.article>
               );

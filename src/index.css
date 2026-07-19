@@ -74,6 +74,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   ::selection {
@@ -85,7 +86,7 @@
 @layer components {
   /* Monospace HUD label: uppercase, gently letter-spaced — used inside the simulation HUD */
   .hud-label {
-    @apply font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground hud-float;
+    @apply font-mono text-[13px] md:text-[11px] uppercase tracking-[0.16em] text-muted-foreground hud-float;
   }
 
   /* Warmer label for content pages (welcome, gate, results) — no uppercase aggression */
@@ -95,7 +96,7 @@
 
   /* Bracketed keyboard affordance: [E] EXAMINE */
   .key-hint {
-    @apply font-mono text-[11px] uppercase tracking-[0.12em] text-foreground/65 hud-float;
+    @apply font-mono text-[13px] md:text-[11px] uppercase tracking-[0.12em] text-foreground/65 hud-float;
   }
   .key-hint b {
     @apply font-medium text-foreground/90;
