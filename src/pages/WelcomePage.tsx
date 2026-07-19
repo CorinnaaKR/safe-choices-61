@@ -296,7 +296,7 @@ export default function WelcomePage() {
 
       {/* Footer */}
       <footer className="px-5 md:px-10 py-8 border-t border-border">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl flex flex-col gap-4">
           <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
             The people in these stories are not real. They are here to help you
             learn. If you are worried about a real person, tell someone you
@@ -305,6 +305,17 @@ export default function WelcomePage() {
             If someone is in danger right now, call{' '}
             <span className="text-foreground font-mono">999</span>.
           </p>
+          <button
+            onClick={() => {
+              Object.keys(localStorage)
+                .filter((k) => k.startsWith('heli-state:'))
+                .forEach((k) => localStorage.removeItem(k));
+              window.location.reload();
+            }}
+            className="self-start font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+          >
+            Clear saved progress
+          </button>
         </div>
       </footer>
 
