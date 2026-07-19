@@ -5,6 +5,14 @@ import * as THREE from 'three';
 import { playHoverTick, playSelect } from '@/lib/sfx';
 import { GLBCharacter } from './GLBCharacter';
 
+const isMobile = typeof window !== 'undefined' && (
+  window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent)
+);
+// Segment counts: halved on mobile to cut triangle count per NPC ~75%
+const S = isMobile ? 6 : 12;  // sphere segments
+const C = isMobile ? 4 : 10;  // capsule radial segments
+const CL = isMobile ? 6 : 20; // capsule length segments
+
 /** Toggle the expanded crosshair cursor on the canvas wrapper. */
 function useCrosshair() {
   const gl = useThree((s) => s.gl);
@@ -126,41 +134,41 @@ export function NPCCharacter({
       <>
       {/* ── Geometry fallback ──────────────────────────────────────────── */}
       {/* Body */}
-      <mesh position={[0, bodyY, 0]} castShadow>
-        <capsuleGeometry args={[0.16, 0.3, 10, 20]} />
+      <mesh position={[0, bodyY, 0]} castShadow={!isMobile}>
+        <capsuleGeometry args={[0.16, 0.3, C, CL]} />
         <meshStandardMaterial color={bodyColor} roughness={0.75} metalness={0.02} />
       </mesh>
 
       {/* Head */}
-      <mesh ref={headRef} position={[0, headY, 0]} castShadow>
-        <sphereGeometry args={[0.14, 20, 20]} />
+      <mesh ref={headRef} position={[0, headY, 0]} castShadow={!isMobile}>
+        <sphereGeometry args={[0.14, S * 2, S * 2]} />
         <meshStandardMaterial color={skinColor} roughness={0.6} metalness={0} />
       </mesh>
 
       {/* Eyes */}
       <group position={[0, headY, 0]} rotation={[headTilt, 0, 0]}>
         <mesh position={[0.04, 0.02, 0.12]}>
-          <sphereGeometry args={[0.02, 10, 10]} />
+          <sphereGeometry args={[0.02, S, S]} />
           <meshStandardMaterial color="#2A2A2A" roughness={0.3} />
         </mesh>
         <mesh position={[-0.04, 0.02, 0.12]}>
-          <sphereGeometry args={[0.02, 10, 10]} />
+          <sphereGeometry args={[0.02, S, S]} />
           <meshStandardMaterial color="#2A2A2A" roughness={0.3} />
         </mesh>
         {/* Eye whites */}
         <mesh position={[0.04, 0.02, 0.115]}>
-          <sphereGeometry args={[0.028, 10, 10]} />
+          <sphereGeometry args={[0.028, S, S]} />
           <meshStandardMaterial color="#F0F0F0" roughness={0.2} />
         </mesh>
         <mesh position={[-0.04, 0.02, 0.115]}>
-          <sphereGeometry args={[0.028, 10, 10]} />
+          <sphereGeometry args={[0.028, S, S]} />
           <meshStandardMaterial color="#F0F0F0" roughness={0.2} />
         </mesh>
       </group>
 
       {/* Hair */}
       <mesh position={[0, headY + 0.1, -0.02]}>
-        <sphereGeometry args={[0.145, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
+        <sphereGeometry args={[0.145, S, S, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial color="#4A2E14" roughness={0.9} metalness={0} />
       </mesh>
 
@@ -168,19 +176,19 @@ export function NPCCharacter({
       {hasBeard && (
         <>
           <mesh position={[0, headY - 0.10, 0.13]}>
-            <sphereGeometry args={[0.075, 10, 10]} />
+            <sphereGeometry args={[0.075, S, S]} />
             <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
           </mesh>
           <mesh position={[0.10, headY - 0.05, 0.11]}>
-            <sphereGeometry args={[0.06, 10, 10]} />
+            <sphereGeometry args={[0.06, S, S]} />
             <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
           </mesh>
           <mesh position={[-0.10, headY - 0.05, 0.11]}>
-            <sphereGeometry args={[0.06, 10, 10]} />
+            <sphereGeometry args={[0.06, S, S]} />
             <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
           </mesh>
           <mesh position={[0, headY + 0.01, 0.15]}>
-            <sphereGeometry args={[0.045, 8, 8]} />
+            <sphereGeometry args={[0.045, S, S]} />
             <meshStandardMaterial color="#3A2814" roughness={0.95} metalness={0} />
           </mesh>
         </>
@@ -188,34 +196,32 @@ export function NPCCharacter({
 
       {/* Left arm */}
       <group ref={leftArmRef} position={[0.22, bodyY + 0.1 + shoulderDrop, 0]}>
-        <mesh position={[0, -0.15, 0]} castShadow>
-          <capsuleGeometry args={[0.042, 0.2, 8, 10]} />
+        <mesh position={[0, -0.15, 0]} castShadow={!isMobile}>
+          <capsuleGeometry args={[0.042, 0.2, C, CL]} />
           <meshStandardMaterial color={bodyColor} roughness={0.75} metalness={0.02} />
         </mesh>
-        {/* Forearm / wrist */}
         <mesh position={[0, -0.3, 0]}>
-          <capsuleGeometry args={[0.035, 0.12, 8, 10]} />
+          <capsuleGeometry args={[0.035, 0.12, C, CL]} />
           <meshStandardMaterial color={skinColor} roughness={0.6} />
         </mesh>
-        {/* Hand */}
         <mesh position={[0, -0.4, 0]}>
-          <sphereGeometry args={[0.03, 8, 8]} />
+          <sphereGeometry args={[0.03, S, S]} />
           <meshStandardMaterial color={skinColor} roughness={0.6} />
         </mesh>
       </group>
 
       {/* Right arm */}
       <group ref={rightArmRef} position={[-0.22, bodyY + 0.1 + shoulderDrop, 0]}>
-        <mesh position={[0, -0.15, 0]} castShadow>
-          <capsuleGeometry args={[0.042, 0.2, 8, 10]} />
+        <mesh position={[0, -0.15, 0]} castShadow={!isMobile}>
+          <capsuleGeometry args={[0.042, 0.2, C, CL]} />
           <meshStandardMaterial color={bodyColor} roughness={0.75} metalness={0.02} />
         </mesh>
         <mesh position={[0, -0.3, 0]}>
-          <capsuleGeometry args={[0.035, 0.12, 8, 10]} />
+          <capsuleGeometry args={[0.035, 0.12, C, CL]} />
           <meshStandardMaterial color={skinColor} roughness={0.6} />
         </mesh>
         <mesh position={[0, -0.4, 0]}>
-          <sphereGeometry args={[0.03, 8, 8]} />
+          <sphereGeometry args={[0.03, S, S]} />
           <meshStandardMaterial color={skinColor} roughness={0.6} />
         </mesh>
       </group>
@@ -223,33 +229,31 @@ export function NPCCharacter({
       {/* Legs */}
       {isSitting ? (
         <>
-          {/* Thighs — extend forward from hips */}
-          <mesh position={[0.08, 0.22, 0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-            <capsuleGeometry args={[0.05, 0.22, 8, 10]} />
+          <mesh position={[0.08, 0.22, 0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow={!isMobile}>
+            <capsuleGeometry args={[0.05, 0.22, C, CL]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
-          <mesh position={[-0.08, 0.22, 0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-            <capsuleGeometry args={[0.05, 0.22, 8, 10]} />
+          <mesh position={[-0.08, 0.22, 0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow={!isMobile}>
+            <capsuleGeometry args={[0.05, 0.22, C, CL]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
-          {/* Shins — hang down from knees */}
-          <mesh position={[0.08, 0.09, 0.35]} castShadow>
-            <capsuleGeometry args={[0.045, 0.18, 8, 10]} />
+          <mesh position={[0.08, 0.09, 0.35]} castShadow={!isMobile}>
+            <capsuleGeometry args={[0.045, 0.18, C, CL]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
-          <mesh position={[-0.08, 0.09, 0.35]} castShadow>
-            <capsuleGeometry args={[0.045, 0.18, 8, 10]} />
+          <mesh position={[-0.08, 0.09, 0.35]} castShadow={!isMobile}>
+            <capsuleGeometry args={[0.045, 0.18, C, CL]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
         </>
       ) : (
         <>
-          <mesh position={[0.07, 0.2, 0]} castShadow>
-            <capsuleGeometry args={[0.05, 0.25, 8, 10]} />
+          <mesh position={[0.07, 0.2, 0]} castShadow={!isMobile}>
+            <capsuleGeometry args={[0.05, 0.25, C, CL]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
-          <mesh position={[-0.07, 0.2, 0]} castShadow>
-            <capsuleGeometry args={[0.05, 0.25, 8, 10]} />
+          <mesh position={[-0.07, 0.2, 0]} castShadow={!isMobile}>
+            <capsuleGeometry args={[0.05, 0.25, C, CL]} />
             <meshStandardMaterial color="#2C2C3E" roughness={0.7} />
           </mesh>
         </>

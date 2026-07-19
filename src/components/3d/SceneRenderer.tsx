@@ -111,11 +111,14 @@ export function SceneRenderer({
       <Canvas
         camera={{ position: [0, 1.05, 3], fov }}
         shadows={!isMobile}
+        dpr={isMobile ? 1 : [1, 2]}
+        performance={{ min: 0.5 }}
         gl={{
           antialias: !isMobile,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: sceneType === 'playground' ? 1.2 : sceneType === 'home' ? 1.1 : sceneType === 'home-jamie' ? 1.4 : 1.0,
           powerPreference: isMobile ? 'low-power' : 'high-performance',
+          failIfMajorPerformanceCaveat: false,
         }}
         style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19' }}
       >
