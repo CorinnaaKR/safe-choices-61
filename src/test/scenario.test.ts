@@ -15,6 +15,15 @@ describe('scenario registry integrity', () => {
   for (const scenario of playable) {
     describe(scenario.title, () => {
       const sceneIds = new Set(scenario.scenes.map((s) => s.id));
+      // 'scene-call' is a hardcoded sentinel (see StoryPage.tsx) that hands off to the
+      // scripted CallScene component rather than a real registered scene — valid only
+      // when the scenario actually defines a callScene to hand off to.
+      const isValidTarget = (nextSceneId: string) =>
+        sceneIds.has(nextSceneId) || (nextSceneId === 'scene-call' && !!scenario.callScene);
+      // Scoring (evidence points, choice skill areas) only applies to scenarios that
+      // support Training mode — see Mode / supportedModes in types/simulation.ts.
+      const supportsTraining =
+        !scenario.supportedModes || scenario.supportedModes.includes('training');
 
       it('has at least one scene and one final scene', () => {
         expect(scenario.scenes.length).toBeGreaterThan(0);
@@ -25,7 +34,7 @@ describe('scenario registry integrity', () => {
         for (const scene of scenario.scenes) {
           for (const choice of scene.choices ?? []) {
             expect(
-              sceneIds.has(choice.nextSceneId),
+              isValidTarget(choice.nextSceneId),
               `choice ${choice.id} in ${scene.id} -> missing scene "${choice.nextSceneId}"`
             ).toBe(true);
           }
@@ -54,17 +63,24 @@ describe('scenario registry integrity', () => {
         }
       });
 
-      it('all evidence carries category, importance and points', () => {
+      it('all evidence carries category and importance', () => {
         for (const scene of scenario.scenes) {
           for (const ev of scene.evidence ?? []) {
             expect(ev.category, `evidence ${ev.id} missing category`).toBeTruthy();
             expect(ev.importance, `evidence ${ev.id} missing importance`).toBeTruthy();
+          }
+        }
+      });
+
+      it.skipIf(!supportsTraining)('all evidence carries points (training-mode scenarios)', () => {
+        for (const scene of scenario.scenes) {
+          for (const ev of scene.evidence ?? []) {
             expect(ev.points, `evidence ${ev.id} missing points`).toBeGreaterThan(0);
           }
         }
       });
 
-      it('all choices carry a skill area', () => {
+      it.skipIf(!supportsTraining)('all choices carry a skill area (training-mode scenarios)', () => {
         for (const scene of scenario.scenes) {
           for (const choice of scene.choices ?? []) {
             expect(choice.skillArea, `choice ${choice.id} missing skillArea`).toBeTruthy();

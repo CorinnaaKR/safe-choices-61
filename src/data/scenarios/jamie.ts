@@ -24,12 +24,16 @@ const evidenceMeta: Record<
   string,
   { category: EvidenceCategory; importance: EvidenceImportance; points: number }
 > = {
-  'obs-1':    { category: 'behavioural', importance: 'major',    points: 0 },
-  'obs-pe-1': { category: 'physical',    importance: 'major',    points: 0 },
-  'obs-2':    { category: 'behavioural', importance: 'major',    points: 0 },
-  'vis-1':    { category: 'physical',    importance: 'major',    points: 0 },
-  'vis-2':    { category: 'physical',    importance: 'critical', points: 0 },
-  'obs-3':    { category: 'verbal',      importance: 'critical', points: 0 },
+  'obs-1':         { category: 'behavioural', importance: 'major',    points: 0 },
+  'obs-pe-1':      { category: 'physical',    importance: 'major',    points: 0 },
+  'obs-2':         { category: 'behavioural', importance: 'major',    points: 0 },
+  'vis-1':         { category: 'physical',    importance: 'major',    points: 0 },
+  'vis-2':         { category: 'physical',    importance: 'critical', points: 0 },
+  'obs-3':         { category: 'verbal',      importance: 'critical', points: 0 },
+  'obs-attendance': { category: 'behavioural', importance: 'minor',   points: 0 },
+  'obs-control':    { category: 'behavioural', importance: 'major',   points: 0 },
+  'obs-home':       { category: 'behavioural', importance: 'major',   points: 0 },
+  'obs-4':          { category: 'behavioural', importance: 'minor',   points: 0 },
 };
 
 const sceneEnvironments: Record<string, SceneEnvironment> = {

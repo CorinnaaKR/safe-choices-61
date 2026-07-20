@@ -17,6 +17,8 @@ describe('app smoke test', () => {
     // Both scenarios now playable
     expect(screen.getByText(/Jamie's Story/)).toBeTruthy();
     expect(screen.getByText(/Lazlo's Story/)).toBeTruthy();
-    expect(screen.getAllByRole('button', { name: /begin simulation/i }).length).toBeGreaterThanOrEqual(1);
+    // Buttons carry an aria-label ("Enter Jamie's Story") that overrides their
+    // visible text ("Enter the story") as the accessible name.
+    expect(screen.getAllByRole('button', { name: /^enter /i }).length).toBeGreaterThanOrEqual(1);
   });
 });

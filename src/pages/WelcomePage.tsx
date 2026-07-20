@@ -116,13 +116,15 @@ export default function WelcomePage() {
       {/* Masthead */}
       <div className="w-full border-b border-border">
         <div className="max-w-4xl mx-auto px-5 md:px-10 py-6 md:py-10 flex flex-col items-center gap-1">
-          <h1 className="flex items-center gap-2 md:gap-3">
-            {['H','E','L','I'].map((letter, i) => (
-              <span key={letter} className="flex items-center gap-2 md:gap-3">
-                <span className="font-mono text-4xl md:text-5xl font-bold text-foreground">{letter}</span>
-                {i < 3 && <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary flex-shrink-0" />}
-              </span>
-            ))}
+          <h1 aria-label="Heli" className="flex items-center gap-2 md:gap-3">
+            <span aria-hidden="true" className="flex items-center gap-2 md:gap-3">
+              {['H','E','L','I'].map((letter, i) => (
+                <span key={letter} className="flex items-center gap-2 md:gap-3">
+                  <span className="font-mono text-4xl md:text-5xl font-bold text-foreground">{letter}</span>
+                  {i < 3 && <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary flex-shrink-0" />}
+                </span>
+              ))}
+            </span>
           </h1>
         </div>
       </div>
@@ -142,10 +144,10 @@ export default function WelcomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="font-sans text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight tracking-tight text-center">
+          <h2 className="font-sans text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight tracking-tight text-center">
             The signs are there.<br />
             <span className="text-primary">Be the person who notices.</span>
-          </h1>
+          </h2>
           <p className="text-base text-muted-foreground max-w-lg leading-relaxed text-center mx-auto">
             Step into a realistic simulation. Read the room. Make decisions under
             uncertainty. Find out what you missed — and what your choices meant.
