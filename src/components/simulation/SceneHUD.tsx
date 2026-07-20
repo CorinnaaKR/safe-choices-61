@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Evidence, Scene, Choice, GameState, Mode, CastMember, KnownFact } from '@/types/simulation';
 import { FeedbackPanel } from './FeedbackPanel';
@@ -539,51 +540,49 @@ export function SceneHUD({
       </AnimatePresence>
 
       {/* ── ONBOARDING OVERLAY: shown once on first play ─────────────────── */}
-      <AnimatePresence>
-        {!onboardingDone && sceneReady && (
+      {/* Outer wrapper is a plain div so CSS pointer-events-none applies     */}
+      {/* instantly on dismiss — Framer Motion overrides inline style props.  */}
+      {sceneReady && (
+        <div
+          className={cn(
+            'absolute inset-0 z-50 flex items-center justify-center transition-opacity duration-[400ms]',
+            onboardingDone ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto',
+          )}
+        >
+          <div className="absolute inset-0 bg-background/75" onClick={dismissOnboarding} />
           <motion.div
-            className="absolute inset-0 z-50 flex items-center justify-center pointer-events-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
+            className="relative z-10 w-[90vw] max-w-sm case-panel p-8 flex flex-col gap-5"
           >
-            <div className="absolute inset-0 bg-background/75" onClick={dismissOnboarding} />
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
-              className="relative z-10 w-[90vw] max-w-sm case-panel p-8 flex flex-col gap-5"
+            <div className="space-y-1">
+              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary">How to play</p>
+              <h2 className="font-sans text-lg font-bold text-foreground leading-snug">You're here. Look around.</h2>
+            </div>
+            <ul className="space-y-3">
+              {[
+                { key: '↑ ↓', label: 'move forward and back' },
+                { key: '← →', label: 'turn left and right' },
+                { key: 'Drag', label: 'to look around freely' },
+                { key: mode === 'learning' ? 'Tap' : 'Click', label: 'anything that feels significant' },
+              ].map(({ key, label }) => (
+                <li key={key} className="flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">{key}</span>
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={dismissOnboarding}
+              className="w-full bg-primary text-primary-foreground font-sans text-sm font-semibold px-5 py-3 hover:bg-primary/90 transition-colors"
+              autoFocus
             >
-              <div className="space-y-1">
-                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary">How to play</p>
-                <h2 className="font-sans text-lg font-bold text-foreground leading-snug">You're here. Look around.</h2>
-              </div>
-              <ul className="space-y-3">
-                {[
-                  { key: '↑ ↓', label: 'move forward and back' },
-                  { key: '← →', label: 'turn left and right' },
-                  { key: 'Drag', label: 'to look around freely' },
-                  { key: mode === 'learning' ? 'Tap' : 'Click', label: 'anything that feels significant' },
-                ].map(({ key, label }) => (
-                  <li key={key} className="flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
-                    <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">{key}</span>
-                    <span>{label}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={dismissOnboarding}
-                className="w-full bg-primary text-primary-foreground font-sans text-sm font-semibold px-5 py-3 hover:bg-primary/90 transition-colors"
-                autoFocus
-              >
-                I'm ready
-              </button>
-            </motion.div>
+              I'm ready
+            </button>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
       {/* ── ARIA LIVE: evidence count announcements for screen readers ─── */}
       <div
