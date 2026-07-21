@@ -18,8 +18,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // Log to console in dev; swap for a real logger (Sentry etc.) later
     console.error('[ErrorBoundary]', error, info.componentStack);
+    // Stale Vite chunks after a new deploy produce a "Failed to fetch dynamically
+    // imported module" error. A hard reload picks up the new chunks automatically.
+    if (error.message?.includes('dynamically imported module') || error.message?.includes('Failed to fetch')) {
+      window.location.reload();
+    }
   }
 
   private reset = () => {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSimulation } from '@/hooks/useSimulation';
 import { DEFAULT_SCENARIO_ID } from '@/data/scenarios';
@@ -75,6 +75,8 @@ export default function ResultsPage() {
     useSimulation(scenarioId, mode);
 
   const { toast } = useToast();
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const scorePercentage =
     gameState.maxPossiblePoints > 0
