@@ -8,6 +8,7 @@ import { GLBCharacter } from './GLBCharacter';
 const isMobile = typeof window !== 'undefined' && (
   window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent)
 );
+const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 // Segment counts: halved on mobile to cut triangle count per NPC ~75%
 const S = isMobile ? 6 : 12;  // sphere segments
 const C = isMobile ? 4 : 10;  // capsule radial segments
@@ -363,13 +364,17 @@ function NPCHotspotMarker({
       <mesh
         onClick={(e) => {
           e.stopPropagation();
-          if (e.delta > 5) return; // orbit drag, not a click
+          // Touch taps can register a small delta — use a looser threshold
+          if (e.delta > (isTouchDevice ? 12 : 5)) return;
           playSelect();
           setCrosshairActive(false);
+          onHover(false);
           onClick();
         }}
         onPointerOver={(e) => { e.stopPropagation(); onHover(true); playHoverTick(); setCrosshairActive(true); }}
         onPointerOut={() => { onHover(false); setCrosshairActive(false); }}
+        // Show tooltip on touch tap-hold so mobile users see the label before tapping
+        onPointerDown={(e) => { if (e.pointerType === 'touch') onHover(true); }}
       >
         <sphereGeometry args={[0.35, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -381,7 +386,9 @@ function NPCHotspotMarker({
           <div className="flex flex-col items-center pointer-events-none -translate-y-full">
             <div className="bg-background/90 border border-foreground/60 px-3 py-1.5 whitespace-nowrap">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground">{hotspot.label}</p>
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary mt-0.5">{hotspot.hint}</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary mt-0.5">
+                {isTouchDevice ? hotspot.hint.replace(/\[Click\]/gi, '[Tap]') : hotspot.hint}
+              </p>
             </div>
             <div className="w-px h-5 bg-foreground/60" />
           </div>

@@ -78,7 +78,8 @@ export function CameraController({
     let lastY = 0;
 
     const onPointerDown = (e: PointerEvent) => {
-      if (e.button !== 0) return;
+      // button === -1 on touch in some browsers; allow touch (pointerType) or primary mouse
+      if (e.button !== 0 && e.pointerType !== 'touch') return;
       pointerDown = true;
       lastX = e.clientX;
       lastY = e.clientY;

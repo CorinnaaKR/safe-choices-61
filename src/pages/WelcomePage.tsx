@@ -176,11 +176,11 @@ export default function WelcomePage() {
                   transition={{ delay: 0.15 + index * 0.1 }}
                   className={cn('content-card p-6 flex flex-col group', locked && 'opacity-40')}
                 >
-                  <div className="flex items-center justify-between mb-5">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="flex items-center justify-between gap-2 mb-5">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground min-w-0 truncate">
                       {scenario.domain?.replace(/-/g, ' ')}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       {fixedModeLabel && !locked && (
                         <span className="text-[10px] font-mono uppercase tracking-widest text-primary/80 border border-primary/30 rounded px-2 py-0.5">
                           {fixedModeLabel}

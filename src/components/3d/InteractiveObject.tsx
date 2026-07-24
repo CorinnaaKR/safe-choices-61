@@ -25,6 +25,7 @@ export function InteractiveObject({
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const gl = useThree((s) => s.gl);
+  const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
   const setCrosshairActive = (active: boolean) => {
     const area = gl.domElement.closest('.crosshair-area');
@@ -41,9 +42,11 @@ export function InteractiveObject({
           position={[0, 0.4, 0]}
           onClick={(e) => {
             e.stopPropagation();
-            if (e.delta > 5) return;
+            // Touch taps can register a small delta — use a looser threshold
+            if (e.delta > (isTouchDevice ? 12 : 5)) return;
             playSelect();
             setCrosshairActive(false);
+            setHovered(false);
             onClick();
           }}
           onPointerOver={(e) => {
@@ -55,6 +58,10 @@ export function InteractiveObject({
           onPointerOut={() => {
             setHovered(false);
             setCrosshairActive(false);
+          }}
+          // Show tooltip on touch tap-hold (pointerdown) so mobile users get the affordance
+          onPointerDown={(e) => {
+            if (e.pointerType === 'touch') setHovered(true);
           }}
         >
           <boxGeometry args={[0.9, 1.2, 0.6]} />
@@ -71,7 +78,7 @@ export function InteractiveObject({
                 {label}
               </p>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary mt-0.5">
-                [Click] Look closer
+                {isTouchDevice ? '[Tap] Look closer' : '[Click] Look closer'}
               </p>
             </div>
             <div className="w-px h-4 bg-foreground/50" />
