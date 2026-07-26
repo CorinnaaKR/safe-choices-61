@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
     const context = this.props.context ?? 'page';
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-6">
+      <div className="min-h-dvh flex items-center justify-center bg-background px-6">
         <div className="case-panel max-w-lg w-full p-8 space-y-6">
           {/* Header */}
           <div className="border-b border-border pb-4">

@@ -112,7 +112,7 @@ export default function WelcomePage() {
   }
 
   return (
-    <div className="min-h-screen relative flex flex-col items-center">
+    <div className="min-h-dvh relative flex flex-col items-center">
       {/* Masthead */}
       <div className="w-full border-b border-border">
         <div className="max-w-4xl mx-auto px-5 md:px-10 py-6 md:py-10 flex flex-col items-center gap-1">

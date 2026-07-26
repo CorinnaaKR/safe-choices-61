@@ -46,6 +46,39 @@ const isMobile = typeof window !== 'undefined' && (
   window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent)
 );
 
+function isWebGLSupported(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      canvas.getContext('webgl2') ||
+      canvas.getContext('webgl') ||
+      canvas.getContext('experimental-webgl')
+    );
+  } catch {
+    return false;
+  }
+}
+
+function WebGLUnsupported() {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-background px-8 text-center gap-6">
+      <div className="max-w-sm">
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary mb-4">3D scene unavailable</p>
+        <h2 className="font-sans text-xl font-bold text-foreground mb-3 leading-snug">
+          Your browser doesn't support 3D graphics
+        </h2>
+        <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+          Heli uses WebGL to render the simulation. Please try opening it in an
+          up-to-date version of Chrome, Firefox, Safari, or Edge.
+        </p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground/60">
+          Chrome and Firefox give the best experience
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function SceneRenderer({
   sceneType,
   scenarioId,
@@ -105,6 +138,8 @@ export function SceneRenderer({
       pendingEvidenceRef.current = null;
     }
   }, [onFocusEvidence]);
+
+  if (!isWebGLSupported()) return <WebGLUnsupported />;
 
   return (
     <div className="absolute inset-0">

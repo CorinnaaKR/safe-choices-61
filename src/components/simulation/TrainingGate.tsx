@@ -40,7 +40,7 @@ export function TrainingGate({ scenarioTitle, onComplete }: TrainingGateProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-5 py-12">
+    <div className="min-h-dvh flex items-center justify-center bg-background px-5 py-12">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: submitted ? 0 : 1, y: submitted ? -8 : 0 }}
