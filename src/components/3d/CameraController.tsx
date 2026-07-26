@@ -70,23 +70,60 @@ export function CameraController({
     inspectZoom.current = 1;
   }, [target]);
 
-  // Pointer drag = orbit; wheel = inspect dolly / orbit distance
+  // Pointer drag = orbit; wheel / pinch = inspect dolly / orbit distance
   useEffect(() => {
     const el = gl.domElement;
     let pointerDown = false;
     let lastX = 0;
     let lastY = 0;
 
+    // Pinch-to-zoom tracking (two active touch pointers)
+    const activePointers = new Map<number, { x: number; y: number }>();
+    let lastPinchDist = 0;
+
     const onPointerDown = (e: PointerEvent) => {
       // button === -1 on touch in some browsers; allow touch (pointerType) or primary mouse
       if (e.button !== 0 && e.pointerType !== 'touch') return;
-      pointerDown = true;
-      lastX = e.clientX;
-      lastY = e.clientY;
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (activePointers.size === 1) {
+        pointerDown = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+      } else if (activePointers.size === 2) {
+        // Starting a pinch — measure initial distance between the two pointers
+        const pts = [...activePointers.values()];
+        lastPinchDist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        pointerDown = false; // suspend single-finger orbit while pinching
+      }
     };
     const onPointerMove = (e: PointerEvent) => {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.y = (e.clientY / window.innerHeight) * 2 - 1;
+
+      if (activePointers.has(e.pointerId)) {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+
+      // Pinch zoom (two pointers active)
+      if (activePointers.size === 2) {
+        const pts = [...activePointers.values()];
+        const pinchDist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        if (lastPinchDist > 0) {
+          const factor = lastPinchDist / pinchDist; // spread = zoom out, pinch = zoom in
+          if (targetRef.current) {
+            inspectZoom.current = THREE.MathUtils.clamp(
+              inspectZoom.current * factor,
+              INSPECT_ZOOM_MIN,
+              INSPECT_ZOOM_MAX
+            );
+          } else {
+            dist.current = THREE.MathUtils.clamp(dist.current * factor, DIST_MIN, DIST_MAX);
+          }
+        }
+        lastPinchDist = pinchDist;
+        return;
+      }
+
       if (!pointerDown || targetRef.current) return;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
@@ -100,9 +137,13 @@ export function CameraController({
         FPS_PITCH_MAX
       );
     };
-    const onPointerUp = () => {
-      pointerDown = false;
-      dragging.current = false;
+    const onPointerUp = (e: PointerEvent) => {
+      activePointers.delete(e.pointerId);
+      if (activePointers.size < 2) lastPinchDist = 0;
+      if (activePointers.size === 0) {
+        pointerDown = false;
+        dragging.current = false;
+      }
     };
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();

@@ -103,12 +103,12 @@ export function TrainingGate({ scenarioTitle, onComplete }: TrainingGateProps) {
             <label htmlFor="gate-training" className="block px-5 pt-4 pb-1 text-xs font-medium text-muted-foreground">
               Prior training completed
             </label>
-            <div className="px-5 pb-4">
+            <div className="px-5 pb-4 relative">
               <select
                 id="gate-training"
                 value={priorTraining}
                 onChange={e => setPriorTraining(e.target.value)}
-                className="w-full bg-transparent font-sans text-sm text-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-sm appearance-none cursor-pointer"
+                className="w-full bg-transparent font-sans text-sm text-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-sm appearance-none cursor-pointer pr-6"
               >
                 <option value="" disabled className="bg-background text-muted-foreground">
                   Select the training you have completed…
@@ -119,6 +119,13 @@ export function TrainingGate({ scenarioTitle, onComplete }: TrainingGateProps) {
                   </option>
                 ))}
               </select>
+              {/* Custom chevron — visible since appearance-none removes native arrow */}
+              <svg
+                className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground"
+                width="14" height="14" viewBox="0 0 14 14" fill="none"
+              >
+                <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
           </div>
 

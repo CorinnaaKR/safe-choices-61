@@ -13,9 +13,7 @@ function getContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   try {
     if (!ctx) ctx = new AudioContext();
-    // Browsers suspend audio until a user gesture; resume is a no-op otherwise
-    if (ctx.state === 'suspended') void ctx.resume();
-    return ctx.state === 'running' ? ctx : null;
+    return ctx;
   } catch {
     return null;
   }
@@ -25,17 +23,27 @@ function blip(frequency: number, durationMs: number, gainPeak: number, type: Osc
   if (muted) return;
   const ac = getContext();
   if (!ac) return;
-  const osc = ac.createOscillator();
-  const gain = ac.createGain();
-  osc.type = type;
-  osc.frequency.value = frequency;
-  const now = ac.currentTime;
-  gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(gainPeak, now + 0.004);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationMs / 1000);
-  osc.connect(gain).connect(ac.destination);
-  osc.start(now);
-  osc.stop(now + durationMs / 1000 + 0.02);
+  const play = () => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = type;
+    osc.frequency.value = frequency;
+    const now = ac.currentTime;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(gainPeak, now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + durationMs / 1000);
+    osc.connect(gain).connect(ac.destination);
+    osc.start(now);
+    osc.stop(now + durationMs / 1000 + 0.02);
+  };
+  // iOS/Safari suspend AudioContext until a user-gesture; resume() is async so
+  // we await it before scheduling nodes — otherwise currentTime is stale and
+  // the sound is silently dropped.
+  if (ac.state === 'suspended') {
+    ac.resume().then(play).catch(() => {});
+  } else {
+    play();
+  }
 }
 
 /** Faint tick when the crosshair passes over an interactive object. */

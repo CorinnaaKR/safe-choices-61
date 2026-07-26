@@ -78,7 +78,7 @@ function PosterInspect({ visual }: { visual: EvidenceVisual }) {
 
   return (
     <div
-      className="w-full max-w-[280px] mx-auto border-4 p-5 flex flex-col gap-3 min-h-[320px]"
+      className="relative w-full max-w-[280px] mx-auto border-4 p-5 flex flex-col gap-3 min-h-[320px]"
       style={{ borderColor: posterAccentColor, background: '#0D0D0D' }}
     >
       {/* Geometric symbol — abstract angular sun, deliberately not a real symbol */}
@@ -141,7 +141,7 @@ function TVInspect({ visual }: { visual: EvidenceVisual }) {
 
   return (
     <div
-      className="w-full max-w-[320px] mx-auto border-2 border-border overflow-hidden"
+      className="relative w-full max-w-[320px] mx-auto border-2 border-border overflow-hidden"
       style={{ background: '#08090C', aspectRatio: '16/9' }}
     >
       {/* Channel bug top-left */}

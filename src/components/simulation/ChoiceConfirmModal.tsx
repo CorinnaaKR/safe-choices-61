@@ -18,7 +18,6 @@ export function ChoiceConfirmModal({ choice, onConfirm, onCancel }: ChoiceConfir
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="absolute inset-0 bg-background/70 backdrop-blur-sm"
-          onClick={onCancel}
         />
         <motion.div
           initial={{ opacity: 0, y: 16 }}

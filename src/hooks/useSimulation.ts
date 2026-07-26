@@ -73,10 +73,14 @@ export function useSimulation(
   }, [scenario, mode]);
 
   useEffect(() => {
-    localStorage.setItem(
-      storageKey(gameState.scenarioId, gameState.mode),
-      JSON.stringify(gameState)
-    );
+    try {
+      localStorage.setItem(
+        storageKey(gameState.scenarioId, gameState.mode),
+        JSON.stringify(gameState)
+      );
+    } catch {
+      // localStorage full or disabled (common in private browsing on iOS) — progress won't persist
+    }
   }, [gameState]);
 
   const currentScene: Scene | undefined = scenario.scenes.find(

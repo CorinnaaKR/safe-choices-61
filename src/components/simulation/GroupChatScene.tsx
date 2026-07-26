@@ -12,6 +12,10 @@ interface Props {
   onChoice: (choice: Choice) => void;
 }
 
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 type ChatMsg = {
   text: string;
   time: string;
@@ -46,8 +50,13 @@ export function GroupChatScene({ choices, onChoice }: Props) {
   const [pendingChoice, setPendingChoice] = useState<Choice | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-reveal messages one by one
+  // Auto-reveal messages one by one (instant when reduced-motion preferred)
   useEffect(() => {
+    if (prefersReducedMotion) {
+      setVisibleCount(CHAT_MESSAGES.length);
+      setChatDone(true);
+      return;
+    }
     if (visibleCount >= CHAT_MESSAGES.length) {
       const t = setTimeout(() => setChatDone(true), 1200);
       return () => clearTimeout(t);
@@ -87,7 +96,7 @@ export function GroupChatScene({ choices, onChoice }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-60 flex items-center justify-center bg-black/80 px-6"
+            className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 px-6"
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}

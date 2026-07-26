@@ -240,7 +240,7 @@ export default function WelcomePage() {
       </section>
 
       {/* Mode selection — quieter, below the stories */}
-      <section className="px-5 md:px-10 pb-14">
+      <section className="w-full max-w-4xl px-5 md:px-10 pb-14">
         <div className="max-w-3xl">
           <p className="page-label mb-4">How do you want to approach this?</p>
           <div
