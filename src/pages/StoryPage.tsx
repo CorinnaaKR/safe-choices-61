@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useSimulation } from '@/hooks/useSimulation';
+import { useLandscapePhone } from '@/hooks/useLandscapePhone';
 import { DEFAULT_SCENARIO_ID } from '@/data/scenarios';
 import { Mode, SceneEnvironment } from '@/types/simulation';
 import { SceneRenderer, SceneType } from '@/components/3d/SceneRenderer';
@@ -57,6 +58,7 @@ export default function StoryPage() {
   const [showEpilogue, setShowEpilogue] = useState(false);
   const [vignettePulse, setVignettePulse] = useState(false);
   const vignettTimer = useRef<ReturnType<typeof setTimeout>>();
+  const isLandscapePhone = useLandscapePhone();
 
   const triggerVignette = () => {
     setVignettePulse(true);
@@ -313,6 +315,30 @@ export default function StoryPage() {
           onLeave={() => navigate('/')}
         />
       )}
+
+      {/* Landscape-phone nudge — shown when the device is phone-sized and rotated sideways */}
+      <AnimatePresence>
+        {isLandscapePhone && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background/95 gap-5 px-8 text-center"
+          >
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="text-primary">
+              <rect x="4" y="10" width="20" height="32" rx="3" stroke="currentColor" strokeWidth="1.8" transform="rotate(-90 4 10) translate(-6 -6)"/>
+              <path d="M22 20a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <path d="M29 20v9h-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-primary mb-2">Rotate your device</p>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+                This simulation works best in portrait mode. Please rotate your phone upright to continue.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
