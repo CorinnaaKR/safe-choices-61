@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { GameState, Evidence, Scene, Choice, Mode, SkillArea, Scenario, TrainingProfile } from '@/types/simulation';
 import { getScenario, DEFAULT_SCENARIO_ID } from '@/data/scenarios';
+import { toast } from '@/hooks/use-toast';
 
 const storageKey = (scenarioId: string, mode: Mode) =>
   `heli-state:${scenarioId}:${mode}`;
@@ -72,14 +73,26 @@ export function useSimulation(
     setLastChoice(null);
   }, [scenario, mode]);
 
+  const saveErrorShown = useRef(false);
+
   useEffect(() => {
     try {
       localStorage.setItem(
         storageKey(gameState.scenarioId, gameState.mode),
         JSON.stringify(gameState)
       );
+      saveErrorShown.current = false;
     } catch {
-      // localStorage full or disabled (common in private browsing on iOS) — progress won't persist
+      // localStorage full or disabled (common in private browsing on iOS)
+      if (!saveErrorShown.current) {
+        saveErrorShown.current = true;
+        toast({
+          title: 'Progress won\'t be saved',
+          description: 'Your browser has storage disabled (common in private browsing). You can still play, but your progress won\'t be remembered if you leave.',
+          variant: 'destructive',
+          duration: 8000,
+        });
+      }
     }
   }, [gameState]);
 

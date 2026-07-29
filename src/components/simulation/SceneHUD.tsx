@@ -6,7 +6,7 @@ import { FeedbackPanel } from './FeedbackPanel';
 import { ChoiceConfirmModal } from './ChoiceConfirmModal';
 import { InspectViewer } from './InspectViewer';
 import { KnowledgePanel } from './KnowledgePanel';
-import { playUiTick } from '@/lib/sfx';
+import { playUiTick, setSfxMuted } from '@/lib/sfx';
 import { useHudActivity } from '@/hooks/useHudActivity';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
@@ -57,6 +57,19 @@ export function SceneHUD({
   const [onboardingDone, setOnboardingDone] = useState(() =>
     !!localStorage.getItem('heli-onboarding-seen')
   );
+  const [sfxMuted, setSfxMutedState] = useState(() =>
+    localStorage.getItem('heli-sfx-muted') === '1'
+  );
+
+  const toggleMute = () => {
+    const next = !sfxMuted;
+    setSfxMutedState(next);
+    setSfxMuted(next);
+    try { localStorage.setItem('heli-sfx-muted', next ? '1' : '0'); } catch {}
+  };
+
+  // Sync sfx module with persisted preference on mount
+  useEffect(() => { setSfxMuted(sfxMuted); }, []);
   const [journalOpen, setJournalOpen] = useState(false);
   const [knowledgeOpen, setKnowledgeOpen] = useState(false);
   const [visibleParagraph, setVisibleParagraph] = useState(() =>
@@ -605,22 +618,42 @@ export function SceneHUD({
         mode={mode}
       />
 
-      {/* ── WHAT YOU KNOW BUTTON: icon-only, top-right ─────────────── */}
-      {!inspectedEvidence && !showFeedback && !knowledgeOpen && (
+      {/* ── TOP-RIGHT ICON BUTTONS ────────────────────────────────── */}
+      <div className="absolute top-4 right-4 flex flex-col gap-2 pointer-events-auto" style={{ zIndex: 15 }}>
+        {!inspectedEvidence && !showFeedback && !knowledgeOpen && (
+          <button
+            onClick={() => setKnowledgeOpen(true)}
+            aria-label="What you know"
+            title="What you know"
+            className="flex items-center justify-center w-10 h-10 bg-background/70 border border-border/60 hover:border-primary/70 hover:bg-background transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-foreground/60 hover:text-primary shrink-0">
+              <path d="M9 4C9 4 6.5 3 3 3.5V14.5C6.5 14 9 15 9 15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 4C9 4 11.5 3 15 3.5V14.5C11.5 14 9 15 9 15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 4V15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+          </button>
+        )}
         <button
-          onClick={() => setKnowledgeOpen(true)}
-          aria-label="What you know"
-          title="What you know"
-          className="absolute top-4 right-4 pointer-events-auto flex items-center justify-center w-10 h-10 bg-background/70 border border-border/60 hover:border-primary/70 hover:bg-background transition-colors"
-          style={{ zIndex: 15 }}
+          onClick={toggleMute}
+          aria-label={sfxMuted ? 'Unmute sound effects' : 'Mute sound effects'}
+          title={sfxMuted ? 'Unmute' : 'Mute'}
+          className="flex items-center justify-center w-10 h-10 bg-background/70 border border-border/60 hover:border-primary/70 hover:bg-background transition-colors"
         >
-          <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-foreground/60 hover:text-primary shrink-0">
-            <path d="M9 4C9 4 6.5 3 3 3.5V14.5C6.5 14 9 15 9 15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M9 4C9 4 11.5 3 15 3.5V14.5C11.5 14 9 15 9 15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M9 4V15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-          </svg>
+          {sfxMuted ? (
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" className="text-foreground/40">
+              <path d="M3 6.5H6L10 3v12l-4-3.5H3V6.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+              <path d="M13 7l3 4M16 7l-3 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" className="text-foreground/60">
+              <path d="M3 6.5H6L10 3v12l-4-3.5H3V6.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+              <path d="M13 6.5c.8.7 1.3 1.7 1.3 2.8s-.5 2.1-1.3 2.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              <path d="M15 4.5c1.5 1.3 2.4 3.1 2.4 5.2s-.9 3.9-2.4 5.2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+          )}
         </button>
-      )}
+      </div>
       </motion.div>
     </>
   );
