@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Choice, Mode } from '@/types/simulation';
 import { playUiTick } from '@/lib/sfx';
@@ -12,10 +12,13 @@ interface FeedbackPanelProps {
 
 export function FeedbackPanel({ choice, onContinue, mode = 'training' }: FeedbackPanelProps) {
   const continueRef = useRef<HTMLButtonElement>(null);
+  // Block the Continue button for 700 ms to prevent ghost-tap from the Confirm modal
+  const [continueEnabled, setContinueEnabled] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => continueRef.current?.focus(), 800);
-    return () => clearTimeout(timer);
+    const enableTimer = setTimeout(() => setContinueEnabled(true), 700);
+    const focusTimer = setTimeout(() => continueRef.current?.focus(), 800);
+    return () => { clearTimeout(enableTimer); clearTimeout(focusTimer); };
   }, []);
 
   return (
@@ -72,10 +75,11 @@ export function FeedbackPanel({ choice, onContinue, mode = 'training' }: Feedbac
         <button
           ref={continueRef}
           onClick={() => {
+            if (!continueEnabled) return;
             playUiTick();
             onContinue();
           }}
-          className="bg-primary text-primary-foreground font-mono text-xs uppercase tracking-[0.2em] px-8 py-3.5 hover:bg-primary/90 transition-colors"
+          className={`bg-primary text-primary-foreground font-mono text-xs uppercase tracking-[0.2em] px-8 py-3.5 hover:bg-primary/90 transition-colors ${continueEnabled ? '' : 'pointer-events-none opacity-50'}`}
           aria-label="Continue to next scene"
         >
           Continue ▸

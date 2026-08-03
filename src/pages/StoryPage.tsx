@@ -247,16 +247,6 @@ export default function StoryPage() {
     );
   }
 
-  // Group chat scene — "Asking Around" beat in Jamie's Story
-  if (currentScene.id === 'scene-4-risk' && currentScene.choices) {
-    return (
-      <GroupChatScene
-        choices={currentScene.choices}
-        onChoice={(choice) => makeChoiceAndAdvance(choice, [])}
-      />
-    );
-  }
-
   const sceneNumber =
     scenario.scenes.findIndex((s) => s.id === currentScene.id) + 1;
 

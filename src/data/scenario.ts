@@ -275,7 +275,7 @@ export const safeguardingScenario: Scenario = {
           type: 'observation',
           title: "Can't go out after school",
           description: 'Something Marcus mentioned at lunch',
-          content: "Jamie's mum's boyfriend doesn't want them going out after school — so they go straight home. Strict parents are like that sometimes, and most of the time it's nothing more. But it also means Jamie's barely seeing anyone outside school anymore. That's worth remembering, alongside everything else.",
+          content: "Jamie's mum's boyfriend doesn't want them going out after school — so they go straight home. Strict parents are like that sometimes, and most of the time it's nothing more. But it also means Jamie's barely seeing anyone outside school anymore.",
           timestamp: 'Monday, lunchtime'
         },
         {
