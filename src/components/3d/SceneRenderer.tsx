@@ -150,6 +150,7 @@ export function SceneRenderer({
   return (
     <div className="absolute inset-0">
       <Canvas
+        frameloop="always"
         camera={{ position: [0, 1.05, 3], fov }}
         shadows={!isMobile}
         dpr={isMobile ? 1 : [1, 2]}
