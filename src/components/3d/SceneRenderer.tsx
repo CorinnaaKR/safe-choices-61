@@ -98,6 +98,12 @@ export function SceneRenderer({
   const [walkTarget, setWalkTarget] = useState<THREE.Vector3 | null>(null);
   const pendingEvidenceRef = useRef<Evidence | null>(null);
 
+  // Clear walk target and pending evidence when scene changes
+  useEffect(() => {
+    setWalkTarget(null);
+    pendingEvidenceRef.current = null;
+  }, [sceneType]);
+
   // R3F's Canvas sizes itself via a ResizeObserver on its container. If the
   // container has no measurable size at the exact moment Canvas mounts (e.g.
   // while a parent is still mid framer-motion fade-in), that first observation
@@ -206,9 +212,9 @@ export function SceneRenderer({
               {sceneType === 'home' && <HomeScene showLazlo={scenarioId === 'lazlo-case'} evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
               {sceneType === 'home-jamie' && <JamieHomeScene />}
               {/* Mobile lighting — simple, no HDR, no render targets */}
-              <ambientLight intensity={sceneType === 'playground' ? 1.8 : sceneType === 'home-jamie' ? 1.4 : 1.2} />
-              <directionalLight position={[5, 8, 5]} intensity={1.2} />
-              <directionalLight position={[-4, 4, -4]} intensity={0.4} />
+              <ambientLight intensity={sceneType === 'playground' ? 1.8 : sceneType === 'home-jamie' ? 1.4 : 1.6} />
+              <directionalLight position={[5, 8, 5]} intensity={1.4} />
+              <directionalLight position={[-4, 4, -4]} intensity={0.6} />
             </>
           ) : (
             <Selection>

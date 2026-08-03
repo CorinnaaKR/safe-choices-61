@@ -258,7 +258,7 @@ export function LazloThread({ onComplete }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col md:flex-row items-center justify-center z-50 gap-4 md:gap-8 px-4 md:px-8 py-4 md:py-0">
+    <div className="fixed inset-0 bg-background z-50 md:flex md:flex-row md:items-center md:justify-center md:gap-8 md:px-8">
 
       {/* Day transition card */}
       <AnimatePresence>
@@ -308,8 +308,9 @@ export function LazloThread({ onComplete }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Phone — hidden during transition cards */}
+      {/* Phone — centered on mobile, flex item on desktop */}
       {beat !== 'day-card' && beat !== 'beat3-day' && (
+        <div className="flex items-center justify-center h-full md:h-auto py-4 md:py-0">
         <PhoneShell>
           {/* Message thread */}
           <div className="flex-1 overflow-y-auto px-3 py-4 min-h-0" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -384,86 +385,94 @@ export function LazloThread({ onComplete }: Props) {
             </div>
           )}
         </PhoneShell>
+        </div>
       )}
 
-      {/* Side panel — choices beside the phone on desktop, below on mobile */}
+      {/* Choices — bottom sheet on mobile, side panel on desktop */}
       <AnimatePresence>
         {(beat === 'beat1' || beat === 'beat2') && (
           <motion.div
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 32 }}
             transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-            className="flex flex-col gap-3 w-full md:w-auto order-1 md:order-none"
-            style={{ maxWidth: 'min(320px, 90vw)' }}
+            className="absolute bottom-0 left-0 right-0 z-10
+                       md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto md:w-auto"
           >
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
-              {beat === 'beat1' ? 'Message Lazlo' : "He's seen it. No reply. What do you do?"}
-            </p>
+            <div className="bg-background/95 backdrop-blur-md border-t border-border/40
+                            px-5 pt-4 pb-10 space-y-3
+                            md:bg-transparent md:backdrop-blur-none md:border-0
+                            md:px-0 md:py-0 md:space-y-3"
+              style={{ maxWidth: 'min(320px, 100%)' }}
+            >
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
+                {beat === 'beat1' ? 'Message Lazlo' : "He's seen it. No reply. What do you do?"}
+              </p>
 
-            {beat === 'beat1' && TONE_OPTIONS.map((opt) => (
-              <motion.button
-                key={opt.id}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => startTyping(opt)}
-                style={{
-                  background: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 12,
-                  padding: '12px 16px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontFamily: '-apple-system, sans-serif',
-                  fontSize: 14,
-                  color: 'hsl(var(--foreground))',
-                  lineHeight: 1.4,
-                }}
-              >
-                <span style={{ display: 'block', fontSize: 10, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))', marginBottom: 6 }}>
+              {beat === 'beat1' && TONE_OPTIONS.map((opt) => (
+                <motion.button
+                  key={opt.id}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => startTyping(opt)}
+                  className="w-full text-left"
+                  style={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: 12,
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    fontFamily: '-apple-system, sans-serif',
+                    fontSize: 14,
+                    color: 'hsl(var(--foreground))',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span style={{ display: 'block', fontSize: 10, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))', marginBottom: 6 }}>
+                    {opt.label}
+                  </span>
+                  {opt.text}
+                </motion.button>
+              ))}
+
+              {beat === 'beat2' && ([
+                { id: 'visit', label: 'Go and see him' },
+                { id: 'message', label: 'Send another message' },
+                { id: 'wait', label: 'Wait a bit longer' },
+              ] as const).map((opt) => (
+                <motion.button
+                  key={opt.id}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleFollowUp(opt.id)}
+                  className="w-full text-left"
+                  style={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: 12,
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    fontFamily: '-apple-system, sans-serif',
+                    fontSize: 14,
+                    color: 'hsl(var(--foreground))',
+                    lineHeight: 1.4,
+                  }}
+                >
                   {opt.label}
-                </span>
-                {opt.text}
-              </motion.button>
-            ))}
-
-            {beat === 'beat2' && ([
-              { id: 'visit', label: 'Go and see him' },
-              { id: 'message', label: 'Send another message' },
-              { id: 'wait', label: 'Wait a bit longer' },
-            ] as const).map((opt) => (
-              <motion.button
-                key={opt.id}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleFollowUp(opt.id)}
-                style={{
-                  background: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 12,
-                  padding: '12px 16px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontFamily: '-apple-system, sans-serif',
-                  fontSize: 14,
-                  color: 'hsl(var(--foreground))',
-                  lineHeight: 1.4,
-                }}
-              >
-                {opt.label}
-              </motion.button>
-            ))}
+                </motion.button>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Label shown when no choices are active */}
+      {/* Label shown when no choices are active — desktop only */}
       {beat !== 'day-card' && beat !== 'beat3-day' && beat !== 'beat1' && beat !== 'beat2' && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground order-1 md:order-none"
+          className="hidden md:block font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground"
         >
           Before you arrive
         </motion.p>

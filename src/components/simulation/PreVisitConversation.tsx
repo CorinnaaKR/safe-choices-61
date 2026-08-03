@@ -169,12 +169,14 @@ export function PreVisitConversation({ data, onComplete }: Props) {
         const replyTime = nextTime();
         markSeen(replyTime);
         setThread((prev) => [...prev, { sender: 'contact', text: choice.response!, time: replyTime }]);
-        setPendingChoice(null);
+        // Don't clear pendingChoice here — advanceExchange clears it atomically with
+        // the phase change so choices never flash for 500ms between the two updates.
         advanceExchange(choice, newTrust);
       }, 900);
       return () => clearTimeout(t);
     } else {
       markSeen(sentTime);
+      setPendingChoice(null);
       advanceExchange(choice, newTrust);
     }
   };
@@ -183,10 +185,12 @@ export function PreVisitConversation({ data, onComplete }: Props) {
     const next = (phase as { exchangeIdx: number }).exchangeIdx + 1;
     if (next < data.exchanges.length) {
       setTimeout(() => {
+        setPendingChoice(null);
         setPhase({ kind: 'incoming', exchangeIdx: next, msgIdx: 0 });
       }, 500);
     } else {
       setTimeout(() => {
+        setPendingChoice(null);
         setPhase({ kind: 'done' });
         onComplete([...choiceIds, choice.id], currentTrust);
       }, 800);
@@ -252,9 +256,8 @@ export function PreVisitConversation({ data, onComplete }: Props) {
                    md:relative md:inset-auto md:order-2 md:max-h-[95vh]
                    md:w-[min(360px,82vw)] md:rounded-[3rem] md:border-[10px] md:border-[#1a1a1a]"
         style={{
-          height: isTyping ? 'min(880px, 95vh)' : 'min(780px, 92vh)',
+          height: '95dvh',
           boxShadow: '0 0 0 1px #333, 0 32px 80px rgba(0,0,0,0.8), inset 0 0 0 1.5px rgba(255,255,255,0.12), inset 0 0 0 4px rgba(0,0,0,0.95)',
-          transition: 'height 0.3s ease',
         }}
       >
         {/* Dynamic island */}
@@ -393,6 +396,8 @@ export function PreVisitConversation({ data, onComplete }: Props) {
             </motion.div>
           )}
 
+          {/* Spacer so the last message isn't hidden under the absolute choices overlay on mobile */}
+          {isChoosing && <div className="h-56 md:h-0 shrink-0" />}
           <div ref={bottomRef} />
         </div>
 

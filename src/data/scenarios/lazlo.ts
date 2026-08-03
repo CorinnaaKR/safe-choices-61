@@ -681,8 +681,8 @@ export const lazloScenario: Scenario = {
       isDecisionPoint: true,
       narrative: [
         '"Joey was the only one who actually knew me." Lazlo is still looking at the TV but he is speaking now.',
-        '"Mum. Lilly." He stops. Starts again. "When he died they just — kept going. Like it was nothing."',
-        '"She cheated. While I was in it." He says it flatly. "And the job — I went to HR. Said what was happening. Two weeks later." A short breath. "Performance issues."',
+        '"Mum. Lilly." He stops. Starts again. "When he died they just — kept going. Like it was nothing." A pause. "And it wasn\'t just that."',
+        'He keeps going. Still not looking at you. "Sienna cheated. Said I was neglecting her." He says it flatly, like a fact rather than a wound. "And the job — I stood up for a colleague. Went to HR. Said what was happening." A short breath. "Two weeks later. Performance issues." He looks at his hands.',
         '"These guys I\'ve been speaking to." He glances at the wall for just a moment. "They don\'t do that. Tell you to move on. They get it."',
         "He doesn't elaborate. As if that's the whole explanation.",
         "You look at the clippings. At the poster. You've heard that language before — on that wall, somewhere.",
@@ -1045,15 +1045,15 @@ export const lazloScenario: Scenario = {
       },
       {
         operatorLine:
-          "Okay. Thank you for noticing that, and for calling — that takes something. Can I ask — has he said anything about taking action, or is this more about how he's thinking and who he's around?",
+          "Okay. Thank you for noticing that, and for calling — that takes something. Can I ask — has he said anything about taking action? Or is this more about how he's thinking, and who he's been around?",
         choices: [
-          { text: "It's how he's thinking. The people around him. Nothing about doing anything." },
-          { text: "I don't know. I didn't want to push him on it." },
+          { text: "It's how he's thinking. The people around him. Nothing about doing anything — not yet." },
+          { text: "I don't know. I didn't want to push him on it. It was already a lot." },
         ],
       },
       {
         operatorLine:
-          "That's helpful, and it's the right call either way. Here's what happens next — this is voluntary for him, and it's confidential. Nothing goes on his record. I'll pass this to a Prevent officer in your area. They might involve other people — a GP, someone from the council, sometimes a mentor — whatever fits him. You won't necessarily hear exactly what happens, because it's his process, not yours. But you've done the hard part.",
+          "That's okay — you don't need to know everything. What you've described is enough, and it's the right call either way. Here's what happens next — this is voluntary for him, and it's confidential. Nothing goes on his record. I'll pass this to a Prevent officer in your area. They might involve other people — a GP, someone from the council, sometimes a mentor — whatever fits him best. You won't necessarily hear exactly what happens, because it's his process, not yours. But you've done the hard part.",
         choices: [
           { text: "What if he won't talk to anyone?" },
         ],

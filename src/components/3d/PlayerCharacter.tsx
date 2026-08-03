@@ -81,7 +81,7 @@ export function PlayerCharacter({ onPositionChange, sceneType = 'classroom', obs
       toTarget.current.set(moveTarget.x, 0, moveTarget.z);
       toTarget.current.sub(new THREE.Vector3(groupRef.current.position.x, 0, groupRef.current.position.z));
       const distToTarget = toTarget.current.length();
-      if (distToTarget < 1.2) {
+      if (distToTarget < 2.0) {
         arrivedRef.current = true;
         onArrived?.();
       } else {

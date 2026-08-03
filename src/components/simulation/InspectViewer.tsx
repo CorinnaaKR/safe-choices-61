@@ -273,7 +273,7 @@ function DefaultInspect({ evidence, evidenceNumber, onDismiss, mode, collected, 
             className="key-hint hover:text-foreground transition-colors hud-btn"
             aria-label="Close panel"
           >
-            <b>[ESC]</b> Close
+            <span className="hidden md:inline"><b>[ESC]</b> </span>Close
           </button>
         </div>
       </div>

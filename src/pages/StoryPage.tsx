@@ -57,7 +57,9 @@ export default function StoryPage() {
   const [showPause, setShowPause] = useState(false);
   const [showEpilogue, setShowEpilogue] = useState(false);
   const [vignettePulse, setVignettePulse] = useState(false);
+  const [cameraReturning, setCameraReturning] = useState(false);
   const vignettTimer = useRef<ReturnType<typeof setTimeout>>();
+  const cameraReturnTimer = useRef<ReturnType<typeof setTimeout>>();
   const isLandscapePhone = useLandscapePhone();
 
   const triggerVignette = () => {
@@ -157,6 +159,13 @@ export default function StoryPage() {
   const handleCameraReset = () => {
     setFocusedEvidenceId(null);
     setInspectedEvidence(null);
+    // Force R3F to recompute the canvas, then briefly show a fade to hide
+    // the one-frame black flash that can occur when the camera returns from
+    // inspect mode to FPS mode.
+    window.dispatchEvent(new Event('resize'));
+    setCameraReturning(true);
+    clearTimeout(cameraReturnTimer.current);
+    cameraReturnTimer.current = setTimeout(() => setCameraReturning(false), 350);
   };
 
   // Training mode: show declaration gate before anything else
@@ -252,8 +261,14 @@ export default function StoryPage() {
     scenario.scenes.findIndex((s) => s.id === currentScene.id) + 1;
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-background crosshair-area">
+    <div className="fixed inset-0 overflow-hidden bg-background crosshair-area" style={{ touchAction: 'none' }}>
       {/* Full-screen 3D scene */}
+      {/* Doorstep scenes (scene-l0): hide the home interior behind a plain dark
+          backdrop so the "knocking at the door" narrative isn't undermined by
+          showing Lazlo already sitting on his sofa. */}
+      {currentScene.id === 'scene-l0' && (
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #0D0A07 60%, #1A1208 100%)', zIndex: 1 }} />
+      )}
       <SceneRenderer
         sceneType={sceneType}
         scenarioId={scenarioId}
@@ -283,6 +298,19 @@ export default function StoryPage() {
             style={{
               background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.55) 100%)',
             }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Brief fade when camera returns from evidence inspect — hides black flash */}
+      <AnimatePresence>
+        {cameraReturning && (
+          <motion.div
+            key="cam-return"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            className="pointer-events-none fixed inset-0 z-20 bg-background"
           />
         )}
       </AnimatePresence>

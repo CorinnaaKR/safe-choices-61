@@ -126,13 +126,12 @@ export default function ResultsPage() {
   const hasPlayedBoth = otherStory ? completedStoryIds.includes(otherStory.id) : true;
   const feedbackAlreadySubmitted = sessionStorage.getItem(POST_FEEDBACK_SUBMITTED_KEY) === 'true';
   type View = 'other-story-prompt' | 'feedback-form' | 'results';
-  // If they already submitted feedback after story 1 and are now finishing story 2,
-  // skip the form — we already have their data.
-  const initialView: View = hasPlayedBoth && feedbackAlreadySubmitted
-    ? 'results'
-    : hasPlayedBoth
-    ? 'feedback-form'
-    : 'other-story-prompt';
+  // Show feedback form after any story — then offer the other story after submission.
+  // Previously this only triggered after both stories were played, meaning single-story
+  // users never reached the form.
+  const initialView: View = feedbackAlreadySubmitted
+    ? (hasPlayedBoth ? 'results' : 'other-story-prompt')
+    : 'feedback-form';
   const [view, setView] = useState<View>(initialView);
 
   const profile = gameState.trainingProfile;
@@ -154,7 +153,7 @@ export default function ResultsPage() {
     } catch (e) {
       console.error('Feedback submission failed:', e);
     }
-    setView('results');
+    setView(hasPlayedBoth ? 'results' : 'other-story-prompt');
   };
 
   const handleReplay = () => {

@@ -236,6 +236,7 @@ export function useSimulation(
   }, []);
 
   const resetSimulation = useCallback(() => {
+    localStorage.removeItem(storageKey(scenario.id, mode));
     setGameState(getInitialState(scenario, mode));
     setShowFeedback(false);
     setLastChoice(null);

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Choice, Mode } from '@/types/simulation';
 import { playUiTick } from '@/lib/sfx';
@@ -10,11 +11,21 @@ interface FeedbackPanelProps {
 }
 
 export function FeedbackPanel({ choice, onContinue, mode = 'training' }: FeedbackPanelProps) {
+  const continueRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => continueRef.current?.focus(), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-lg mx-auto"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
     >
       {/* Consequence — in training mode labelled; in learning mode pure narrative */}
       <motion.div
@@ -59,11 +70,13 @@ export function FeedbackPanel({ choice, onContinue, mode = 'training' }: Feedbac
         className="mt-8 flex justify-center"
       >
         <button
+          ref={continueRef}
           onClick={() => {
             playUiTick();
             onContinue();
           }}
           className="bg-primary text-primary-foreground font-mono text-xs uppercase tracking-[0.2em] px-8 py-3.5 hover:bg-primary/90 transition-colors"
+          aria-label="Continue to next scene"
         >
           Continue ▸
         </button>

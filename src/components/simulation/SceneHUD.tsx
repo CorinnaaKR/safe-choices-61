@@ -359,7 +359,7 @@ export function SceneHUD({
 
       {/* ── EXPLORE PROMPT: bottom-right, gates the decision while clues remain ── */}
       {!showFeedback && needsExplorePrompt && (
-        <div className="absolute bottom-safe left-4 right-4 md:left-auto md:bottom-4 md:w-[400px] pointer-events-auto" style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
+        <div className="absolute bottom-safe left-4 right-4 md:left-auto md:bottom-4 md:w-[400px] pointer-events-none" style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -387,7 +387,7 @@ export function SceneHUD({
                 whileHover={{ x: 4, scale: 1.03 }}
                 whileTap={{ scale: 0.97, x: 2 }}
                 transition={CHOICE_SPRING}
-                className="w-full bg-primary text-primary-foreground font-sans text-sm font-semibold px-5 py-3 hover:bg-primary/90 transition-colors"
+                className="w-full bg-primary text-primary-foreground font-sans text-sm font-semibold px-5 py-3 hover:bg-primary/90 transition-colors pointer-events-auto"
               >
                 I've seen enough — show me the choices
               </motion.button>
