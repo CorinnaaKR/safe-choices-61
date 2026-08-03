@@ -40,22 +40,22 @@ function MumCharacter() {
         <boxGeometry args={[0.2, 0.18, 0.08]} />
         <meshStandardMaterial color={hairColor} roughness={0.8} />
       </mesh>
-      {/* Left arm on table */}
-      <mesh position={[-0.2, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, 0.1]} castShadow>
+      {/* Left arm on table — z negative so arms reach toward table with Math.PI parent rotation */}
+      <mesh position={[-0.2, 0.82, -0.28]} rotation={[-Math.PI * 0.35, 0, 0.1]} castShadow>
         <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
         <meshStandardMaterial color={topColor} roughness={0.7} />
       </mesh>
-      {/* Right arm (elbow on table, hand toward mug) */}
-      <mesh position={[0.18, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, -0.1]} castShadow>
+      {/* Right arm */}
+      <mesh position={[0.18, 0.82, -0.28]} rotation={[-Math.PI * 0.35, 0, -0.1]} castShadow>
         <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
         <meshStandardMaterial color={topColor} roughness={0.7} />
       </mesh>
       {/* Hands */}
-      <mesh position={[-0.22, 0.78, 0.48]} castShadow>
+      <mesh position={[-0.22, 0.78, -0.48]} castShadow>
         <sphereGeometry args={[0.042, 8, 6]} />
         <meshStandardMaterial color={skinColor} roughness={0.65} />
       </mesh>
-      <mesh position={[0.2, 0.78, 0.48]} castShadow>
+      <mesh position={[0.2, 0.78, -0.48]} castShadow>
         <sphereGeometry args={[0.042, 8, 6]} />
         <meshStandardMaterial color={skinColor} roughness={0.65} />
       </mesh>
@@ -295,8 +295,10 @@ export function JamieHomeScene() {
         </mesh>
       ))}
 
-      {/* ── Mum — seated at the far side of the dining table ─────────── */}
-      <MumCharacter />
+      {/* ── Mum — seated at the far side of the dining table, facing player ── */}
+      <group position={[0.5, 0, 0.6]} rotation={[0, Math.PI, 0]}>
+        <MumCharacter />
+      </group>
 
       {/* ── Noticeboard left wall ──────────────────────────────────────── */}
       <mesh position={[-4.46, 1.9, -2.0]} rotation={[0, Math.PI / 2, 0]} castShadow>
