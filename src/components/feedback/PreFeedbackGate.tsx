@@ -6,6 +6,10 @@ interface Props {
   onComplete: (data: PreFeedback) => void;
   /** Scenario domain — adapts the confidence question to what this story is actually about. */
   domain?: string;
+  scenarioTitle?: string;
+  scenarioMode?: 'learning' | 'training';
+  /** Called when the user wants to switch to the other scenario instead. */
+  onSwitchToJamie?: () => void;
 }
 
 const CONFIDENCE_OPTIONS = [
@@ -25,11 +29,13 @@ const CONFIDENCE_QUESTION_BY_DOMAIN: Record<string, string> = {
 const DEFAULT_CONFIDENCE_QUESTION =
   'How confident do you feel in your ability to recognise the signs that someone may be at risk?';
 
-export function PreFeedbackGate({ onComplete, domain }: Props) {
+export function PreFeedbackGate({ onComplete, domain, scenarioTitle, scenarioMode, onSwitchToJamie }: Props) {
   const [priorTraining, setPriorTraining] = useState('');
   const [confidenceBefore, setConfidenceBefore] = useState('');
 
   const canContinue = priorTraining && confidenceBefore;
+  const noTraining = priorTraining === 'No';
+  const suggestJamie = noTraining && scenarioMode === 'training' && !!onSwitchToJamie;
 
   return (
     <div className="fixed inset-0 bg-background overflow-y-auto z-50">
@@ -40,6 +46,9 @@ export function PreFeedbackGate({ onComplete, domain }: Props) {
         className="content-card max-w-lg w-full p-7 md:p-9"
       >
         <p className="page-label mb-2">Before you begin</p>
+        {scenarioTitle && (
+          <p className="font-sans text-xl font-bold text-foreground mb-2 leading-snug">{scenarioTitle}</p>
+        )}
         <p className="text-sm text-foreground/70 leading-relaxed mb-8">
           Two quick questions before you start — your answers help us understand the impact of this experience.
         </p>
@@ -92,13 +101,32 @@ export function PreFeedbackGate({ onComplete, domain }: Props) {
           </div>
         </div>
 
+        {suggestJamie && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 border border-primary/30 bg-primary/5"
+          >
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary mb-1">Heads up</p>
+            <p className="text-sm text-foreground/80 leading-relaxed mb-3">
+              Lazlo's Story is our training mode — built for people already working in safeguarding. If this is your first time, <strong>Jamie's Story</strong> is a gentler place to start.
+            </p>
+            <button
+              onClick={onSwitchToJamie}
+              className="font-mono text-[11px] uppercase tracking-[0.15em] text-primary hover:text-foreground transition-colors underline underline-offset-2"
+            >
+              Switch to Jamie's Story instead →
+            </button>
+          </motion.div>
+        )}
+
         <div className="flex justify-end">
           <button
             disabled={!canContinue}
             onClick={() => onComplete({ priorTraining, confidenceBefore })}
             className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-8 py-3.5 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed shadow-lg"
           >
-            Begin
+            Begin{scenarioTitle ? ` — ${scenarioTitle}` : ''}
           </button>
         </div>
       </motion.div>

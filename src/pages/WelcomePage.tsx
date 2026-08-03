@@ -108,7 +108,22 @@ export default function WelcomePage() {
   };
 
   if (pendingFeedbackScenario) {
-    return <PreFeedbackGate onComplete={handlePreFeedbackComplete} domain={pendingFeedbackScenario.scenario.domain} />;
+    const { scenario } = pendingFeedbackScenario;
+    const effectiveMode = modeForScenario(scenario);
+    const jamieScenario = scenarios.find((s) => s.id === 'jamie-case');
+    return (
+      <PreFeedbackGate
+        onComplete={handlePreFeedbackComplete}
+        domain={scenario.domain}
+        scenarioTitle={scenario.title}
+        scenarioMode={effectiveMode}
+        onSwitchToJamie={
+          jamieScenario && scenario.id !== 'jamie-case'
+            ? () => { setPendingFeedbackScenario(null); startScenario(jamieScenario); }
+            : undefined
+        }
+      />
+    );
   }
 
   return (
@@ -133,7 +148,7 @@ export default function WelcomePage() {
       <header className="w-full max-w-4xl flex items-center justify-between px-5 md:px-10 py-3 border-b border-border">
         <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-muted-foreground w-full text-center">Helping Everyone Learn Interactively</p>
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground hidden sm:block">
-          Prototype v0.1
+          Beta
         </span>
       </header>
 
