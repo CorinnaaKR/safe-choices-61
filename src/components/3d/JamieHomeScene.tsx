@@ -1,6 +1,68 @@
 /** Jamie's Story — home kitchen/diner.
  *  Bright white walls + strip lighting = immediately distinct from Lazlo's dark living room. */
 
+/** Simple seated adult figure — mum at the kitchen table. */
+function MumCharacter() {
+  const skinColor  = '#D4956A';
+  const hairColor  = '#3A2010';
+  const topColor   = '#7080B0'; // blue-grey top
+  const trouserCol = '#4A4060';
+
+  return (
+    <group position={[-0.7, 0, 0.6]} rotation={[0, Math.PI * 0.15, 0]}>
+      {/* Torso */}
+      <mesh position={[0, 0.88, 0]} castShadow>
+        <boxGeometry args={[0.32, 0.38, 0.22]} />
+        <meshStandardMaterial color={topColor} roughness={0.7} />
+      </mesh>
+      {/* Hips / lap */}
+      <mesh position={[0, 0.62, 0.05]} castShadow>
+        <boxGeometry args={[0.34, 0.18, 0.32]} />
+        <meshStandardMaterial color={trouserCol} roughness={0.75} />
+      </mesh>
+      {/* Upper legs (seated, horizontal) */}
+      <mesh position={[0, 0.54, 0.2]} castShadow>
+        <boxGeometry args={[0.3, 0.14, 0.36]} />
+        <meshStandardMaterial color={trouserCol} roughness={0.75} />
+      </mesh>
+      {/* Head */}
+      <mesh position={[0, 1.2, 0]} castShadow>
+        <sphereGeometry args={[0.115, 14, 10]} />
+        <meshStandardMaterial color={skinColor} roughness={0.65} />
+      </mesh>
+      {/* Hair */}
+      <mesh position={[0, 1.28, -0.02]} castShadow>
+        <sphereGeometry args={[0.118, 14, 10]} />
+        <meshStandardMaterial color={hairColor} roughness={0.8} />
+      </mesh>
+      {/* Hair back */}
+      <mesh position={[0, 1.18, -0.1]} castShadow>
+        <boxGeometry args={[0.2, 0.18, 0.08]} />
+        <meshStandardMaterial color={hairColor} roughness={0.8} />
+      </mesh>
+      {/* Left arm on table */}
+      <mesh position={[-0.2, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, 0.1]} castShadow>
+        <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
+        <meshStandardMaterial color={topColor} roughness={0.7} />
+      </mesh>
+      {/* Right arm (elbow on table, hand toward mug) */}
+      <mesh position={[0.18, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, -0.1]} castShadow>
+        <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
+        <meshStandardMaterial color={topColor} roughness={0.7} />
+      </mesh>
+      {/* Hands */}
+      <mesh position={[-0.22, 0.78, 0.48]} castShadow>
+        <sphereGeometry args={[0.042, 8, 6]} />
+        <meshStandardMaterial color={skinColor} roughness={0.65} />
+      </mesh>
+      <mesh position={[0.2, 0.78, 0.48]} castShadow>
+        <sphereGeometry args={[0.042, 8, 6]} />
+        <meshStandardMaterial color={skinColor} roughness={0.65} />
+      </mesh>
+    </group>
+  );
+}
+
 export function JamieHomeScene() {
   const wallColor    = '#F2EDE4'; // off-white plaster
   const floorColor   = '#A87040'; // warm oak boards
@@ -232,6 +294,9 @@ export function JamieHomeScene() {
           <meshStandardMaterial color="#FFFFF0" emissive="#FFFCE0" emissiveIntensity={2.5} roughness={0.5} />
         </mesh>
       ))}
+
+      {/* ── Mum — seated at the far side of the dining table ─────────── */}
+      <MumCharacter />
 
       {/* ── Noticeboard left wall ──────────────────────────────────────── */}
       <mesh position={[-4.46, 1.9, -2.0]} rotation={[0, Math.PI / 2, 0]} castShadow>
