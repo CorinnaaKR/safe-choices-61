@@ -106,6 +106,12 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         <meshStandardMaterial map={wallTex} roughness={0.92} metalness={0} />
       </mesh>
 
+      {/* Ceiling */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 4, 0]} receiveShadow>
+        <planeGeometry args={[12, 10]} />
+        <meshStandardMaterial color="#F0ECE4" roughness={0.95} metalness={0} />
+      </mesh>
+
       {/* Classroom door — right wall */}
       <Door position={[5.95, 0, 3.5]} rotation={-Math.PI / 2} />
 

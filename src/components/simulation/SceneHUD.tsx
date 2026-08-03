@@ -194,7 +194,7 @@ export function SceneHUD({
       >
       {/* ── TOP-CENTRE: scene identity + clue count ─────────────────────── */}
       {!inspectedEvidence && !showFeedback && (
-        <div className="absolute top-20 md:top-6 inset-x-0 flex flex-col items-center gap-1.5 pointer-events-none">
+        <div className="absolute top-28 md:top-6 inset-x-0 flex flex-col items-center gap-1.5 pointer-events-none">
           <div className="bg-background/55 backdrop-blur-sm px-4 py-1.5 flex flex-col items-center gap-1 rounded-sm">
             <motion.p
               initial={{ opacity: 0, y: -6 }}
