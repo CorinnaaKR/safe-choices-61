@@ -39,6 +39,7 @@ const evidenceMeta: Record<
 const sceneEnvironments: Record<string, SceneEnvironment> = {
   'scene-1':         'classroom',
   'scene-2':         'playground',
+  'scene-2b':        'playground',
   'scene-3a':        'playground',
   'scene-3b':        'classroom',
   'scene-4':         'home-jamie',

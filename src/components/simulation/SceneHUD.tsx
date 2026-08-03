@@ -343,15 +343,21 @@ export function SceneHUD({
             </motion.div>
           )}
 
-          {allRevealed && !currentScene.isDecisionPoint && !currentScene.isFinalScene && (
+          {allRevealed && !currentScene.isDecisionPoint && !currentScene.isFinalScene && currentScene.nextSceneId && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="case-panel px-4 py-2 text-center"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center"
             >
-              <p className="hud-label normal-case tracking-normal text-foreground/50">
-                {currentScene.narrative[currentScene.narrative.length - 1]?.slice(0, 80)}…
-              </p>
+              <motion.button
+                onClick={onProceed}
+                whileHover={{ x: 4, scale: 1.03 }}
+                whileTap={{ scale: 0.96, x: 2 }}
+                transition={CHOICE_SPRING}
+                className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-8 py-3.5 hover:bg-primary/90 shadow-lg"
+              >
+                Continue ▸
+              </motion.button>
             </motion.div>
           )}
         </div>

@@ -31,6 +31,8 @@ interface SceneRendererProps {
   scenarioId?: string;
   /** Hide the player avatar — used during dialogue/decision scenes so the character doesn't block NPC view. */
   hidePlayer?: boolean;
+  /** Classroom variant: 'tutor-only' removes students and shows tutor at front desk */
+  classroomVariant?: 'tutor-only';
   evidence: Evidence[];
   collectedIds: string[];
   focusedEvidenceId: string | null;
@@ -83,6 +85,7 @@ export function SceneRenderer({
   sceneType,
   scenarioId,
   hidePlayer = false,
+  classroomVariant,
   evidence,
   collectedIds,
   focusedEvidenceId,
@@ -207,7 +210,7 @@ export function SceneRenderer({
           {/* Scene geometry — wrapped in Selection only on desktop for Outline effect */}
           {isMobile ? (
             <>
-              {sceneType === 'classroom' && <ClassroomScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'classroom' && <ClassroomScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} tutorOnly={classroomVariant === 'tutor-only'} />}
               {sceneType === 'playground' && <PlaygroundScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
               {sceneType === 'office' && <OfficeScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
               {sceneType === 'home' && <HomeScene showLazlo={scenarioId === 'lazlo-case'} evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
@@ -219,7 +222,7 @@ export function SceneRenderer({
             </>
           ) : (
             <Selection>
-              {sceneType === 'classroom' && <ClassroomScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
+              {sceneType === 'classroom' && <ClassroomScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} tutorOnly={classroomVariant === 'tutor-only'} />}
               {sceneType === 'playground' && <PlaygroundScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
               {sceneType === 'office' && <OfficeScene evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
               {sceneType === 'home' && <HomeScene showLazlo={scenarioId === 'lazlo-case'} evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}

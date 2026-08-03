@@ -185,14 +185,15 @@ export function useSimulation(
   );
 
   const proceedToNextScene = useCallback(() => {
-    if (!lastChoice) return;
+    const nextId = lastChoice?.nextSceneId ?? currentScene?.nextSceneId;
+    if (!nextId) return;
     setGameState((prev) => ({
       ...prev,
-      currentSceneId: lastChoice.nextSceneId,
+      currentSceneId: nextId,
     }));
     setShowFeedback(false);
     setLastChoice(null);
-  }, [lastChoice, scenario]);
+  }, [lastChoice, currentScene]);
 
   // Like makeChoice but skips the feedback panel and advances the scene immediately.
   // Use in self-contained scenes (e.g. GroupChatScene) that have no SceneHUD.

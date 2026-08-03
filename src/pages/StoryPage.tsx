@@ -285,6 +285,11 @@ export default function StoryPage() {
         sceneType={sceneType}
         scenarioId={scenarioId}
         hidePlayer={true}
+        classroomVariant={
+          ['scene-4-tutor', 'scene-4-tutor-interim', 'scene-4-tutor-resolve'].includes(currentScene.id)
+            ? 'tutor-only'
+            : undefined
+        }
         evidence={sceneEvidence}
         collectedIds={collectedIds}
         focusedEvidenceId={focusedEvidenceId}

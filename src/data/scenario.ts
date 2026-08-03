@@ -111,7 +111,7 @@ export const safeguardingScenario: Scenario = {
       ],
       isDecisionPoint: true
     },
-    // Scene 2: Break Time (PE + playground)
+    // Scene 2a: PE Day — changing room (no decision, auto-advances to break time)
     {
       id: 'scene-2',
       title: 'PE Day',
@@ -119,10 +119,7 @@ export const safeguardingScenario: Scenario = {
       narrative: [
         "It's a PE day. While everyone else gets changed in the usual chaos of the changing room — bags everywhere, someone always losing a trainer — Jamie slips off to use the toilets instead.",
         "You don't think much of it until Jamie comes out in a long-sleeve top, even though the room's thick and humid from forty people getting changed at once. Everyone else is in shorts and t-shirts complaining about the heat. Jamie isn't.",
-        "It's probably nothing. Loads of people get weird about changing rooms at this age. But you noticed it, and once you've noticed something, it's hard to unnotice it.",
-        "Later, at break, you spot Jamie sitting alone on a bench near the fence, picking at their sleeve. Their usual group is playing football nearby, but Jamie hasn't moved to join in.",
-        "Marcus — who lives next door to Jamie — jogs over and tries to pull Jamie up to play. Jamie yanks their arm away sharply — and for a second, before the sleeve drops back down, you catch a glimpse of something dark on their wrist.",
-        "Marcus shrugs and jogs back to the game, looking a bit confused."
+        "It's probably nothing. Loads of people get weird about changing rooms at this age. But you noticed it, and once you've noticed something, it's hard to unnotice it."
       ],
       evidence: [
         {
@@ -132,7 +129,22 @@ export const safeguardingScenario: Scenario = {
           description: 'PE lesson',
           content: "Jamie changed in the toilets instead of with everyone else, then wore long sleeves on a hot, sweaty day when literally no one else did. Could just be self-conscious about changing in front of people — loads of people are like that. But it's the kind of thing that's easy to explain away one at a time, and hard to explain away all together.",
           timestamp: 'Monday, PE lesson'
-        },
+        }
+      ],
+      isDecisionPoint: false,
+      nextSceneId: 'scene-2b'
+    },
+    // Scene 2b: Break Time — bench + Marcus incident
+    {
+      id: 'scene-2b',
+      title: 'Break Time',
+      environment: 'playground',
+      narrative: [
+        "At break, you spot Jamie sitting alone on a bench near the fence, picking at their sleeve. Their usual group is playing football nearby, but Jamie hasn't moved to join in.",
+        "Marcus — who lives next door to Jamie — jogs over and tries to pull Jamie up to play. Jamie yanks their arm away sharply — and for a second, before the sleeve drops back down, you catch a glimpse of something dark on their wrist.",
+        "Marcus shrugs and jogs back to the game, looking a bit confused."
+      ],
+      evidence: [
         {
           id: 'obs-2',
           type: 'observation',

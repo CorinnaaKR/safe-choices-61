@@ -25,6 +25,8 @@ interface ClassroomSceneProps {
   focusedEvidenceId: string | null;
   onCollectEvidence: (evidence: Evidence) => void;
   onFocusEvidence: (evidence: Evidence) => void;
+  /** When true: no student NPCs, tutor sits at the teacher's desk */
+  tutorOnly?: boolean;
 }
 
 // NPC child sitting at a desk
@@ -41,6 +43,21 @@ function StudentNPC({ position, color, name }: { position: [number, number, numb
   );
 }
 
+// Adult tutor seated at the teacher's desk, facing the player
+function TutorNPC() {
+  return (
+    <NPCCharacter
+      position={[0, 0.41, -3.1]}
+      rotation={0}
+      bodyColor="#4A6080"
+      skinColor="#C8A882"
+      pose="sitting"
+      name="Form tutor"
+      fidget={0.1}
+    />
+  );
+}
+
 export const CLASSROOM_EVIDENCE_POSITIONS: [number, number, number][] = [
   [3.7, 0.9, 2.3],   // Near Jamie — crumpled uniform observation
   [3.2, 0.75, 2.8],  // Dropped note on floor near Jamie's desk
@@ -48,7 +65,7 @@ export const CLASSROOM_EVIDENCE_POSITIONS: [number, number, number][] = [
   [-1.5, 0.9, 2.5],
 ];
 
-export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence }: ClassroomSceneProps) {
+export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCollectEvidence, onFocusEvidence, tutorOnly = false }: ClassroomSceneProps) {
   const floorTex = useTileTexture('#C4A882', '#B09A72', 32, [3, 2]);
   const wallTex = useWallTexture('#F5F0E8', [2, 1]);
   const sideWallTex = useWallTexture('#EDE8DC', [2, 1]);
@@ -164,7 +181,7 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         </mesh>
       ))}
 
-      {/* Student desks with NPC students */}
+      {/* Student desks — always present, student NPCs hidden in tutor-only mode */}
       {[-2, 0, 2].map((x) =>
         [-1, 0.5, 2].map((z, i) => (
           <group key={`${x}-${i}`}>
@@ -174,38 +191,44 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
         ))
       )}
 
-      {/* Background student NPCs for atmosphere */}
-      <StudentNPC position={[-2, 0.41, -0.55]} color="#e74c3c" name="Student" />
-      <StudentNPC position={[0, 0.41, -0.55]} color="#2ecc71" name="Student" />
-      <StudentNPC position={[2, 0.41, -0.55]} color="#9b59b6" name="Student" />
-      <StudentNPC position={[-2, 0.41, 0.95]} color="#e67e22" name="Student" />
-      <StudentNPC position={[0, 0.41, 0.95]} color="#1abc9c" name="Student" />
+      {!tutorOnly && (
+        <>
+          {/* Background student NPCs */}
+          <StudentNPC position={[-2, 0.41, -0.55]} color="#e74c3c" name="Student" />
+          <StudentNPC position={[0, 0.41, -0.55]} color="#2ecc71" name="Student" />
+          <StudentNPC position={[2, 0.41, -0.55]} color="#9b59b6" name="Student" />
+          <StudentNPC position={[-2, 0.41, 0.95]} color="#e67e22" name="Student" />
+          <StudentNPC position={[0, 0.41, 0.95]} color="#1abc9c" name="Student" />
 
-      {/* Jamie's desk — back corner, isolated */}
-      <group>
-        <Desk position={[3.5, 0, 2.5]} />
-        <Chair position={[3.5, 0, 2.95]} rotation={Math.PI} />
-        {/* Subtle highlight ring */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3.5, 0.01, 2.5]}>
-          <circleGeometry args={[0.8, 32]} />
-          <meshBasicMaterial color="#f59e0b" transparent opacity={0.08} />
-        </mesh>
-      </group>
+          {/* Jamie's desk — back corner */}
+          <group>
+            <Desk position={[3.5, 0, 2.5]} />
+            <Chair position={[3.5, 0, 2.95]} rotation={Math.PI} />
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3.5, 0.01, 2.5]}>
+              <circleGeometry args={[0.8, 32]} />
+              <meshBasicMaterial color="#f59e0b" transparent opacity={0.08} />
+            </mesh>
+          </group>
 
-      {/* Jamie NPC — sitting withdrawn in their chair */}
-      <NPCCharacter
-        position={[3.5, 0.41, 2.95]}
-        rotation={Math.PI}
-        bodyColor="#6B8CA8"
-        skinColor="#e8c4a0"
-        pose="withdrawn"
-        name="Jamie"
-        behaviorHint="Hunched over, pulling at sleeves..."
-        pullsSleeves={true}
-        fidget={0.8}
-        hotspots={jamieHotspots}
-        onHotspotClick={handleJamieHotspot}
-      />
+          {/* Jamie NPC */}
+          <NPCCharacter
+            position={[3.5, 0.41, 2.95]}
+            rotation={Math.PI}
+            bodyColor="#6B8CA8"
+            skinColor="#e8c4a0"
+            pose="withdrawn"
+            name="Jamie"
+            behaviorHint="Hunched over, pulling at sleeves..."
+            pullsSleeves={true}
+            fidget={0.8}
+            hotspots={jamieHotspots}
+            onHotspotClick={handleJamieHotspot}
+          />
+        </>
+      )}
+
+      {/* Tutor-only mode: teacher seated at front desk facing player */}
+      {tutorOnly && <TutorNPC />}
 
       {/* Free-standing evidence items (not on NPCs) */}
       {freeEvidence.map(({ ev, idx }) => {

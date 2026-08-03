@@ -129,6 +129,8 @@ export interface Scene {
   choices?: Choice[];
   isDecisionPoint: boolean;
   isFinalScene?: boolean;
+  /** For non-decision non-final scenes: advance to this scene when the player continues. */
+  nextSceneId?: string;
   /** Which 3D environment renders this scene. */
   environment?: SceneEnvironment;
   /**
