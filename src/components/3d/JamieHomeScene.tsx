@@ -8,8 +8,9 @@ function MumCharacter() {
   const topColor   = '#7080B0'; // blue-grey top
   const trouserCol = '#4A4060';
 
+  // Mum faces +z (toward player). Arms reach toward +z (toward table at higher z).
   return (
-    <group position={[-0.7, 0, 0.6]} rotation={[0, Math.PI * 0.15, 0]}>
+    <group>
       {/* Torso */}
       <mesh position={[0, 0.88, 0]} castShadow>
         <boxGeometry args={[0.32, 0.38, 0.22]} />
@@ -20,7 +21,7 @@ function MumCharacter() {
         <boxGeometry args={[0.34, 0.18, 0.32]} />
         <meshStandardMaterial color={trouserCol} roughness={0.75} />
       </mesh>
-      {/* Upper legs (seated, horizontal) */}
+      {/* Upper legs (seated, horizontal toward table) */}
       <mesh position={[0, 0.54, 0.2]} castShadow>
         <boxGeometry args={[0.3, 0.14, 0.36]} />
         <meshStandardMaterial color={trouserCol} roughness={0.75} />
@@ -31,31 +32,31 @@ function MumCharacter() {
         <meshStandardMaterial color={skinColor} roughness={0.65} />
       </mesh>
       {/* Hair */}
-      <mesh position={[0, 1.28, -0.02]} castShadow>
+      <mesh position={[0, 1.28, 0.02]} castShadow>
         <sphereGeometry args={[0.118, 14, 10]} />
         <meshStandardMaterial color={hairColor} roughness={0.8} />
       </mesh>
       {/* Hair back */}
-      <mesh position={[0, 1.18, -0.1]} castShadow>
+      <mesh position={[0, 1.18, 0.1]} castShadow>
         <boxGeometry args={[0.2, 0.18, 0.08]} />
         <meshStandardMaterial color={hairColor} roughness={0.8} />
       </mesh>
-      {/* Left arm on table — z negative so arms reach toward table with Math.PI parent rotation */}
-      <mesh position={[-0.2, 0.82, -0.28]} rotation={[-Math.PI * 0.35, 0, 0.1]} castShadow>
+      {/* Left arm reaching toward table (+z) */}
+      <mesh position={[-0.2, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, 0.1]} castShadow>
         <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
         <meshStandardMaterial color={topColor} roughness={0.7} />
       </mesh>
       {/* Right arm */}
-      <mesh position={[0.18, 0.82, -0.28]} rotation={[-Math.PI * 0.35, 0, -0.1]} castShadow>
+      <mesh position={[0.18, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, -0.1]} castShadow>
         <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
         <meshStandardMaterial color={topColor} roughness={0.7} />
       </mesh>
-      {/* Hands */}
-      <mesh position={[-0.22, 0.78, -0.48]} castShadow>
+      {/* Hands resting on table */}
+      <mesh position={[-0.22, 0.78, 0.48]} castShadow>
         <sphereGeometry args={[0.042, 8, 6]} />
         <meshStandardMaterial color={skinColor} roughness={0.65} />
       </mesh>
-      <mesh position={[0.2, 0.78, -0.48]} castShadow>
+      <mesh position={[0.2, 0.78, 0.48]} castShadow>
         <sphereGeometry args={[0.042, 8, 6]} />
         <meshStandardMaterial color={skinColor} roughness={0.65} />
       </mesh>
@@ -64,24 +65,24 @@ function MumCharacter() {
 }
 
 export function JamieHomeScene() {
-  const wallColor    = '#F2EDE4'; // off-white plaster
-  const floorColor   = '#A87040'; // warm oak boards
-  const cabinetColor = '#FFFFFF'; // white gloss kitchen units
-  const worktopColor = '#7A9090'; // grey-green stone
-  const fridgeColor  = '#E8E8E8'; // white fridge
-  const chairColor   = '#5A8A6A'; // sage green chairs
+  const wallColor    = '#E8DDD0'; // warm biscuit — clearly home, not classroom
+  const floorColor   = '#8A5C2A'; // darker oak, distinctly residential
+  const cabinetColor = '#F0EDE8'; // slightly warm white units
+  const worktopColor = '#5A7070'; // slate worktop
+  const fridgeColor  = '#E4E0DC'; // warm off-white fridge
+  const chairColor   = '#4A7A5A'; // sage green chairs
 
   return (
     <group>
-      {/* ── Lighting — deliberately bright, domestic kitchen feel ──── */}
-      <ambientLight intensity={1.8} color="#FFF8F0" />
-      {/* Main ceiling strip lights */}
-      <rectAreaLight position={[-1.5, 2.9, -1]} width={3} height={0.2} intensity={6} color="#FFF5E8" rotation={[-Math.PI / 2, 0, 0]} />
-      <rectAreaLight position={[1.5, 2.9, 1]} width={3} height={0.2} intensity={6} color="#FFF5E8" rotation={[-Math.PI / 2, 0, 0]} />
-      {/* Daylight from window */}
-      <directionalLight position={[5, 4, 1]} intensity={2.0} color="#FFF0D8" castShadow shadow-mapSize={[512, 512]} />
-      {/* Fill */}
-      <pointLight position={[-3, 2, 2]} intensity={1.0} color="#FFE8D0" />
+      {/* ── Lighting — evening kitchen: warm overhead, dark outside ──── */}
+      <ambientLight intensity={0.9} color="#FFE8D0" />
+      {/* Main ceiling strip lights — warm domestic, not classroom fluorescent */}
+      <rectAreaLight position={[-1.5, 2.9, -1]} width={3} height={0.2} intensity={8} color="#FFD080" rotation={[-Math.PI / 2, 0, 0]} />
+      <rectAreaLight position={[1.5, 2.9, 1]} width={3} height={0.2} intensity={8} color="#FFD080" rotation={[-Math.PI / 2, 0, 0]} />
+      {/* Evening — no daylight, replace with a dim blue ambient from window direction */}
+      <directionalLight position={[5, 4, 1]} intensity={0.3} color="#8090C0" castShadow shadow-mapSize={[512, 512]} />
+      {/* Warm kitchen fill */}
+      <pointLight position={[-3, 2, 2]} intensity={1.4} color="#FFC878" />
 
       {/* ── Floor ──────────────────────────────────────────────────── */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
@@ -217,10 +218,10 @@ export function JamieHomeScene() {
         <boxGeometry args={[0.07, 1.6, 1.4]} />
         <meshStandardMaterial color="#E8E0D0" roughness={0.6} />
       </mesh>
-      {/* Glass — emissive bright daylight */}
+      {/* Glass — evening darkness outside */}
       <mesh position={[4.43, 2.0, -1.0]}>
         <boxGeometry args={[0.025, 1.4, 1.2]} />
-        <meshStandardMaterial color="#D0E8FF" transparent opacity={0.55} emissive="#A0D0FF" emissiveIntensity={0.8} />
+        <meshStandardMaterial color="#1A2030" transparent opacity={0.85} emissive="#0A1020" emissiveIntensity={0.3} />
       </mesh>
       {/* Cross bar */}
       <mesh position={[4.46, 2.0, -1.0]}>
@@ -246,25 +247,25 @@ export function JamieHomeScene() {
         </mesh>
       ))}
 
-      {/* ── Chairs (sage green) ──────────────────────────────────────── */}
-      {/* Near chair */}
-      <group position={[0.5, 0, 2.4]}>
+      {/* ── Chairs (sage green) — all face toward table centre ─────────── */}
+      {/* Near chair (player side, z=2.2): rotation π so sitter faces -z toward table */}
+      <group position={[0.5, 0, 2.2]} rotation={[0, Math.PI, 0]}>
         <mesh position={[0, 0.44, 0]} castShadow><boxGeometry args={[0.42, 0.04, 0.42]} /><meshStandardMaterial color={chairColor} roughness={0.6} /></mesh>
         <mesh position={[0, 0.72, -0.19]} castShadow><boxGeometry args={[0.42, 0.5, 0.04]} /><meshStandardMaterial color={chairColor} roughness={0.6} /></mesh>
         {[[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]].map(([cx, cz], i) => (
           <mesh key={i} position={[cx, 0.21, cz]}><cylinderGeometry args={[0.015, 0.015, 0.42, 8]} /><meshStandardMaterial color="#3A5A40" /></mesh>
         ))}
       </group>
-      {/* Far chair */}
-      <group position={[0.5, 0, 0.6]} rotation={[0, Math.PI, 0]}>
+      {/* Far chair (kitchen side, z=0.75): rotation 0 so sitter faces +z toward table */}
+      <group position={[0.5, 0, 0.75]}>
         <mesh position={[0, 0.44, 0]} castShadow><boxGeometry args={[0.42, 0.04, 0.42]} /><meshStandardMaterial color={chairColor} roughness={0.6} /></mesh>
         <mesh position={[0, 0.72, -0.19]} castShadow><boxGeometry args={[0.42, 0.5, 0.04]} /><meshStandardMaterial color={chairColor} roughness={0.6} /></mesh>
         {[[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]].map(([cx, cz], i) => (
           <mesh key={i} position={[cx, 0.21, cz]}><cylinderGeometry args={[0.015, 0.015, 0.42, 8]} /><meshStandardMaterial color="#3A5A40" /></mesh>
         ))}
       </group>
-      {/* Side chair */}
-      <group position={[1.9, 0, 1.5]} rotation={[0, -Math.PI / 2, 0]}>
+      {/* Side chair (right of table, x=1.9): rotation +π/2 so sitter faces -x toward table */}
+      <group position={[1.9, 0, 1.5]} rotation={[0, Math.PI / 2, 0]}>
         <mesh position={[0, 0.44, 0]} castShadow><boxGeometry args={[0.42, 0.04, 0.42]} /><meshStandardMaterial color={chairColor} roughness={0.6} /></mesh>
         <mesh position={[0, 0.72, -0.19]} castShadow><boxGeometry args={[0.42, 0.5, 0.04]} /><meshStandardMaterial color={chairColor} roughness={0.6} /></mesh>
         {[[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]].map(([cx, cz], i) => (
@@ -295,8 +296,8 @@ export function JamieHomeScene() {
         </mesh>
       ))}
 
-      {/* ── Mum — seated at the far side of the dining table, facing player ── */}
-      <group position={[0.5, 0, 0.6]} rotation={[0, Math.PI, 0]}>
+      {/* ── Mum — far side of table, facing player (+z) ── */}
+      <group position={[0.5, 0.41, 0.75]}>
         <MumCharacter />
       </group>
 

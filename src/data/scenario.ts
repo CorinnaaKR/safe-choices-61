@@ -446,7 +446,7 @@ export const safeguardingScenario: Scenario = {
         {
           id: 'c4tr-1',
           text: 'Nod and go to your next lesson',
-          consequence: 'You don\'t know exactly what happens next — that part isn\'t yours to know. But you\'re not carrying it alone anymore.',
+          consequence: 'Your tutor gives a small, certain nod. "Leave it with me." You walk out into the corridor and the weight that has been sitting in your chest since Monday lifts, just slightly.',
           feedback: 'The telling was the part that was yours to do. The rest belongs to the people whose job it is.',
           isOptimal: true,
           nextSceneId: 'scene-5',

@@ -158,11 +158,11 @@ export function SceneRenderer({
         gl={{
           antialias: !isMobile,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: sceneType === 'playground' ? 1.2 : sceneType === 'home' ? 1.1 : sceneType === 'home-jamie' ? 1.4 : 1.0,
+          toneMappingExposure: sceneType === 'playground' ? 1.2 : sceneType === 'home' ? 1.1 : sceneType === 'home-jamie' ? 1.2 : 1.0,
           powerPreference: isMobile ? 'low-power' : 'high-performance',
           failIfMajorPerformanceCaveat: false,
         }}
-        style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19' }}
+        style={{ background: sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#1A1408' : '#211c19' }}
       >
         <Suspense fallback={null}>
 
@@ -225,7 +225,7 @@ export function SceneRenderer({
               {sceneType === 'home' && <HomeScene showLazlo={scenarioId === 'lazlo-case'} evidence={evidence} collectedIds={collectedIds} focusedEvidenceId={focusedEvidenceId} onCollectEvidence={onCollectEvidence} onFocusEvidence={handleFocusEvidence} />}
               {sceneType === 'home-jamie' && <JamieHomeScene />}
               {/* Desktop: full HDR environment + contact shadows + postprocessing */}
-              <Environment preset={sceneType === 'playground' ? 'park' : sceneType === 'home' ? 'night' : sceneType === 'home-jamie' ? 'warehouse' : 'apartment'} />
+              <Environment preset={sceneType === 'playground' ? 'park' : sceneType === 'home' || sceneType === 'home-jamie' ? 'night' : 'apartment'} />
               <ContactShadows position={[0, 0.01, 0]} opacity={0.4} scale={sceneType === 'playground' ? 20 : 12} blur={2} far={4} frames={1} />
               <EffectComposer multisampling={0} autoClear={false}>
                 <N8AO halfRes quality="performance" intensity={2} aoRadius={0.5} distanceFalloff={0.75} />
@@ -234,7 +234,7 @@ export function SceneRenderer({
                 {focusTarget != null && <DepthOfField target={new THREE.Vector3(focusTarget[0], focusTarget[1], focusTarget[2])} focalLength={0.02} bokehScale={4} height={480} />}
                 {focusTarget != null && <Vignette eskil={false} offset={0.2} darkness={0.55} />}
               </EffectComposer>
-              <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' ? '#0D0B08' : sceneType === 'home-jamie' ? '#E8D8B8' : '#211c19', sceneType === 'home' || sceneType === 'home-jamie' ? 8 : 12, sceneType === 'home' || sceneType === 'home-jamie' ? 18 : 30]} />
+              <fog attach="fog" args={[sceneType === 'playground' ? '#87CEEB' : sceneType === 'home' || sceneType === 'home-jamie' ? '#0D0B08' : '#211c19', sceneType === 'home' || sceneType === 'home-jamie' ? 8 : 12, sceneType === 'home' || sceneType === 'home-jamie' ? 18 : 30]} />
             </Selection>
           )}
 
