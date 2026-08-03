@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useThree } from '@react-three/fiber';
+import { useThree, useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { playHoverTick, playSelect } from '@/lib/sfx';
@@ -14,6 +14,25 @@ interface InteractiveObjectProps {
   collected?: boolean;
   focused?: boolean;
   onClick: () => void;
+}
+
+function PulsRing() {
+  const ref = useRef<THREE.Mesh>(null);
+  const t = useRef(0);
+  useFrame((_, delta) => {
+    t.current += delta;
+    if (!ref.current) return;
+    const s = 1 + Math.sin(t.current * 2.2) * 0.18;
+    ref.current.scale.set(s, 1, s);
+    (ref.current.material as THREE.MeshBasicMaterial).opacity =
+      0.28 + Math.sin(t.current * 2.2) * 0.18;
+  });
+  return (
+    <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+      <ringGeometry args={[0.38, 0.52, 32]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.3} depthWrite={false} />
+    </mesh>
+  );
 }
 
 export function InteractiveObject({
@@ -34,6 +53,9 @@ export function InteractiveObject({
 
   return (
     <group position={position}>
+      {/* Pulsing floor ring on touch devices — signals "tap me" without hover */}
+      {isTouchDevice && !collected && <PulsRing />}
+
       {/* Invisible hit area covering an NPC's upper body — easy to find by
           exploring, no persistent UI marker. Prompt appears on hover only. */}
       {!collected && (

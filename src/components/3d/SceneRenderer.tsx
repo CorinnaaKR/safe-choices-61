@@ -175,12 +175,19 @@ export function SceneRenderer({
             visible={false}
           />
 
-          {/* Double-click/tap anywhere on the floor to walk there */}
+          {/* Walk on tap (mobile) or double-click (desktop) */}
           {!focusTarget && (
             <mesh
               rotation={[-Math.PI / 2, 0, 0]}
               position={[0, 0.005, 0]}
+              onClick={(e) => {
+                if (!isMobile) return; // desktop uses onDoubleClick below
+                e.stopPropagation();
+                if (e.delta > 12) return; // ignore drags
+                setWalkTarget(new THREE.Vector3(e.point.x, 0, e.point.z));
+              }}
               onDoubleClick={(e) => {
+                if (isMobile) return;
                 e.stopPropagation();
                 setWalkTarget(new THREE.Vector3(e.point.x, 0, e.point.z));
               }}
