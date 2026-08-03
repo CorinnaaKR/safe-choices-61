@@ -6,7 +6,7 @@ const AIRTABLE_TABLE_ID = process.env.AIRTABLE_TABLE_ID;
 
 const ALLOWED_FIELDS = new Set([
   'Submitted At',
-  'scenario',
+  'Scenario',
   'Prior Training',
   'Confidence Before',
   'Confidence After',

@@ -31,7 +31,7 @@ export interface FeedbackSubmission extends PreFeedback, PostFeedback {
 export async function submitFeedback(data: FeedbackSubmission): Promise<void> {
   const fields: Record<string, string | number> = {
     'Submitted At': data.submittedAt,
-    'scenario': data.storiesPlayed,
+    'Scenario': data.storiesPlayed,
     'Prior Training': data.priorTraining,
     'Confidence Before': data.confidenceBefore,
     'Confidence After': data.confidenceAfter,
