@@ -143,6 +143,13 @@ export function CameraController({
       if (activePointers.size === 0) {
         pointerDown = false;
         dragging.current = false;
+      } else if (activePointers.size === 1) {
+        // One finger left after a pinch — re-enable single-finger drag from
+        // the remaining pointer's current position so the view doesn't jump.
+        const remaining = [...activePointers.values()][0];
+        lastX = remaining.x;
+        lastY = remaining.y;
+        pointerDown = true;
       }
     };
     const onWheel = (e: WheelEvent) => {

@@ -43,7 +43,7 @@ export function InteractiveObject({
           onClick={(e) => {
             e.stopPropagation();
             // Touch taps can register a small delta — use a looser threshold
-            if (e.delta > (isTouchDevice ? 12 : 5)) return;
+            if (e.delta > (isTouchDevice ? 20 : 5)) return;
             playSelect();
             setCrosshairActive(false);
             setHovered(false);
