@@ -131,8 +131,10 @@ export function CameraController({
       lastY = e.clientY;
       dragging.current = true;
       yaw.current -= dx * ORBIT_SPEED;
+      // Touch Y-axis is perceived as inverted vs mouse — negate dy for touch
+      const pitchDelta = e.pointerType === 'touch' ? -dy : dy;
       pitch.current = THREE.MathUtils.clamp(
-        pitch.current + dy * ORBIT_SPEED,
+        pitch.current + pitchDelta * ORBIT_SPEED,
         FPS_PITCH_MIN,
         FPS_PITCH_MAX
       );

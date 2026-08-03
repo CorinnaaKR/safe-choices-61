@@ -47,7 +47,7 @@ const scenarioHooks: Record<string, string> = {
 };
 
 function savedStateKey(scenarioId: string, mode: Mode) {
-  return `heli-state:${scenarioId}:${mode}`;
+  return `heli-state-v2:${scenarioId}:${mode}`;
 }
 
 function hasProgress(scenarioId: string, mode: Mode): boolean {
@@ -318,7 +318,7 @@ export default function WelcomePage() {
           <button
             onClick={() => {
               Object.keys(localStorage)
-                .filter((k) => k.startsWith('heli-state:'))
+                .filter((k) => k.startsWith('heli-state-v2:'))
                 .forEach((k) => localStorage.removeItem(k));
               window.location.reload();
             }}

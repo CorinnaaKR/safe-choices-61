@@ -4,7 +4,7 @@ import { getScenario, DEFAULT_SCENARIO_ID } from '@/data/scenarios';
 import { toast } from '@/hooks/use-toast';
 
 const storageKey = (scenarioId: string, mode: Mode) =>
-  `heli-state:${scenarioId}:${mode}`;
+  `heli-state-v2:${scenarioId}:${mode}`;
 
 function getInitialState(scenario: Scenario, mode: Mode): GameState {
   return {
