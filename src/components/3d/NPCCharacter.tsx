@@ -352,7 +352,7 @@ function NPCHotspotMarker({
     <group position={hotspot.offset}>
       {/* Pulsing marker */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[0.05, 12, 12]} />
+        <sphereGeometry args={[0.08, 12, 12]} />
         <meshBasicMaterial
           color="#e9e7e3"
           transparent
@@ -365,7 +365,7 @@ function NPCHotspotMarker({
         onClick={(e) => {
           e.stopPropagation();
           // Touch taps can register a small delta — use a looser threshold
-          if (e.delta > (isTouchDevice ? 12 : 5)) return;
+          if (e.delta > (isTouchDevice ? 20 : 5)) return;
           playSelect();
           setCrosshairActive(false);
           onHover(false);

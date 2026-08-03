@@ -99,7 +99,7 @@ export function HomeScene({
       'beh-l1': [0, 0.35, 0.22],   // body / posture
       'beh-l2': [0.22, 0.55, 0.15], // arms / shoulders
       'beh-l3': [0, 0.95, 0.18],   // face / speech
-      'dig-l2': [-0.2, 0.28, 0.2], // hand / phone
+      'dig-l2': [-0.28, 0.42, 0.28], // hand / phone — raised + pushed out from body
     };
     return {
       id: ev.id,
