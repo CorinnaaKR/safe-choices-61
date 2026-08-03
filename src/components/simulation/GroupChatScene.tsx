@@ -86,7 +86,7 @@ export function GroupChatScene({ choices, onChoice }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col md:flex-row items-center md:items-center justify-center z-50 px-4 py-6 gap-6">
+    <div className="fixed inset-0 bg-black flex flex-col md:flex-row items-center md:items-center justify-center z-50 px-4 py-6 gap-6 overflow-y-auto">
 
       {/* Feedback card — shown after a choice, before advancing */}
       <AnimatePresence>
@@ -145,7 +145,7 @@ export function GroupChatScene({ choices, onChoice }: Props) {
         className="flex flex-col relative overflow-hidden shrink-0"
         style={{
           width: 'min(380px, 94vw)',
-          height: '80vh',
+          height: 'min(80vh, 55dvh)',
           borderRadius: '2.8rem',
           border: '10px solid #1a1a1a',
           boxShadow: '0 0 0 1px #333, 0 32px 80px rgba(0,0,0,0.9), inset 0 0 0 1.5px rgba(255,255,255,0.1)',

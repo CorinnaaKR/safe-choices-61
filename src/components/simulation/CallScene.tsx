@@ -114,7 +114,7 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
         className="flex flex-col bg-background relative overflow-hidden"
         style={{
           width: 'min(360px, 82vw)',
-          height: 'min(780px, 92vh)',
+          height: 'min(580px, 68dvh)',
           borderRadius: '3rem',
           border: '10px solid #1a1a1a',
           boxShadow:
@@ -142,68 +142,25 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
           </span>
         </div>
 
-        {/* Transcript — rendered as chat bubbles, like a live call transcript */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 min-h-0" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {/* Call transcript — plain text speaker lines, not chat bubbles */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 min-h-0" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <AnimatePresence initial={false}>
             {turns.map((turn, i) => {
               const isYou = turn.kind === 'you';
-              const prevSame = turns[i - 1]?.kind === turn.kind;
-              const nextSame = turns[i + 1]?.kind === turn.kind;
-              const showTail = !nextSame;
               return (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: isYou ? 'flex-end' : 'flex-start', marginTop: prevSame ? 2 : 12 }}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22 }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 3 }}
                 >
-                  {!prevSame && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontFamily: 'monospace',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        color: '#8e8e93',
-                        marginBottom: 4,
-                        paddingRight: isYou ? 4 : 0,
-                        paddingLeft: isYou ? 0 : 4,
-                      }}
-                    >
-                      {turn.kind === 'operator' ? data.operatorName : 'You'} · {turn.time}
-                    </span>
-                  )}
-                  <div style={{ position: 'relative', maxWidth: '78%' }}>
-                    <div
-                      style={{
-                        padding: '8px 14px',
-                        fontSize: 14,
-                        lineHeight: 1.45,
-                        fontFamily: '-apple-system, sans-serif',
-                        background: isYou ? '#0a84ff' : '#3a3a3c',
-                        color: '#fff',
-                        borderRadius: isYou
-                          ? showTail ? '20px 20px 4px 20px' : '20px'
-                          : showTail ? '20px 20px 20px 4px' : '20px',
-                      }}
-                    >
-                      {turn.text}
-                    </div>
-                    {showTail && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          bottom: 0,
-                          ...(isYou ? { right: -6 } : { left: -6 }),
-                          width: 0,
-                          height: 0,
-                          borderTop: '10px solid transparent',
-                          ...(isYou ? { borderLeft: '10px solid #0a84ff' } : { borderRight: '10px solid #3a3a3c' }),
-                        }}
-                      />
-                    )}
-                  </div>
+                  <span style={{ fontSize: 10, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.12em', color: isYou ? '#0a84ff' : '#8e8e93' }}>
+                    {isYou ? 'You' : data.operatorName} · {turn.time}
+                  </span>
+                  <p style={{ fontSize: 14, lineHeight: 1.6, fontFamily: '-apple-system, sans-serif', color: isYou ? '#e0e0e0' : '#aeaeb2', margin: 0 }}>
+                    {turn.text}
+                  </p>
                 </motion.div>
               );
             })}

@@ -112,10 +112,11 @@ export function SceneHUD({
 
   const advanceNarrative = () => {
     const next = visibleParagraph + 1;
-    if (next <= currentScene.narrative.length) setVisibleParagraph(next);
+    if (next <= currentScene.narrative.length + 1) setVisibleParagraph(next);
   };
 
-  const allRevealed = visibleParagraph >= currentScene.narrative.length;
+  // strictly past the end so the final paragraph is shown before explore/choices appear
+  const allRevealed = visibleParagraph > currentScene.narrative.length;
   const narrativeUnread = sceneReady && !allRevealed && visibleParagraph > 0;
   // Before showing the decision, give the player an explicit beat to explore
   // the room if there's still something uncollected — otherwise it's easy to
@@ -310,9 +311,9 @@ export function SceneHUD({
                       animate={{ opacity: [0.85, 1, 0.85] }}
                       transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                     >
-                      {visibleParagraph >= currentScene.narrative.length - 1 && currentScene.isDecisionPoint && uncollected.length > 0
+                      {visibleParagraph >= currentScene.narrative.length && currentScene.isDecisionPoint && uncollected.length > 0
                         ? 'Look around →'
-                        : visibleParagraph >= currentScene.narrative.length - 1
+                        : visibleParagraph >= currentScene.narrative.length
                         ? 'Continue'
                         : 'Next'}
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M6 3l2 2-2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -574,17 +575,23 @@ export function SceneHUD({
               <h2 className="font-sans text-lg font-bold text-foreground leading-snug">You're here. Look around.</h2>
             </div>
             <ul className="space-y-3">
-              {[
-                { key: '↑ ↓', label: 'move forward and back' },
-                { key: '← →', label: 'turn left and right' },
-                { key: 'Drag', label: 'to look around freely' },
-                { key: mode === 'learning' ? 'Tap' : 'Click', label: 'anything that feels significant' },
-              ].map(({ key, label }) => (
-                <li key={key} className="flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
-                  <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">{key}</span>
-                  <span>{label}</span>
-                </li>
-              ))}
+              <li className="hidden md:flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">↑ ↓</span>
+                <span>move forward and back</span>
+              </li>
+              <li className="hidden md:flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">← →</span>
+                <span>turn left and right</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5 hidden md:inline">Drag</span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5 md:hidden">Swipe</span>
+                <span>to look around</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-foreground/75 leading-relaxed">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary shrink-0 mt-0.5">Tap</span>
+                <span>anything that feels significant</span>
+              </li>
             </ul>
             <button
               onClick={dismissOnboarding}
