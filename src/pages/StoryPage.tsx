@@ -263,11 +263,29 @@ export default function StoryPage() {
   return (
     <div className="fixed inset-0 overflow-hidden bg-background crosshair-area" style={{ touchAction: 'none' }}>
       {/* Full-screen 3D scene */}
-      {/* Doorstep scenes (scene-l0): hide the home interior behind a plain dark
-          backdrop so the "knocking at the door" narrative isn't undermined by
-          showing Lazlo already sitting on his sofa. */}
+      {/* Doorstep scene (scene-l0): replace the 3D interior with a simple
+          exterior backdrop — overcast afternoon sky + concrete step + door —
+          so the narrative ("you're outside knocking") makes visual sense. */}
       {currentScene.id === 'scene-l0' && (
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #0D0A07 60%, #1A1208 100%)', zIndex: 1 }} />
+        <div className="absolute inset-0 flex flex-col" style={{ zIndex: 1 }}>
+          {/* Sky — flat overcast afternoon */}
+          <div style={{ flex: '0 0 45%', background: 'linear-gradient(to bottom, #B8C8D8 0%, #D0D8E0 100%)' }} />
+          {/* Exterior wall — rendered brick / render finish */}
+          <div style={{ flex: '1', background: 'linear-gradient(to bottom, #9A8C7E 0%, #8A7C6E 100%)', position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '8%' }}>
+            {/* Door */}
+            <div style={{ width: '18%', maxWidth: 120, aspectRatio: '0.48', background: '#3A2A1A', borderRadius: '2px 2px 0 0', position: 'relative', boxShadow: '4px 0 12px rgba(0,0,0,0.4)' }}>
+              {/* Door panels */}
+              <div style={{ position: 'absolute', top: '8%', left: '10%', right: '10%', height: '28%', background: '#2E2010', borderRadius: 2 }} />
+              <div style={{ position: 'absolute', top: '42%', left: '10%', right: '10%', height: '38%', background: '#2E2010', borderRadius: 2 }} />
+              {/* Handle */}
+              <div style={{ position: 'absolute', top: '55%', right: '12%', width: '10%', height: '6%', background: '#B09060', borderRadius: 4 }} />
+              {/* Letterbox */}
+              <div style={{ position: 'absolute', top: '48%', left: '25%', right: '25%', height: '3%', background: '#B09060', borderRadius: 2 }} />
+            </div>
+            {/* Step */}
+            <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '30%', maxWidth: 200, height: '8%', background: '#7A7060' }} />
+          </div>
+        </div>
       )}
       <SceneRenderer
         sceneType={sceneType}
