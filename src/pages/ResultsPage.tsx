@@ -234,9 +234,9 @@ export default function ResultsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="content-card max-w-lg w-full p-7 md:p-9"
           >
-            <p className="page-label mb-2">Before you give feedback</p>
+            <p className="page-label mb-2">What's next?</p>
             <h2 className="font-sans text-2xl font-bold text-foreground mb-4 tracking-tight leading-snug">
-              Want to try {otherStory.title} first?
+              Play {otherStory.title}
             </h2>
             <p className="text-sm text-foreground/70 leading-relaxed mb-8 border-l-2 border-primary/40 pl-4">
               {otherStory.hook}
@@ -249,10 +249,10 @@ export default function ResultsPage() {
                 Play {otherStory.title}
               </button>
               <button
-                onClick={() => setView('feedback-form')}
+                onClick={() => navigate('/')}
                 className="border border-border text-foreground/70 font-sans text-sm px-8 py-3.5 rounded-lg hover:border-foreground/50 hover:text-foreground transition-colors"
               >
-                Give feedback now
+                Return home
               </button>
             </div>
           </motion.div>
