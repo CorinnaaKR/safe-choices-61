@@ -76,6 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!airtableRes.ok) {
     const err = await airtableRes.text();
+    console.error('Airtable error', airtableRes.status, err, 'fields sent:', JSON.stringify(Object.keys(fields)));
     return res.status(502).send(`Airtable submission failed: ${err}`);
   }
 
