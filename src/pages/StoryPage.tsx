@@ -70,7 +70,11 @@ export default function StoryPage() {
 
   useEffect(() => {
     if (gameState.isComplete) {
-      navigate(`/results?scenario=${gameState.scenarioId}&mode=${gameState.mode}`);
+      if (gameState.mode === 'learning') {
+        navigate('/');
+      } else {
+        navigate(`/results?scenario=${gameState.scenarioId}&mode=${gameState.mode}`);
+      }
     }
   }, [gameState.isComplete, gameState.scenarioId, gameState.mode, navigate]);
 

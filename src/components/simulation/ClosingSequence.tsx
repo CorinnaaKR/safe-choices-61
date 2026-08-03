@@ -158,7 +158,7 @@ function CommonSignsCard({
             onClick={onComplete}
             className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-8 py-3.5 rounded-lg hover:bg-primary/90 transition-colors shadow-lg"
           >
-            View results
+            Finish
           </button>
         </div>
       </motion.div>

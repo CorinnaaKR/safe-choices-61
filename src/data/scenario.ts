@@ -603,10 +603,10 @@ export const safeguardingScenario: Scenario = {
       id: 'scene-final-good',
       title: 'Some Weeks Later',
       narrative: [
-        "It's a few weeks later, and Jamie's at lunch with the rest of you, actually laughing at something stupid Marcus said.",
-        "Walking home, Jamie says, out of nowhere: \"Thanks for not just... ignoring it. The thing in the summer.\"",
-        "You don't really know what to say to that, so you just shrug. \"Course.\"",
-        "Jamie smiles — a small one, but a real one — and changes the subject."
+        "It's a few weeks later. Jamie is back at lunch with the rest of you — not the same as before, but present. Laughing at something stupid Marcus said.",
+        "At one point Jamie catches your eye across the table. Just for a second. Then looks away.",
+        "That's it. That's all.",
+        "It's enough."
       ],
       isDecisionPoint: false,
       isFinalScene: true,
