@@ -402,8 +402,7 @@ export function LazloThread({ onComplete }: Props) {
             <div className="bg-background/95 backdrop-blur-md border-t border-border/40
                             px-5 pt-4 pb-10 space-y-3
                             md:bg-transparent md:backdrop-blur-none md:border-0
-                            md:px-0 md:py-0 md:space-y-3"
-              style={{ maxWidth: 'min(320px, 100%)' }}
+                            md:px-0 md:py-0 md:space-y-3 md:max-w-xs"
             >
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
                 {beat === 'beat1' ? 'Message Lazlo' : "He's seen it. No reply. What do you do?"}
