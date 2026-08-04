@@ -193,7 +193,7 @@ export function PreVisitConversation({ data, onComplete }: Props) {
         setPendingChoice(null);
         setPhase({ kind: 'done' });
         onComplete([...choiceIds, choice.id], currentTrust);
-      }, 800);
+      }, 3500);
     }
   };
 
