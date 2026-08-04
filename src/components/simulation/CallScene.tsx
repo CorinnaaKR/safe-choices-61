@@ -6,7 +6,6 @@ import { playUiTick } from '@/lib/sfx';
 interface Props {
   data: CallSceneData;
   collectedEvidence: Evidence[];
-  /** Up to 3 evidence items the player may draw on across the call. */
   onComplete: (scriptIds: string[]) => void;
 }
 
@@ -36,19 +35,16 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [turns]);
 
-  // Call timer
   useEffect(() => {
     if (callEnded) return;
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, [callEnded]);
 
-  // Advance through operator lines automatically; pause when a step has choices
   useEffect(() => {
     if (callEnded) return;
     const step = data.steps[stepIdx];
     if (!step) {
-      // All steps done — closing line
       const t = setTimeout(() => {
         playUiTick();
         setTurns((prev) => [...prev, { kind: 'operator', text: data.closingLine, time: formatElapsed(secondsRef.current) }]);
@@ -56,7 +52,6 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
       }, 900);
       return () => clearTimeout(t);
     }
-    // Only push the operator line once per step
     let alreadyShown = false;
     setTurns((prev) => {
       if (prev.length > 0) {
@@ -71,12 +66,10 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
     if (alreadyShown) return;
 
     if (!step.choices) {
-      // Monologue step — no player input, auto-advance after a reading pause
       const delay = Math.max(1400, step.operatorLine.split(' ').length * 200);
       const t = setTimeout(() => setStepIdx((i) => i + 1), delay);
       return () => clearTimeout(t);
     }
-    // Give the player time to read the operator's line before choices appear
     const readDelay = Math.max(900, step.operatorLine.split(' ').length * 150);
     const t = setTimeout(() => setWaitingForChoice(true), readDelay);
     return () => clearTimeout(t);
@@ -85,10 +78,9 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
   const availableChoices = (() => {
     const step = data.steps[stepIdx];
     if (!step?.choices) return [];
-    const offered = step.choices.filter(
+    return step.choices.filter(
       (c) => !c.requiresEvidenceId || collectedEvidence.some((e) => e.id === c.requiresEvidenceId)
     );
-    return offered;
   })();
 
   const handlePick = (text: string, evidenceId?: string) => {
@@ -100,65 +92,56 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
     setTimeout(() => setStepIdx((i) => i + 1), 1100);
   };
 
-  const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const ss = String(seconds % 60).padStart(2, '0');
-
   const step = data.steps[stepIdx];
   const hasChoiceStep = !!step?.choices;
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 gap-5 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col bg-background relative overflow-hidden"
-        style={{
-          width: 'min(360px, 82vw)',
-          height: 'min(580px, 68dvh)',
-          borderRadius: '3rem',
-          border: '10px solid #1a1a1a',
-          boxShadow:
-            '0 0 0 1px #333, 0 32px 80px rgba(0,0,0,0.8), inset 0 0 0 1.5px rgba(255,255,255,0.12), inset 0 0 0 4px rgba(0,0,0,0.95)',
-        }}
-      >
-        {/* Dynamic island */}
-        <div className="absolute top-0 inset-x-0 flex justify-center pt-3 z-10">
-          <div style={{ width: 120, height: 34, background: '#000', borderRadius: 20 }} />
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{ background: 'linear-gradient(to bottom, #0a0a0f 0%, #0f0f1a 100%)' }}
+    >
+      {/* Top — caller ID */}
+      <div className="flex flex-col items-center pt-14 pb-6 px-6 shrink-0">
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"
+              fill="rgba(255,255,255,0.6)" />
+          </svg>
         </div>
+        <p className="text-xl font-semibold text-white tracking-tight" style={{ fontFamily: '-apple-system, sans-serif' }}>
+          {data.serviceName}
+        </p>
+        <p className="text-sm mt-1" style={{ color: '#8e8e93', fontFamily: '-apple-system, sans-serif' }}>
+          {data.phoneNumber}
+        </p>
+        <p className="text-sm mt-2 tabular-nums" style={{ color: callEnded ? '#8e8e93' : '#30d158', fontFamily: '-apple-system, sans-serif' }}>
+          {callEnded ? 'Call ended' : formatElapsed(seconds)}
+        </p>
+      </div>
 
-        {/* Call header */}
-        <div className="flex flex-col items-center pt-12 pb-4 shrink-0" style={{ borderBottom: '0.5px solid rgba(255,255,255,0.12)' }}>
-          <span style={{ fontSize: 11, letterSpacing: '0.08em', color: '#8e8e93', fontFamily: '-apple-system, sans-serif', textTransform: 'uppercase' }}>
-            {callEnded ? 'Call ended' : 'Calling'}
-          </span>
-          <span style={{ fontSize: 19, fontWeight: 600, color: '#fff', fontFamily: '-apple-system, sans-serif', marginTop: 4 }}>
-            {data.serviceName}
-          </span>
-          <span style={{ fontSize: 13, color: '#8e8e93', fontFamily: '-apple-system, sans-serif', marginTop: 2 }}>
-            {data.phoneNumber}
-          </span>
-          <span style={{ fontSize: 13, color: '#0a84ff', fontFamily: '-apple-system, sans-serif', marginTop: 4 }}>
-            {mm}:{ss}
-          </span>
-        </div>
-
-        {/* Call transcript — plain text speaker lines, not chat bubbles */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 min-h-0" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Transcript */}
+      <div className="flex-1 overflow-y-auto px-6 min-h-0">
+        <div className="max-w-lg mx-auto space-y-6 pb-4">
           <AnimatePresence initial={false}>
             {turns.map((turn, i) => {
               const isYou = turn.kind === 'you';
               return (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.22 }}
-                  style={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+                  transition={{ duration: 0.25 }}
                 >
-                  <span style={{ fontSize: 10, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.12em', color: isYou ? '#0a84ff' : '#8e8e93' }}>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] mb-1.5"
+                    style={{ color: isYou ? '#0a84ff' : '#636366' }}>
                     {isYou ? 'You' : data.operatorName} · {turn.time}
-                  </span>
-                  <p style={{ fontSize: 14, lineHeight: 1.6, fontFamily: '-apple-system, sans-serif', color: isYou ? '#e0e0e0' : '#aeaeb2', margin: 0 }}>
+                  </p>
+                  <p className="text-base leading-relaxed"
+                    style={{ color: isYou ? '#e0e0e0' : '#aeaeb2', fontFamily: '-apple-system, sans-serif' }}>
                     {turn.text}
                   </p>
                 </motion.div>
@@ -167,100 +150,86 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
           </AnimatePresence>
           <div ref={bottomRef} />
         </div>
+      </div>
 
-        {/* End call button */}
-        {callEnded && (
-          <div className="flex justify-center pb-8 pt-2 shrink-0">
-            <button
-              onClick={() => onComplete(usedEvidenceIds)}
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: '50%',
-                background: '#ff3b30',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+      {/* Bottom — choices or end call */}
+      <div className="shrink-0 px-6 pb-12 pt-4 max-w-lg mx-auto w-full">
+        <AnimatePresence mode="wait">
+          {callEnded ? (
+            <motion.div
+              key="end"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-center"
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"
-                  fill="white"
-                  transform="rotate(135 12 12)"
+              <button
+                onClick={() => onComplete(usedEvidenceIds)}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="w-16 h-16 rounded-full flex items-center justify-center"
+                  style={{ background: '#ff3b30' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"
+                      fill="white" transform="rotate(135 12 12)" />
+                  </svg>
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: '#636366' }}>
+                  End call
+                </span>
+              </button>
+            </motion.div>
+          ) : hasChoiceStep && waitingForChoice ? (
+            <motion.div
+              key="choices"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="space-y-2.5"
+            >
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-center mb-3"
+                style={{ color: '#636366' }}>
+                What do you say?
+              </p>
+              {(availableChoices.length > 0 ? availableChoices : step?.fallbackChoiceText ? [{ text: step.fallbackChoiceText, requiresEvidenceId: undefined }] : []).map((choice, i) => (
+                <button
+                  key={i}
+                  onClick={() => handlePick(choice.text, choice.requiresEvidenceId)}
+                  className="w-full text-left transition-opacity hover:opacity-80 active:opacity-60"
+                  style={{
+                    padding: '13px 18px',
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: 14,
+                    color: '#e0e0e0',
+                    fontSize: 15,
+                    fontFamily: '-apple-system, sans-serif',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {choice.text}
+                </button>
+              ))}
+            </motion.div>
+          ) : !callEnded ? (
+            <motion.div
+              key="waiting"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center justify-center gap-2 py-2"
+            >
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: '#636366' }}
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
                 />
-              </svg>
-            </button>
-          </div>
-        )}
-      </motion.div>
-
-      {/* Reply choices — outside the phone, same pattern as PreVisitConversation */}
-      <AnimatePresence>
-        {hasChoiceStep && waitingForChoice && !callEnded && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            style={{ width: 'min(360px, 82vw)' }}
-            className="space-y-2"
-          >
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground text-center mb-3">
-              What do you say?
-            </p>
-            {availableChoices.map((choice, i) => (
-              <button
-                key={i}
-                onClick={() => handlePick(choice.text, choice.requiresEvidenceId)}
-                className="w-full text-left transition-colors"
-                style={{
-                  padding: '11px 16px',
-                  background: 'hsl(var(--secondary))',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 14,
-                  color: 'hsl(var(--foreground))',
-                  fontSize: 14,
-                  fontFamily: '-apple-system, sans-serif',
-                  lineHeight: 1.45,
-                  cursor: 'pointer',
-                }}
-              >
-                {choice.text}
-              </button>
-            ))}
-            {availableChoices.length === 0 && step?.fallbackChoiceText && (
-              <button
-                onClick={() => handlePick(step.fallbackChoiceText!)}
-                className="w-full text-left transition-colors"
-                style={{
-                  padding: '11px 16px',
-                  background: 'hsl(var(--secondary))',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 14,
-                  color: 'hsl(var(--foreground))',
-                  fontSize: 14,
-                  fontFamily: '-apple-system, sans-serif',
-                  lineHeight: 1.45,
-                  cursor: 'pointer',
-                }}
-              >
-                {step.fallbackChoiceText}
-              </button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!hasChoiceStep && !callEnded && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground"
-        >
-          Making the call
-        </motion.p>
-      )}
-    </div>
+              ))}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
+    </motion.div>
   );
 }
