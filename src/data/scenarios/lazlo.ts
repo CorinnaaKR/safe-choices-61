@@ -333,7 +333,6 @@ export const lazloScenario: Scenario = {
       isDecisionPoint: true,
       narrative: [
         'Lazlo disappears into the kitchen. You hear the kettle. You are alone in the room.',
-        'Something settles — not relief exactly. More like permission.',
         'The room has changed since you were last here. There are things on the walls that were not there before.',
         "A laptop glows on the side table. On the coffee table, a folded pamphlet. Uncle Joey's photos are arranged in the corner with candles.",
         "When Lazlo comes back with the coffee he finds you standing near the wall.",
@@ -685,10 +684,8 @@ export const lazloScenario: Scenario = {
         'He keeps going. Still not looking at you. "Sienna cheated. Said I was neglecting her." He says it flatly, like a fact rather than a wound. "And the job — I stood up for a colleague. Went to HR. Said what was happening." A short breath. "Two weeks later. Performance issues." He looks at his hands.',
         '"These guys I\'ve been speaking to." He glances at the wall for just a moment. "They don\'t do that. Tell you to move on. They get it."',
         "He doesn't elaborate. As if that's the whole explanation.",
-        "You look at the clippings. At the poster. You've heard that language before — on that wall, somewhere.",
         "A silence settles. Then, almost as an afterthought: 'Lilly's got her own thing going on anyway. That relationship.' A small shrug. 'Goes against God's will. And Priya — she doesn't belong here anyway.'",
         "He says it the way you'd close a topic. Already moving on.",
-        "The name sits in the room. Priya. Someone he has known for years.",
         "His phone buzzes. He glances at it, then puts it face-down on the cushion. You caught a glimpse of the screen.",
       ],
       evidence: [
@@ -846,7 +843,7 @@ export const lazloScenario: Scenario = {
         'Lazlo barely speaks. You sit together in the dark room.',
         'You notice more of what is around you. The pamphlet on the coffee table. The annotated clippings on the wall.',
         "The laptop glowing on the side table. The pile of post by the door that hasn't been touched.",
-        'You know you have seen enough. Now you need to decide what to do with it.',
+        'You sit with it for a moment. Then you get up to leave.',
       ],
       choices: [
         {
@@ -902,7 +899,7 @@ export const lazloScenario: Scenario = {
         'Lazlo lost his uncle six months ago. Since then: his girlfriend left, he lost his job, he stopped seeing anyone.',
         "An online group found him in his grief. Their material is on his walls, his coffee table, his laptop, his phone.",
         'He talks about them with more warmth than anyone else in his life.',
-        'This is a Prevent concern. Lazlo is vulnerable. He may not see it. But you do.',
+        'You sit in your car outside and don\'t start the engine for a while.',
       ],
       choices: [
         {
@@ -954,8 +951,6 @@ export const lazloScenario: Scenario = {
         "The visit did not go well. Lazlo may have asked you to leave. He barely spoke.",
         'But you still saw things in that room. The poster. The pamphlets. The laptop. The phone screen.',
         'You heard him mention a group.',
-        'You do not have the full picture. But what you have is enough to be concerned.',
-        'You do not need to be certain to act.',
       ],
       choices: [
         {
@@ -1009,7 +1004,6 @@ export const lazloScenario: Scenario = {
         'What you noticed, and what you chose to do, will shape what happens next.',
         'In the real world, early referrals through ACT Early give people like Lazlo access to the Channel programme — confidential, voluntary support designed specifically for people at risk.',
         'You cannot force someone to accept help. But you can make sure the right people know to offer it.',
-        'If you ever see these signs in someone you know, you do not need to be certain. You need to act.',
       ],
     },
   ],
