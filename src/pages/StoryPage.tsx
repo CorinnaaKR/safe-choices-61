@@ -20,7 +20,6 @@ import { ClosingSequence } from '@/components/simulation/ClosingSequence';
 import { TrainingGate } from '@/components/simulation/TrainingGate';
 import { SceneTitleStamp } from '@/components/LoadingSequence';
 import { PauseOverlay } from '@/components/simulation/PauseOverlay';
-import { GroupChatScene } from '@/components/simulation/GroupChatScene';
 
 function environmentToSceneType(env?: SceneEnvironment): SceneType {
   if (env === 'classroom' || env === 'playground' || env === 'office' || env === 'home' || env === 'home-jamie') return env;
@@ -148,17 +147,6 @@ export default function StoryPage() {
     collectEvidence(evidence);
   };
 
-  // Dev-only: allow Playwright tests to inject an inspect state without 3D click
-  useEffect(() => {
-    if (import.meta.env.DEV && sceneEvidence.length > 0) {
-      (window as any).__heliTestInspect = () => handleFocusEvidence(sceneEvidence[0]);
-      (window as any).__heliTestDismiss = handleCameraReset;
-    }
-    return () => {
-      delete (window as any).__heliTestInspect;
-      delete (window as any).__heliTestDismiss;
-    };
-  }, [sceneEvidence]);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCameraReset = () => {
     setFocusedEvidenceId(null);
