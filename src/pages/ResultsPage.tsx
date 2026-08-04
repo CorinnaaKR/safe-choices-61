@@ -551,10 +551,18 @@ export default function ResultsPage() {
                         You chose: {choiceData.text}
                       </p>
                     )}
-                    {mode === 'learning' && choiceData && (
+                    {choiceData?.consequence && (
                       <p className="text-sm text-foreground/70 mt-2 leading-relaxed border-l-2 border-primary/50 pl-3">
-                        Because of this: {choiceData.consequence}
+                        {mode === 'learning' ? 'Because of this: ' : ''}{choiceData.consequence}
                       </p>
+                    )}
+                    {mode === 'training' && choiceData?.feedback && (
+                      <div className="mt-3 pt-3 border-t border-border/60">
+                        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1.5">Debrief</p>
+                        <p className="text-sm text-foreground/65 leading-relaxed">
+                          {choiceData.feedback}
+                        </p>
+                      </div>
                     )}
                     {citedEvidence.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-border/60">
