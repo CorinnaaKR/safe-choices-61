@@ -57,6 +57,7 @@ export default function StoryPage() {
   const [showEpilogue, setShowEpilogue] = useState(false);
   const [vignettePulse, setVignettePulse] = useState(false);
   const [cameraReturning, setCameraReturning] = useState(false);
+  const [doorOpen, setDoorOpen] = useState(false);
   const vignettTimer = useRef<ReturnType<typeof setTimeout>>();
   const cameraReturnTimer = useRef<ReturnType<typeof setTimeout>>();
   const isLandscapePhone = useLandscapePhone();
@@ -81,6 +82,16 @@ export default function StoryPage() {
     setFocusedEvidenceId(null);
     setInspectedEvidence(null);
   }, [gameState.currentSceneId, showFeedback]);
+
+  // Reset door state when leaving scene-l0
+  useEffect(() => {
+    if (currentScene?.id !== 'scene-l0') {
+      setDoorOpen(false);
+      return;
+    }
+    const t = setTimeout(() => setDoorOpen(true), 1800);
+    return () => clearTimeout(t);
+  }, [currentScene?.id]);
 
   // Scenes where observation is conveyed through narrative, not active exploration.
   // Auto-collect evidence so the "look around" gate is bypassed and choices appear immediately.
@@ -269,9 +280,33 @@ export default function StoryPage() {
             {/* Porch / frame surround */}
             <div style={{ position: 'relative', width: 'min(52%, 220px)' }}>
               {/* Door frame */}
-              <div style={{ background: '#2A1E12', padding: '8px 8px 0', borderRadius: '3px 3px 0 0', boxShadow: '0 0 0 4px #1A1208, 6px 8px 24px rgba(0,0,0,0.55)' }}>
-                {/* Door */}
-                <div style={{ aspectRatio: '0.48', background: '#3D2A18', position: 'relative', borderRadius: '2px 2px 0 0' }}>
+              <div style={{ background: '#2A1E12', padding: '8px 8px 0', borderRadius: '3px 3px 0 0', boxShadow: '0 0 0 4px #1A1208, 6px 8px 24px rgba(0,0,0,0.55)', position: 'relative', overflow: 'hidden' }}>
+                {/* Dark hallway interior — always present behind the door */}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, #0A0806 0%, #100C08 100%)' }}>
+                  {/* Lazlo silhouette — fades in as door opens */}
+                  <div style={{
+                    position: 'absolute', bottom: '2%', left: '50%',
+                    transform: 'translateX(-50%)',
+                    opacity: doorOpen ? 1 : 0,
+                    transition: 'opacity 0.6s ease 0.4s',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  }}>
+                    {/* Head */}
+                    <div style={{ width: '22%', aspectRatio: '1', background: '#1A1210', borderRadius: '50%', marginBottom: '1%', boxShadow: '0 0 8px rgba(0,0,0,0.8)' }} />
+                    {/* Shoulders / body */}
+                    <div style={{ width: '44%', height: '45%', background: '#141008', borderRadius: '40% 40% 0 0', boxShadow: '0 0 12px rgba(0,0,0,0.8)' }} />
+                  </div>
+                </div>
+                {/* Door panel — swings open on hinge (left edge) */}
+                <div style={{
+                  aspectRatio: '0.48',
+                  position: 'relative',
+                  transformOrigin: 'left center',
+                  transform: doorOpen ? 'perspective(600px) rotateY(-68deg)' : 'perspective(600px) rotateY(0deg)',
+                  transition: 'transform 0.9s cubic-bezier(0.4, 0, 0.2, 1)',
+                  background: '#3D2A18',
+                  borderRadius: '2px 2px 0 0',
+                }}>
                   {/* Upper panel */}
                   <div style={{ position: 'absolute', top: '6%', left: '10%', right: '10%', height: '22%', background: '#2A1A0C', borderRadius: 3, boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }} />
                   {/* Lower panel */}

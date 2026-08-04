@@ -411,15 +411,25 @@ export function CurtainedWindow({ position, rotation = 0 }: PropTransform) {
         <planeGeometry args={[1.35, 1.55]} />
         <meshStandardMaterial color="#1E1C14" roughness={1} emissive="#302818" emissiveIntensity={0.15} />
       </mesh>
-      {/* Left curtain panel */}
-      <mesh position={[-0.6, 0, 0.06]} castShadow>
-        <boxGeometry args={[0.3, 1.7, 0.04]} />
+      {/* Left curtain panel — drawn inward so panels meet and cover the window */}
+      <mesh position={[-0.18, 0, 0.06]} castShadow>
+        <boxGeometry args={[0.82, 1.7, 0.04]} />
         <meshStandardMaterial color="#3A2A1E" roughness={0.95} />
       </mesh>
+      {/* Left curtain fold detail */}
+      <mesh position={[-0.05, 0, 0.09]} castShadow>
+        <boxGeometry args={[0.06, 1.7, 0.02]} />
+        <meshStandardMaterial color="#2E2218" roughness={0.98} />
+      </mesh>
       {/* Right curtain panel */}
-      <mesh position={[0.6, 0, 0.06]} castShadow>
-        <boxGeometry args={[0.3, 1.7, 0.04]} />
+      <mesh position={[0.18, 0, 0.06]} castShadow>
+        <boxGeometry args={[0.82, 1.7, 0.04]} />
         <meshStandardMaterial color="#3A2A1E" roughness={0.95} />
+      </mesh>
+      {/* Right curtain fold detail */}
+      <mesh position={[0.05, 0, 0.09]} castShadow>
+        <boxGeometry args={[0.06, 1.7, 0.02]} />
+        <meshStandardMaterial color="#2E2218" roughness={0.98} />
       </mesh>
       {/* Curtain rod */}
       <mesh position={[0, 0.85, 0.1]} castShadow>

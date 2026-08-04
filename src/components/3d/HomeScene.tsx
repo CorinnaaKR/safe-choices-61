@@ -65,7 +65,7 @@ export const HOME_EVIDENCE_POSITIONS: Record<string, [number, number, number]> =
   'env-l2': [2.2, 1.9, -3.94],    // newspaper clippings on back wall
   'env-l3': [-4.49, 0.85, -2.6],  // Uncle Joey shrine (left wall)
   'env-l4': [0, 0.36, -0.78],     // pamphlet on coffee table
-  'env-l5': [-3.92, 1.5, 0.2],    // curtained window
+  'env-l5': [-4.3, 1.5, 0.2],     // curtained window (left wall)
   // Documentation
   'doc-l1': [3.1, 0.08, 2.4],     // mail pile near door
   // Digital
@@ -409,11 +409,11 @@ export function HomeScene({
             );
 
           case 'env-l5':
-            // Window / curtain trigger
+            // Curtained window trigger — sits at the window on the left wall
             return (
               <InteractiveObject
                 key={ev.id}
-                position={[pos[0] + 0.5, pos[1], pos[2]]}
+                position={[pos[0] + 0.22, pos[1], pos[2]]}
                 geometry="box"
                 size={[0.15, 0.5, 0.12]}
                 color="#3A2A1E"

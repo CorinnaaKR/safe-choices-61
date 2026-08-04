@@ -19,18 +19,20 @@ interface InteractiveObjectProps {
 function PulsRing() {
   const ref = useRef<THREE.Mesh>(null);
   const t = useRef(0);
+  const { camera } = useThree();
   useFrame((_, delta) => {
     t.current += delta;
     if (!ref.current) return;
     const s = 1 + Math.sin(t.current * 2.2) * 0.18;
-    ref.current.scale.set(s, 1, s);
+    ref.current.scale.set(s, s, s);
     (ref.current.material as THREE.MeshBasicMaterial).opacity =
       0.28 + Math.sin(t.current * 2.2) * 0.18;
+    ref.current.quaternion.copy(camera.quaternion);
   });
   return (
-    <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-      <ringGeometry args={[0.38, 0.52, 32]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0.3} depthWrite={false} />
+    <mesh ref={ref} position={[0, 0, 0]}>
+      <ringGeometry args={[0.28, 0.38, 32]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.3} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
