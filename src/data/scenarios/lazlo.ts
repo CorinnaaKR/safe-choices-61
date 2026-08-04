@@ -132,8 +132,8 @@ export const lazloScenario: Scenario = {
           "His girlfriend left. He lost his job last month.",
           "I know he's grieving but he's made it impossible to help him.",
           "I went round a few weeks ago and we ended up in a row.",
-          "He said things about my girlfriend Priya. Out of nowhere. Things that — I'm a lawyer, Evan. I hear that kind of thing in a professional context.",
-          "Not from my brother.",
+          "He's suddenly got this massive issue with Priya. With our relationship. My job. Things he's never had a problem with before.",
+          "It's like talking to a completely different person.",
           "I'm still angry about it. But I'm also worried because it is not him.",
         ],
         choices: [
