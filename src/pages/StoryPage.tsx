@@ -82,10 +82,10 @@ export default function StoryPage() {
     setInspectedEvidence(null);
   }, [gameState.currentSceneId, showFeedback]);
 
-  // Doorstep scene: the observation is conveyed through narrative, not exploration.
-  // Auto-collect all evidence so the "look around" gate is bypassed.
+  // Scenes where observation is conveyed through narrative, not active exploration.
+  // Auto-collect evidence so the "look around" gate is bypassed and choices appear immediately.
   useEffect(() => {
-    if (currentScene?.id === 'scene-l0') {
+    if (currentScene?.id === 'scene-l0' || currentScene?.id === 'scene-l1') {
       currentScene.evidence?.forEach(ev => {
         if (!gameState.collectedEvidence.some(c => c.id === ev.id)) {
           collectEvidence(ev);

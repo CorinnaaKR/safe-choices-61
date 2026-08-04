@@ -50,7 +50,6 @@ export function ChoiceConfirmModal({ choice, onConfirm, onCancel }: ChoiceConfir
           className="relative z-10 w-[92vw] max-w-md case-panel"
         >
           <div className="px-6 py-5 border-b border-border">
-            <p className="hud-label text-primary mb-3">Before you decide</p>
             <p id={labelId} className="text-base md:text-lg text-foreground leading-snug">
               {choice.text.startsWith('"') && choice.text.endsWith('"')
                 ? choice.text
@@ -62,9 +61,9 @@ export function ChoiceConfirmModal({ choice, onConfirm, onCancel }: ChoiceConfir
             <button
               onClick={onCancel}
               className="key-hint hover:text-foreground transition-colors px-2 py-2"
-              aria-label="Reconsider — go back to choices"
+              aria-label="Go back to choices"
             >
-              ◂ Reconsider
+              ◂ Back
             </button>
             <button
               ref={confirmRef}

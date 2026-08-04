@@ -47,23 +47,6 @@ export function FeedbackPanel({ choice, onContinue, mode = 'training' }: Feedbac
         </p>
       </motion.div>
 
-      {/* Reflection note — training mode only: in learning mode the
-          consequence carries the lesson (cause and effect). */}
-      {mode === 'training' && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="case-panel"
-        >
-          <div className="px-6 py-3 border-b border-border">
-            <span className="hud-label">Something to consider</span>
-          </div>
-          <p className="px-6 py-4 text-sm text-foreground/75 leading-relaxed">
-            {choice.feedback}
-          </p>
-        </motion.div>
-      )}
 
       {/* Continue */}
       <motion.div

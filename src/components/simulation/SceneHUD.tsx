@@ -213,21 +213,6 @@ export function SceneHUD({
               {currentScene.title}
             </motion.p>
           </div>
-          <AnimatePresence>
-            {uncollected.length > 0 && !focusedEvidenceId && (
-              <motion.p
-                key="clue-count"
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-                className="font-mono text-[9px] uppercase tracking-[0.35em] text-primary bg-background/55 backdrop-blur-sm px-3 py-1 rounded-sm mt-1"
-              >
-                {String(uncollected.length).padStart(2, '0')}&nbsp;
-                {uncollected.length === 1 ? 'clue' : 'clues'} in scene
-              </motion.p>
-            )}
-          </AnimatePresence>
         </div>
       )}
 
