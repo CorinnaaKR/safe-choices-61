@@ -83,6 +83,9 @@ export function PostFeedbackForm({ onComplete, onSkip, completedStoryIds = [], d
   const [orgType, setOrgType] = useState('');
   const [wouldOrgUse, setWouldOrgUse] = useState('');
   const [suggestions, setSuggestions] = useState('');
+  const [name, setName] = useState('');
+  const [organisation, setOrganisation] = useState('');
+  const [email, setEmail] = useState('');
 
   const allLikertFilled = Object.values(likert).every((v) => v > 0);
   const canSubmit = confidenceAfter && allLikertFilled;
@@ -98,6 +101,9 @@ export function PostFeedbackForm({ onComplete, onSkip, completedStoryIds = [], d
       orgType,
       wouldOrgUse,
       suggestions,
+      ...(name ? { name } : {}),
+      ...(organisation ? { organisation } : {}),
+      ...(email ? { email } : {}),
       ...(playedJamie && jamieReflection ? { jamieReflection } : {}),
       ...(playedLazlo && lazloReflection ? { lazloReflection } : {}),
     });
@@ -232,6 +238,50 @@ export function PostFeedbackForm({ onComplete, onSkip, completedStoryIds = [], d
           <Section label="Is there anything you'd change or improve?">
             <Textarea value={suggestions} onChange={setSuggestions} placeholder="Optional" />
           </Section>
+
+          {/* Stay in touch */}
+          <div className="mb-7 border border-border rounded-lg overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-border bg-secondary/40">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                Stay in touch
+              </p>
+            </div>
+            <div className="p-4 space-y-4">
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                Entirely optional — but if you'd be open to being contacted about how this programme develops, or to have your feedback attributed in funding applications, leave your details below.
+              </p>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">Name</p>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Optional"
+                  className="w-full bg-secondary/40 border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                />
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">Organisation</p>
+                <input
+                  type="text"
+                  value={organisation}
+                  onChange={(e) => setOrganisation(e.target.value)}
+                  placeholder="Optional"
+                  className="w-full bg-secondary/40 border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                />
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">Email</p>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Optional"
+                  className="w-full bg-secondary/40 border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                />
+              </div>
+            </div>
+          </div>
 
           <div className="flex justify-end mt-2">
             <button

@@ -24,6 +24,9 @@ const ALLOWED_FIELDS = new Set([
   'Suggestions',
   "Jamie's Story — Reflection",
   "Lazlo's Story — Reflection",
+  'Name',
+  'Organisation',
+  'Email',
 ]);
 
 const MAX_STRING_LENGTH = 5000;

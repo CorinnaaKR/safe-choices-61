@@ -17,6 +17,10 @@ export interface PostFeedback {
   orgType: string;
   wouldOrgUse: string;
   suggestions: string;
+  /** Contact details — all optional, collected for impact attribution */
+  name?: string;
+  organisation?: string;
+  email?: string;
   /** Per-story reflections — only present when that story was played */
   jamieReflection?: string;
   lazloReflection?: string;
@@ -49,6 +53,9 @@ export async function submitFeedback(data: FeedbackSubmission): Promise<void> {
   if (data.orgType) fields['Organisation Type'] = data.orgType;
   if (data.wouldOrgUse) fields['Would Org Use This'] = data.wouldOrgUse;
   if (data.suggestions) fields['Suggestions'] = data.suggestions;
+  if (data.name) fields['Name'] = data.name;
+  if (data.organisation) fields['Organisation'] = data.organisation;
+  if (data.email) fields['Email'] = data.email;
   if (data.jamieReflection) fields["Jamie's Story — Reflection"] = data.jamieReflection;
   if (data.lazloReflection) fields["Lazlo's Story — Reflection"] = data.lazloReflection;
 
