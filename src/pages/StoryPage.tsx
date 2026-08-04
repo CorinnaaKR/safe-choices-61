@@ -82,6 +82,18 @@ export default function StoryPage() {
     setInspectedEvidence(null);
   }, [gameState.currentSceneId, showFeedback]);
 
+  // Doorstep scene: the observation is conveyed through narrative, not exploration.
+  // Auto-collect all evidence so the "look around" gate is bypassed.
+  useEffect(() => {
+    if (currentScene?.id === 'scene-l0') {
+      currentScene.evidence?.forEach(ev => {
+        if (!gameState.collectedEvidence.some(c => c.id === ev.id)) {
+          collectEvidence(ev);
+        }
+      });
+    }
+  }, [currentScene?.id]);
+
   // If the player chose to go straight over (pv-3a), skip the Lazlo text thread —
   // messaging him before visiting contradicts that choice.
   useEffect(() => {
@@ -250,22 +262,33 @@ export default function StoryPage() {
           so the narrative ("you're outside knocking") makes visual sense. */}
       {currentScene.id === 'scene-l0' && (
         <div className="absolute inset-0 flex flex-col" style={{ zIndex: 1 }}>
-          {/* Sky — flat overcast afternoon */}
-          <div style={{ flex: '0 0 45%', background: 'linear-gradient(to bottom, #B8C8D8 0%, #D0D8E0 100%)' }} />
-          {/* Exterior wall — rendered brick / render finish */}
-          <div style={{ flex: '1', background: 'linear-gradient(to bottom, #9A8C7E 0%, #8A7C6E 100%)', position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '8%' }}>
-            {/* Door */}
-            <div style={{ width: '18%', maxWidth: 120, aspectRatio: '0.48', background: '#3A2A1A', borderRadius: '2px 2px 0 0', position: 'relative', boxShadow: '4px 0 12px rgba(0,0,0,0.4)' }}>
-              {/* Door panels */}
-              <div style={{ position: 'absolute', top: '8%', left: '10%', right: '10%', height: '28%', background: '#2E2010', borderRadius: 2 }} />
-              <div style={{ position: 'absolute', top: '42%', left: '10%', right: '10%', height: '38%', background: '#2E2010', borderRadius: 2 }} />
-              {/* Handle */}
-              <div style={{ position: 'absolute', top: '55%', right: '12%', width: '10%', height: '6%', background: '#B09060', borderRadius: 4 }} />
-              {/* Letterbox */}
-              <div style={{ position: 'absolute', top: '48%', left: '25%', right: '25%', height: '3%', background: '#B09060', borderRadius: 2 }} />
+          {/* Sky — overcast afternoon */}
+          <div style={{ flex: '0 0 38%', background: 'linear-gradient(to bottom, #9BAFC0 0%, #C0CEDB 100%)' }} />
+          {/* Exterior wall */}
+          <div style={{ flex: '1', background: 'linear-gradient(to bottom, #7A6E62 0%, #6A5E54 100%)', position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '4%' }}>
+            {/* Porch / frame surround */}
+            <div style={{ position: 'relative', width: 'min(52%, 220px)' }}>
+              {/* Door frame */}
+              <div style={{ background: '#2A1E12', padding: '8px 8px 0', borderRadius: '3px 3px 0 0', boxShadow: '0 0 0 4px #1A1208, 6px 8px 24px rgba(0,0,0,0.55)' }}>
+                {/* Door */}
+                <div style={{ aspectRatio: '0.48', background: '#3D2A18', position: 'relative', borderRadius: '2px 2px 0 0' }}>
+                  {/* Upper panel */}
+                  <div style={{ position: 'absolute', top: '6%', left: '10%', right: '10%', height: '22%', background: '#2A1A0C', borderRadius: 3, boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }} />
+                  {/* Lower panel */}
+                  <div style={{ position: 'absolute', top: '34%', left: '10%', right: '10%', height: '48%', background: '#2A1A0C', borderRadius: 3, boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }} />
+                  {/* Handle */}
+                  <div style={{ position: 'absolute', top: '52%', right: '10%', width: '8%', height: '8%', background: '#C8A060', borderRadius: 4, boxShadow: '0 1px 4px rgba(0,0,0,0.5)' }} />
+                  {/* Letterbox */}
+                  <div style={{ position: 'absolute', top: '46%', left: '20%', right: '20%', height: '3%', background: '#C8A060', borderRadius: 2 }} />
+                  {/* Door number */}
+                  <div style={{ position: 'absolute', top: '14%', left: '50%', transform: 'translateX(-50%)', color: '#C8A060', fontSize: '1.1rem', fontWeight: 700, fontFamily: 'serif', letterSpacing: '0.05em' }}>14</div>
+                </div>
+              </div>
+              {/* Doorstep */}
+              <div style={{ background: '#5A5248', height: 14, marginTop: 0, boxShadow: '0 3px 8px rgba(0,0,0,0.4)' }} />
             </div>
-            {/* Step */}
-            <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '30%', maxWidth: 200, height: '8%', background: '#7A7060' }} />
+            {/* Ground / path */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '18%', background: 'linear-gradient(to bottom, #5A5248 0%, #4A4440 100%)' }} />
           </div>
         </div>
       )}

@@ -67,7 +67,7 @@ export function SceneTitleStamp({ index, title }: SceneTitleStampProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 6 }}
           transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 24 }}
-          className="absolute inset-x-0 top-[20%] z-20 flex justify-center pointer-events-none"
+          className="absolute inset-x-0 top-1/3 z-20 flex justify-center pointer-events-none"
         >
           <div className="text-center">
             <div className="rule-h w-12 mx-auto mb-2 bg-primary" />

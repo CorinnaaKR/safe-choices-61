@@ -381,12 +381,7 @@ export function SceneHUD({
               </p>
               <p className="text-sm text-foreground/60 leading-relaxed mb-4">
                 {mode === 'learning' ? 'Swipe' : 'Drag'} to look around the room.{' '}
-                Tap anything that catches your attention.{' '}
-                There {uncollected.length === 1 ? 'is' : 'are'}{' '}
-                <span className="text-primary font-medium">
-                  {uncollected.length === 1 ? 'something' : `${uncollected.length} things`}
-                </span>{' '}
-                here worth noticing.
+                Tap anything that catches your attention.
               </p>
               <motion.button
                 onClick={() => setExploreAcknowledged(true)}
