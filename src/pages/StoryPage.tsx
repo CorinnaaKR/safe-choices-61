@@ -22,7 +22,7 @@ import { SceneTitleStamp } from '@/components/LoadingSequence';
 import { PauseOverlay } from '@/components/simulation/PauseOverlay';
 
 function environmentToSceneType(env?: SceneEnvironment): SceneType {
-  if (env === 'classroom' || env === 'playground' || env === 'office' || env === 'home' || env === 'home-jamie') return env;
+  if (env === 'classroom' || env === 'playground' || env === 'office' || env === 'home' || env === 'home-jamie' || env === 'home-doorstep') return env;
   return 'office';
 }
 

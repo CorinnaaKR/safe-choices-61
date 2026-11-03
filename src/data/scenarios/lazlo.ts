@@ -196,7 +196,7 @@ export const lazloScenario: Scenario = {
     {
       id: 'scene-l0',
       title: 'Wednesday Afternoon — The Doorstep',
-      environment: 'home',
+      environment: 'home-doorstep',
       isDecisionPoint: true,
       narrative: [
         "You knock. There's a pause before anything moves behind the door.",

@@ -22,7 +22,7 @@ export type SkillArea =
   | 'escalation'
   | 'record-keeping';
 
-export type SceneEnvironment = 'classroom' | 'playground' | 'office' | 'home' | 'home-jamie';
+export type SceneEnvironment = 'classroom' | 'playground' | 'office' | 'home' | 'home-jamie' | 'home-doorstep';
 
 // ─── Rich evidence visual types ──────────────────────────────────────────────
 

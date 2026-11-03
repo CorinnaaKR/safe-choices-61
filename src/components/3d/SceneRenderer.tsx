@@ -7,22 +7,24 @@ import { PlaygroundScene } from './PlaygroundScene';
 import { OfficeScene } from './OfficeScene';
 import { HomeScene, HOME_OBSTACLES, HOME_OBSTACLES_BASE } from './HomeScene';
 import { JamieHomeScene } from './JamieHomeScene';
+import { DoorstepScene } from './DoorstepScene';
 import { CameraController } from './CameraController';
 import { PlayerCharacter } from './PlayerCharacter';
 import { Evidence } from '@/types/simulation';
 import * as THREE from 'three';
 
-export type SceneType = 'classroom' | 'playground' | 'office' | 'home' | 'home-jamie';
+export type SceneType = 'classroom' | 'playground' | 'office' | 'home' | 'home-jamie' | 'home-doorstep';
 
 // [minX, maxX, minZ, maxZ, minY, maxY] — kept a little inside each room's
 // actual wall/ceiling positions so the orbit camera never ends up outside
 // the room looking back at the invisible backside of a wall.
 const ROOM_BOUNDS: Record<SceneType, [number, number, number, number, number, number]> = {
-  classroom:  [-5.6, 5.6, -4.6, 4.6, 0.3, 3.6],
-  office:     [-3.6, 3.6, -2.6, 2.6, 0.3, 3.6],
-  home:       [-4.1, 4.1, -3.6, 3.6, 0.3, 2.6],
+  classroom:    [-5.6, 5.6, -4.6, 4.6, 0.3, 3.6],
+  office:       [-3.6, 3.6, -2.6, 2.6, 0.3, 3.6],
+  home:         [-4.1, 4.1, -3.6, 3.6, 0.3, 2.6],
   'home-jamie': [-4.1, 4.1, -3.6, 3.6, 0.3, 3.0],
-  playground: [-13, 13, -8, 9, 0.3, 6],
+  'home-doorstep': [-4.1, 4.1, -3.6, 3.6, 0.3, 2.6],
+  playground:   [-13, 13, -8, 9, 0.3, 6],
 };
 
 interface SceneRendererProps {
@@ -94,6 +96,11 @@ export function SceneRenderer({
   onFocusEvidence,
   onCameraReset,
 }: SceneRendererProps) {
+  // Doorstep is a 2D illustrated scene — skip the 3D canvas entirely.
+  if (sceneType === 'home-doorstep') {
+    return <DoorstepScene />;
+  }
+
   const focusTarget = focusedEvidenceId ? evidencePositions.get(focusedEvidenceId) ?? null : null;
   // Wider FOV on portrait mobile so the room fills the screen horizontally
   const fov = isMobile && window.innerHeight > window.innerWidth ? 90 : 75;

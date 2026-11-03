@@ -299,11 +299,11 @@ function DefaultInspect({ evidence, evidenceNumber, onDismiss, mode, collected, 
       {/* Tags + log control */}
       <div className="flex flex-wrap items-center gap-2 px-5 pb-4">
         {mode !== 'learning' && evidence.category && (
-          <span className="hud-label border border-border px-2 py-1">{evidence.category}</span>
+          <span className="hud-label border border-border px-2 py-1">Type: {evidence.category}</span>
         )}
         {mode !== 'learning' && evidence.importance && (
           <span className={`hud-label border px-2 py-1 ${evidence.importance === 'critical' ? 'border-primary text-primary' : 'border-border'}`}>
-            {evidence.importance}
+            Weight: {evidence.importance}
           </span>
         )}
         <LogControl mode={mode} collected={collected} onAddObservation={onAddObservation} onDismiss={onDismiss} />
@@ -373,11 +373,11 @@ export function InspectViewer({ evidence, evidenceNumber, onDismiss, mode, colle
         </p>
         <div className="flex flex-wrap items-center gap-2">
           {mode !== 'learning' && evidence.category && (
-            <span className="hud-label border border-border px-2 py-1">{evidence.category}</span>
+            <span className="hud-label border border-border px-2 py-1">Type: {evidence.category}</span>
           )}
           {mode !== 'learning' && evidence.importance && (
             <span className={`hud-label border px-2 py-1 ${evidence.importance === 'critical' ? 'border-primary text-primary' : 'border-border'}`}>
-              {evidence.importance}
+              Weight: {evidence.importance}
             </span>
           )}
           <LogControl mode={mode} collected={collected} onAddObservation={onAddObservation} onDismiss={onDismiss} />
