@@ -69,58 +69,35 @@ export function DoorstepScene() {
             style={{ background: 'linear-gradient(90deg, rgba(180,130,60,0.18) 0%, rgba(160,110,40,0.06) 100%)' }}
           />
 
-          {/* Lazlo — visible in the gap, shadowed, guarded */}
-          <div className="absolute inset-x-0 bottom-0 flex justify-center items-end overflow-hidden"
-            style={{ height: '88%' }}
+          {/* Lazlo — SVG primitive style, matching in-game NPC geometry */}
+          <svg
+            viewBox="0 0 80 240"
+            preserveAspectRatio="xMidYMax meet"
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-52%)',
+              width: '140%',
+              height: '88%',
+            }}
           >
-            {/* Body silhouette */}
-            <div className="relative flex flex-col items-center"
-              style={{ width: '110%' }}
-            >
-              {/* Head */}
-              <div style={{
-                width: '55%',
-                aspectRatio: '1',
-                background: 'radial-gradient(ellipse at 40% 35%, #5a4535 0%, #3d2e1f 60%, #2a1f12 100%)',
-                borderRadius: '50%',
-                boxShadow: '2px 0 8px rgba(0,0,0,0.7)',
-                position: 'relative',
-                flexShrink: 0,
-              }}>
-                {/* Beard — darker chin area */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: '8%',
-                  left: '15%',
-                  right: '15%',
-                  height: '45%',
-                  background: 'rgba(20,12,5,0.55)',
-                  borderRadius: '0 0 50% 50%',
-                }} />
-                {/* Eyes — alert, guarded */}
-                <div style={{
-                  position: 'absolute',
-                  top: '38%',
-                  left: '20%',
-                  right: '20%',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}>
-                  <div style={{ width: '22%', height: 3, background: '#c8a060', borderRadius: 2, opacity: 0.8 }} />
-                  <div style={{ width: '22%', height: 3, background: '#c8a060', borderRadius: 2, opacity: 0.8 }} />
-                </div>
-              </div>
-              {/* Shoulders / body */}
-              <div style={{
-                width: '130%',
-                height: '160%',
-                background: 'linear-gradient(180deg, #2e2216 0%, #1c1509 100%)',
-                borderRadius: '40% 40% 0 0',
-                marginTop: -4,
-                flexShrink: 0,
-              }} />
-            </div>
-          </div>
+            <rect x="5" y="138" width="70" height="102" rx="20" fill="#6B5C7A"/>
+            <ellipse cx="40" cy="138" rx="35" ry="16" fill="#6B5C7A"/>
+            <rect x="31" y="110" width="18" height="30" rx="6" fill="#D4A87A"/>
+            <circle cx="40" cy="76" r="26" fill="#D4A87A"/>
+            <path d="M 14 76 A 26 26 0 0 1 66 76 Q 62 48 40 46 Q 18 48 14 76 Z" fill="#4A2E14"/>
+            <ellipse cx="26" cy="92" rx="9" ry="8" fill="#3A2814"/>
+            <ellipse cx="40" cy="98" rx="12" ry="8" fill="#3A2814"/>
+            <ellipse cx="54" cy="92" rx="9" ry="8" fill="#3A2814"/>
+            <ellipse cx="40" cy="84" rx="9" ry="5" fill="#3A2814"/>
+            <circle cx="31" cy="70" r="5" fill="#F0F0F0"/>
+            <circle cx="31" cy="70" r="3.2" fill="#2A2A2A"/>
+            <circle cx="49" cy="70" r="5" fill="#F0F0F0"/>
+            <circle cx="49" cy="70" r="3.2" fill="#2A2A2A"/>
+            <circle cx="40" cy="76" r="26" fill="rgba(0,0,0,0.22)"/>
+          </svg>
         </div>
 
         {/* Peephole */}
