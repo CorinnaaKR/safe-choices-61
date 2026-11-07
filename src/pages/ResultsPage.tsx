@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SKILL_AREA_HINTS } from '@/lib/trainingHints';
 import Certificate from '@/components/Certificate';
-import { PostFeedbackForm } from '@/components/feedback/PostFeedbackForm';
-import { submitFeedback, PostFeedback, PreFeedback } from '@/lib/feedback';
+import { QuickFeedbackForm, QuickFeedback } from '@/components/feedback/QuickFeedbackForm';
+import { submitQuickFeedback } from '@/lib/feedback';
 import { useToast } from '@/hooks/use-toast';
 
 const EVIDENCE_MEANINGS: Record<string, string> = {
@@ -28,9 +28,8 @@ const EVIDENCE_MEANINGS: Record<string, string> = {
   'beh-l7': 'Derogatory or dismissive comments about women or specific ethnic groups that weren\'t present before are a significant behavioural change. Misogyny and ethnonationalism are closely intertwined in many far-right movements.',
 };
 
-const PRE_FEEDBACK_KEY = 'heli-pre-feedback';
 const COMPLETED_STORIES_KEY = 'heli-completed-stories';
-const POST_FEEDBACK_SUBMITTED_KEY = 'heli-post-feedback-submitted';
+const QUICK_FEEDBACK_SUBMITTED_KEY = 'heli-quick-feedback-submitted';
 
 const OTHER_STORY: Record<string, { id: string; title: string; hook: string; mode: string }> = {
   'jamie-case': {
@@ -124,11 +123,8 @@ export default function ResultsPage() {
   const completedStoryIds = registerStory(scenarioId);
   const otherStory = OTHER_STORY[scenarioId];
   const hasPlayedBoth = otherStory ? completedStoryIds.includes(otherStory.id) : true;
-  const feedbackAlreadySubmitted = sessionStorage.getItem(POST_FEEDBACK_SUBMITTED_KEY) === 'true';
+  const feedbackAlreadySubmitted = sessionStorage.getItem(QUICK_FEEDBACK_SUBMITTED_KEY) === 'true';
   type View = 'other-story-prompt' | 'feedback-form' | 'results';
-  // Show feedback form after any story — then offer the other story after submission.
-  // Previously this only triggered after both stories were played, meaning single-story
-  // users never reached the form.
   const initialView: View = feedbackAlreadySubmitted
     ? (hasPlayedBoth ? 'results' : 'other-story-prompt')
     : 'feedback-form';
@@ -136,20 +132,15 @@ export default function ResultsPage() {
 
   const profile = gameState.trainingProfile;
 
-  const handlePostFeedback = async (post: PostFeedback) => {
-    const preFeedbackRaw = sessionStorage.getItem(PRE_FEEDBACK_KEY);
-    const pre: PreFeedback = preFeedbackRaw
-      ? JSON.parse(preFeedbackRaw)
-      : { priorTraining: 'Unknown', confidenceBefore: 'Unknown' };
-
+  const handleQuickFeedback = async (data: QuickFeedback) => {
     try {
-      await submitFeedback({
-        ...pre,
-        ...post,
-        storiesPlayed: completedStoryIds.join(', '),
+      await submitQuickFeedback({
+        ...data,
+        scenario: scenarioId,
+        mode,
         submittedAt: new Date().toISOString(),
       });
-      sessionStorage.setItem(POST_FEEDBACK_SUBMITTED_KEY, 'true');
+      sessionStorage.setItem(QUICK_FEEDBACK_SUBMITTED_KEY, 'true');
     } catch (e) {
       console.error('Feedback submission failed:', e);
     }
@@ -263,11 +254,9 @@ export default function ResultsPage() {
 
   if (view === 'feedback-form') {
     return (
-      <PostFeedbackForm
-        onComplete={handlePostFeedback}
-        onSkip={() => setView('results')}
-        completedStoryIds={completedStoryIds}
-        domain={hasPlayedBoth ? undefined : scenario.domain}
+      <QuickFeedbackForm
+        onComplete={handleQuickFeedback}
+        onSkip={() => setView(hasPlayedBoth ? 'results' : 'other-story-prompt')}
       />
     );
   }

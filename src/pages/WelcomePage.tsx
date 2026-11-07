@@ -12,11 +12,6 @@ import { listScenarios } from '@/data/scenarios';
 import { Mode, Scenario } from '@/types/simulation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { PreFeedbackGate } from '@/components/feedback/PreFeedbackGate';
-import { PreFeedback } from '@/lib/feedback';
-
-const PRE_FEEDBACK_KEY = 'heli-pre-feedback';
-
 const MODE_STORAGE_KEY = 'heli-mode';
 
 const modeOptions: {
@@ -80,51 +75,11 @@ export default function WelcomePage() {
   const modeForScenario = (scenario: Scenario): Mode =>
     scenario.supportedModes?.[0] ?? mode;
 
-  const [pendingFeedbackScenario, setPendingFeedbackScenario] = useState<{ scenario: Scenario; fresh: boolean } | null>(null);
-
   const startScenario = (scenario: Scenario, fresh = false) => {
-    // Show pre-feedback gate if we haven't collected it yet this session
-    const alreadyAnswered = sessionStorage.getItem(PRE_FEEDBACK_KEY);
-    if (!alreadyAnswered) {
-      setPendingFeedbackScenario({ scenario, fresh });
-      return;
-    }
-    launchScenario(scenario, fresh);
-  };
-
-  const launchScenario = (scenario: Scenario, fresh = false) => {
     const effectiveMode = modeForScenario(scenario);
     if (fresh) localStorage.removeItem(savedStateKey(scenario.id, effectiveMode));
     navigate(`/story/${scenario.id}?mode=${effectiveMode}`);
   };
-
-  const handlePreFeedbackComplete = (data: PreFeedback) => {
-    sessionStorage.setItem(PRE_FEEDBACK_KEY, JSON.stringify(data));
-    if (pendingFeedbackScenario) {
-      const { scenario, fresh } = pendingFeedbackScenario;
-      setPendingFeedbackScenario(null);
-      launchScenario(scenario, fresh);
-    }
-  };
-
-  if (pendingFeedbackScenario) {
-    const { scenario } = pendingFeedbackScenario;
-    const effectiveMode = modeForScenario(scenario);
-    const jamieScenario = scenarios.find((s) => s.id === 'jamie-case');
-    return (
-      <PreFeedbackGate
-        onComplete={handlePreFeedbackComplete}
-        domain={scenario.domain}
-        scenarioTitle={scenario.title}
-        scenarioMode={effectiveMode}
-        onSwitchToJamie={
-          jamieScenario && scenario.id !== 'jamie-case'
-            ? () => { setPendingFeedbackScenario(null); startScenario(jamieScenario); }
-            : undefined
-        }
-      />
-    );
-  }
 
   return (
     <div className="min-h-dvh relative flex flex-col items-center">

@@ -26,38 +26,25 @@ export interface PostFeedback {
   lazloReflection?: string;
 }
 
-export interface FeedbackSubmission extends PreFeedback, PostFeedback {
-  /** Comma-separated list of story IDs completed this session */
-  storiesPlayed: string;
+export interface QuickFeedbackSubmission {
+  scenario: string;
+  mode: string;
+  engagingScore: number;
+  realisticScore: number;
+  oneThingToChange: string;
   submittedAt: string;
 }
 
-export async function submitFeedback(data: FeedbackSubmission): Promise<void> {
+export async function submitQuickFeedback(data: QuickFeedbackSubmission): Promise<void> {
   const fields: Record<string, string | number> = {
     'Submitted At': data.submittedAt,
-    'Scenario': data.storiesPlayed,
-    'Prior Training': data.priorTraining,
-    'Confidence Before': data.confidenceBefore,
-    'Confidence After': data.confidenceAfter,
-    'Realistic & True to Life': data.realisticScore,
-    'Tone Appropriate': data.toneScore,
-    'Engaging': data.engagingScore,
-    'Learned Something New': data.learnedScore,
-    'Respected Seriousness': data.seriousnessScore,
+    'Scenario': data.scenario,
+    'Mode': data.mode,
+    'Engaging Score': data.engagingScore,
+    'Realistic Score': data.realisticScore,
   };
 
-  if (data.takeaway) fields['Takeaway'] = data.takeaway;
-  if (data.whatWasMissing) fields['What Was Missing'] = data.whatWasMissing;
-  if (data.whoWouldBenefit) fields['Who Would Benefit'] = data.whoWouldBenefit;
-  if (data.role) fields['Role'] = data.role;
-  if (data.orgType) fields['Organisation Type'] = data.orgType;
-  if (data.wouldOrgUse) fields['Would Org Use This'] = data.wouldOrgUse;
-  if (data.suggestions) fields['Suggestions'] = data.suggestions;
-  if (data.name) fields['Name'] = data.name;
-  if (data.organisation) fields['Organisation'] = data.organisation;
-  if (data.email) fields['Email'] = data.email;
-  if (data.jamieReflection) fields["Jamie's Story — Reflection"] = data.jamieReflection;
-  if (data.lazloReflection) fields["Lazlo's Story — Reflection"] = data.lazloReflection;
+  if (data.oneThingToChange) fields['One Thing to Change'] = data.oneThingToChange;
 
   const res = await fetch('/api/submit-feedback', {
     method: 'POST',
