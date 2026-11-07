@@ -36,13 +36,10 @@ export function ClosingSequence({ data, outcome, collectedEvidence, onComplete }
 
   if (step === 'reflection') {
     const threshold = data.reflection.manyThreshold ?? 3;
-    const manyObs = collectedEvidence.length >= threshold;
     const paragraphs =
       outcome === 'sobering'
-        ? manyObs
-          ? data.reflection.manyObservations
-          : data.reflection.fewObservationsSilent
-        : manyObs
+        ? data.reflection.fewObservationsSilent
+        : collectedEvidence.length >= threshold
           ? data.reflection.manyObservations
           : data.reflection.fewObservationsToldAnyway;
 
@@ -51,7 +48,9 @@ export function ClosingSequence({ data, outcome, collectedEvidence, onComplete }
         label="What you noticed"
         paragraphs={paragraphs}
         observations={
-          manyObs ? collectedEvidence.map((e) => e.title) : undefined
+          outcome !== 'sobering' && collectedEvidence.length >= threshold
+            ? collectedEvidence.map((e) => e.title)
+            : undefined
         }
         ctaLabel="Continue"
         onContinue={() => setStep('common-signs')}

@@ -497,13 +497,20 @@ export default function ResultsPage() {
             ) : !passed ? (
               <section className="content-card border-muted-foreground/20 mb-3">
                 <div className="px-6 py-5 space-y-2">
-                  <p className="text-sm text-foreground leading-relaxed">
-                    A score of <strong>{PASS_THRESHOLD}%</strong> or above is required to receive
-                    a completion certificate. You scored <strong>{scorePercentage}%</strong>.
-                  </p>
+                  {scorePercentage >= PASS_THRESHOLD ? (
+                    <p className="text-sm text-foreground leading-relaxed">
+                      You scored <strong>{scorePercentage}%</strong>, but this scenario also requires
+                      a minimum number of key observations and optimal decisions. Review what you
+                      missed above, then retake the simulation.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-foreground leading-relaxed">
+                      A score of <strong>{PASS_THRESHOLD}%</strong> or above is required to receive
+                      a completion certificate. You scored <strong>{scorePercentage}%</strong>.
+                    </p>
+                  )}
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Review the observations above, then retake the simulation. There is no limit
-                    on attempts.
+                    There is no limit on attempts.
                   </p>
                 </div>
               </section>
