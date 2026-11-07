@@ -439,6 +439,7 @@ export function SceneHUD({
             className="flex justify-center items-center pointer-events-none overflow-y-auto"
             style={{ position: 'fixed', inset: 0, zIndex: 9000, padding: '1rem' }}
           >
+            <div className="absolute inset-0 bg-background/80 pointer-events-auto" onClick={onDismissEvidence} />
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -491,6 +492,15 @@ export function SceneHUD({
       {/* ── JOURNAL DRAWER ───────────────────────────────────────────────── */}
       <AnimatePresence>
         {journalOpen && (
+          <>
+            <motion.div
+              className="absolute inset-0 bg-background/60 pointer-events-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setJournalOpen(false)}
+            />
           <motion.div
             ref={journalTrapRef}
             role="dialog"
@@ -536,6 +546,7 @@ export function SceneHUD({
               )}
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
 

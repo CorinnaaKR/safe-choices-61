@@ -125,6 +125,11 @@ function PosterInspect({ visual }: { visual: EvidenceVisual }) {
       <div className="absolute inset-x-0 bottom-0 h-1 opacity-20"
         style={{ background: `repeating-linear-gradient(90deg, ${posterAccentColor} 0 3px, transparent 3px 6px)` }}
       />
+
+      {/* Fictional content disclaimer */}
+      <p className="font-mono text-[8px] uppercase tracking-[0.15em] text-white/30 text-center mt-2">
+        Fictional content — created for training purposes only
+      </p>
     </div>
   );
 }
