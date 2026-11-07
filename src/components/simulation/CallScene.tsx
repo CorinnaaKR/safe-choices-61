@@ -30,6 +30,9 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const secondsRef = useRef(0);
   secondsRef.current = seconds;
+  const collectedEvidenceRef = useRef(collectedEvidence);
+  collectedEvidenceRef.current = collectedEvidence;
+  const shownOperatorStepRef = useRef(-1);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -52,18 +55,12 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
       }, 900);
       return () => clearTimeout(t);
     }
-    let alreadyShown = false;
-    setTurns((prev) => {
-      if (prev.length > 0) {
-        const last = prev[prev.length - 1];
-        if (last.kind === 'operator' && last.text === step.operatorLine) {
-          alreadyShown = true;
-          return prev;
-        }
-      }
-      return [...prev, { kind: 'operator', text: step.operatorLine, time: formatElapsed(secondsRef.current) }];
-    });
-    if (alreadyShown) return;
+    if (shownOperatorStepRef.current === stepIdx) return;
+    shownOperatorStepRef.current = stepIdx;
+    setTurns((prev) => [
+      ...prev,
+      { kind: 'operator', text: step.operatorLine, time: formatElapsed(secondsRef.current) },
+    ]);
 
     if (!step.choices) {
       const delay = Math.max(1400, step.operatorLine.split(' ').length * 200);
@@ -71,7 +68,16 @@ export function CallScene({ data, collectedEvidence, onComplete }: Props) {
       return () => clearTimeout(t);
     }
     const readDelay = Math.max(900, step.operatorLine.split(' ').length * 150);
-    const t = setTimeout(() => setWaitingForChoice(true), readDelay);
+    const t = setTimeout(() => {
+      const available = step.choices!.filter(
+        (c) => !c.requiresEvidenceId || collectedEvidenceRef.current.some((e) => e.id === c.requiresEvidenceId)
+      );
+      if (available.length === 0 && !step.fallbackChoiceText) {
+        setStepIdx((i) => i + 1);
+      } else {
+        setWaitingForChoice(true);
+      }
+    }, readDelay);
     return () => clearTimeout(t);
   }, [stepIdx, data.steps, data.closingLine, callEnded]);
 

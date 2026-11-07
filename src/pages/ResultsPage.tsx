@@ -48,9 +48,9 @@ const OTHER_STORY: Record<string, { id: string; title: string; hook: string; mod
 
 /** Register current story as completed and return all completed story IDs. */
 function registerStory(scenarioId: string): string[] {
-  const existing: string[] = JSON.parse(sessionStorage.getItem(COMPLETED_STORIES_KEY) || '[]');
+  const existing: string[] = JSON.parse(localStorage.getItem(COMPLETED_STORIES_KEY) || '[]');
   if (!existing.includes(scenarioId)) existing.push(scenarioId);
-  sessionStorage.setItem(COMPLETED_STORIES_KEY, JSON.stringify(existing));
+  localStorage.setItem(COMPLETED_STORIES_KEY, JSON.stringify(existing));
   return existing;
 }
 
@@ -97,7 +97,7 @@ export default function ResultsPage() {
     criticalEvidenceCount >= criteria.requiredCriticalEvidence &&
     poorDecisionCount <= criteria.maxPoorDecisions
   );
-  const passed = scorePercentage >= PASS_THRESHOLD;
+  const passed = scorePercentage >= PASS_THRESHOLD && meetsCriteria;
 
   const getGrade = () => {
     if (passed && scorePercentage === 100) return { grade: 'Excellent', accent: true };

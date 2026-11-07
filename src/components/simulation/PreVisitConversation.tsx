@@ -146,6 +146,7 @@ export function PreVisitConversation({ data, onComplete }: Props) {
 
   const commitChoice = (choice: PreVisitChoice) => {
     const newTrust = Math.max(0, Math.min(100, trust + choice.trustDelta));
+    const currentExchangeIdx = (phase as { exchangeIdx: number }).exchangeIdx;
     setTrust(newTrust);
     setChoiceIds((prev) => [...prev, choice.id]);
     const sentTime = nextTime();
@@ -171,18 +172,18 @@ export function PreVisitConversation({ data, onComplete }: Props) {
         setThread((prev) => [...prev, { sender: 'contact', text: choice.response!, time: replyTime }]);
         // Don't clear pendingChoice here — advanceExchange clears it atomically with
         // the phase change so choices never flash for 500ms between the two updates.
-        advanceExchange(choice, newTrust);
+        advanceExchange(choice, newTrust, currentExchangeIdx);
       }, 900);
       return () => clearTimeout(t);
     } else {
       markSeen(sentTime);
       setPendingChoice(null);
-      advanceExchange(choice, newTrust);
+      advanceExchange(choice, newTrust, currentExchangeIdx);
     }
   };
 
-  const advanceExchange = (choice: PreVisitChoice, currentTrust: number) => {
-    const next = (phase as { exchangeIdx: number }).exchangeIdx + 1;
+  const advanceExchange = (choice: PreVisitChoice, currentTrust: number, exchangeIdx: number) => {
+    const next = exchangeIdx + 1;
     if (next < data.exchanges.length) {
       setTimeout(() => {
         setPendingChoice(null);

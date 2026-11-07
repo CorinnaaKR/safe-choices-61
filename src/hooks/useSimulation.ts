@@ -6,6 +6,11 @@ import { toast } from '@/hooks/use-toast';
 const storageKey = (scenarioId: string, mode: Mode) =>
   `heli-state-v2:${scenarioId}:${mode}`;
 
+function applyTrustDelta(current: number, delta?: number): number {
+  if (delta === undefined) return current;
+  return Math.max(0, Math.min(100, current + delta));
+}
+
 function getInitialState(scenario: Scenario, mode: Mode): GameState {
   return {
     scenarioId: scenario.id,
@@ -115,10 +120,7 @@ export function useSimulation(
       setLastChoice(choice);
       setShowFeedback(true);
       setGameState((prev) => {
-        const currentTrust = prev.trustLevel ?? 50;
-        const newTrust = choice.trustDelta !== undefined
-          ? Math.max(0, Math.min(100, currentTrust + choice.trustDelta))
-          : currentTrust;
+        const newTrust = applyTrustDelta(prev.trustLevel ?? 50, choice.trustDelta);
         return {
           ...prev,
           decisions: [
@@ -138,7 +140,7 @@ export function useSimulation(
         };
       });
     },
-    [scenario]
+    []
   );
 
   const completeTrainingGate = useCallback(
@@ -200,10 +202,7 @@ export function useSimulation(
   const makeChoiceAndAdvance = useCallback(
     (choice: Choice, supportingEvidenceIds: string[] = []) => {
       setGameState((prev) => {
-        const currentTrust = prev.trustLevel ?? 50;
-        const newTrust = choice.trustDelta !== undefined
-          ? Math.max(0, Math.min(100, currentTrust + choice.trustDelta))
-          : currentTrust;
+        const newTrust = applyTrustDelta(prev.trustLevel ?? 50, choice.trustDelta);
         return {
           ...prev,
           decisions: [
@@ -224,7 +223,7 @@ export function useSimulation(
         };
       });
     },
-    [scenario]
+    []
   );
 
   /** Call when the player clicks "View results" on the final scene. */

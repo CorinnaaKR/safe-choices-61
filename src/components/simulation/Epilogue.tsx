@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EpilogueData, EpilogueMiddle } from '@/types/simulation';
 import { playUiTick } from '@/lib/sfx';
@@ -34,12 +34,14 @@ function GoodEpilogue({ data, onComplete }: { data: EpilogueData['good']; onComp
   const bottomRef = useRef<HTMLDivElement>(null);
   const clockRef = useRef(11 * 60 + 20); // 11:20 AM
   const timesRef = useRef<string[]>([]);
-  if (timesRef.current.length < data.messages.length) {
-    while (timesRef.current.length < data.messages.length) {
+  useMemo(() => {
+    timesRef.current = [];
+    clockRef.current = 11 * 60 + 20;
+    for (let i = 0; i < data.messages.length; i++) {
       clockRef.current += 1 + Math.floor(Math.random() * 2);
       timesRef.current.push(formatClock(clockRef.current));
     }
-  }
+  }, [data.messages.length]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -210,12 +212,14 @@ function SoberingEpilogue({ data, onComplete }: { data: EpilogueData['sobering']
   const [showContinue, setShowContinue] = useState(false);
   const clockRef = useRef(16 * 60 + 5); // 4:05 PM
   const timesRef = useRef<string[]>([]);
-  if (timesRef.current.length < data.sentMessages.length) {
-    while (timesRef.current.length < data.sentMessages.length) {
+  useMemo(() => {
+    timesRef.current = [];
+    clockRef.current = 16 * 60 + 5;
+    for (let i = 0; i < data.sentMessages.length; i++) {
       clockRef.current += 6 + Math.floor(Math.random() * 4);
       timesRef.current.push(formatClock(clockRef.current));
     }
-  }
+  }, [data.sentMessages.length]);
 
   useEffect(() => {
     if (sentShown >= data.sentMessages.length) return;
