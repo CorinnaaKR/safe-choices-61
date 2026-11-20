@@ -6,6 +6,13 @@ import { toast } from '@/hooks/use-toast';
 const storageKey = (scenarioId: string, mode: Mode) =>
   `heli-state-v2:${scenarioId}:${mode}`;
 
+const SAVE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+function isSaveStale(parsed: Record<string, unknown>): boolean {
+  if (!parsed._savedAt) return false; // no timestamp — keep (legacy save)
+  return Date.now() - new Date(parsed._savedAt as string).getTime() > SAVE_TTL_MS;
+}
+
 function applyTrustDelta(current: number, delta?: number): number {
   if (delta === undefined) return current;
   return Math.max(0, Math.min(100, current + delta));
@@ -39,8 +46,13 @@ export function useSimulation(
     const saved = localStorage.getItem(storageKey(scenario.id, mode));
     if (saved) {
       try {
-        const parsed = JSON.parse(saved) as GameState;
-        if (parsed.scenarioId === scenario.id && parsed.mode === mode && !parsed.isComplete) {
+        const parsed = JSON.parse(saved) as GameState & Record<string, unknown>;
+        if (
+          parsed.scenarioId === scenario.id &&
+          parsed.mode === mode &&
+          !parsed.isComplete &&
+          !isSaveStale(parsed)
+        ) {
           return {
             ...parsed,
             maxPossiblePoints: scenario.maxPoints ?? parsed.maxPossiblePoints,
@@ -61,8 +73,8 @@ export function useSimulation(
     const saved = localStorage.getItem(storageKey(scenario.id, mode));
     if (saved) {
       try {
-        const parsed = JSON.parse(saved) as GameState;
-        if (parsed.scenarioId === scenario.id && parsed.mode === mode && !parsed.isComplete) {
+        const parsed = JSON.parse(saved) as GameState & Record<string, unknown>;
+        if (parsed.scenarioId === scenario.id && parsed.mode === mode && !parsed.isComplete && !isSaveStale(parsed)) {
           setGameState({
             ...parsed,
             maxPossiblePoints: scenario.maxPoints ?? parsed.maxPossiblePoints,
@@ -84,7 +96,7 @@ export function useSimulation(
     try {
       localStorage.setItem(
         storageKey(gameState.scenarioId, gameState.mode),
-        JSON.stringify(gameState)
+        JSON.stringify({ ...gameState, _savedAt: new Date().toISOString() })
       );
       saveErrorShown.current = false;
     } catch {
