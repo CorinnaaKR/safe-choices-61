@@ -46,12 +46,12 @@ const OTHER_STORY: Record<string, { id: string; title: string; hook: string; mod
   },
 };
 
-/** Register current story as completed and return all completed story IDs. */
-function registerStory(scenarioId: string): string[] {
-  const existing: string[] = JSON.parse(localStorage.getItem(COMPLETED_STORIES_KEY) || '[]');
-  if (!existing.includes(scenarioId)) existing.push(scenarioId);
-  localStorage.setItem(COMPLETED_STORIES_KEY, JSON.stringify(existing));
-  return existing;
+function readCompletedStories(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(COMPLETED_STORIES_KEY) || '[]');
+  } catch {
+    return [];
+  }
 }
 
 const PASS_THRESHOLD = 85;
@@ -119,8 +119,26 @@ export default function ResultsPage() {
 
   const [activeSkillArea, setActiveSkillArea] = useState<SkillArea | null>(null);
 
-  // Track completed stories and decide initial view
-  const completedStoryIds = registerStory(scenarioId);
+  // Read completed stories once on mount via lazy initialiser — includes current
+  // scenario optimistically since we're already on the results page.
+  const [completedStoryIds] = useState<string[]>(() => {
+    const existing = readCompletedStories();
+    return existing.includes(scenarioId) ? existing : [...existing, scenarioId];
+  });
+
+  // Persist the registration after mount — isolated from render, with error handling.
+  useEffect(() => {
+    try {
+      const existing = readCompletedStories();
+      if (!existing.includes(scenarioId)) {
+        existing.push(scenarioId);
+        localStorage.setItem(COMPLETED_STORIES_KEY, JSON.stringify(existing));
+      }
+    } catch {
+      // localStorage unavailable — completed stories won't persist this session
+    }
+  }, [scenarioId]);
+
   const otherStory = OTHER_STORY[scenarioId];
   const hasPlayedBoth = otherStory ? completedStoryIds.includes(otherStory.id) : true;
   const feedbackAlreadySubmitted = sessionStorage.getItem(QUICK_FEEDBACK_SUBMITTED_KEY) === 'true';
