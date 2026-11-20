@@ -8,6 +8,8 @@ interface Props {
   /** The player's own logged observations — used to personalise the reflection step. */
   collectedEvidence: Evidence[];
   onComplete: () => void;
+  /** Optional callback to restart the story — shown as a nudge when player noticed nothing. */
+  onReplay?: () => void;
 }
 
 type Step = 'epilogue' | 'reflection' | 'common-signs';
@@ -19,7 +21,7 @@ type Step = 'epilogue' | 'reflection' | 'common-signs';
  * in short: this never scores or tallies the player, it reflects their own
  * choices back at them and then validates the instinct, not the completeness.
  */
-export function ClosingSequence({ data, outcome, collectedEvidence, onComplete }: Props) {
+export function ClosingSequence({ data, outcome, collectedEvidence, onComplete, onReplay }: Props) {
   const [step, setStep] = useState<Step>('epilogue');
 
   if (step === 'epilogue') {
@@ -43,6 +45,8 @@ export function ClosingSequence({ data, outcome, collectedEvidence, onComplete }
           ? data.reflection.manyObservations
           : data.reflection.fewObservationsToldAnyway;
 
+    const showReplayNudge = collectedEvidence.length === 0 && onReplay;
+
     return (
       <NarrativeCard
         label="What you noticed"
@@ -54,6 +58,8 @@ export function ClosingSequence({ data, outcome, collectedEvidence, onComplete }
         }
         ctaLabel="Continue"
         onContinue={() => setStep('common-signs')}
+        replayLabel={showReplayNudge ? 'Try again and look more closely →' : undefined}
+        onReplay={showReplayNudge ? onReplay : undefined}
       />
     );
   }
@@ -67,12 +73,16 @@ function NarrativeCard({
   observations,
   ctaLabel,
   onContinue,
+  replayLabel,
+  onReplay,
 }: {
   label: string;
   paragraphs: string[];
   observations?: string[];
   ctaLabel: string;
   onContinue: () => void;
+  replayLabel?: string;
+  onReplay?: () => void;
 }) {
   return (
     <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 px-5 py-10 overflow-y-auto">
@@ -112,13 +122,21 @@ function NarrativeCard({
           </motion.ul>
         )}
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex flex-col sm:flex-row-reverse items-start sm:items-center gap-3">
           <button
             onClick={onContinue}
             className="bg-primary text-primary-foreground font-sans text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
           >
             {ctaLabel}
           </button>
+          {replayLabel && onReplay && (
+            <button
+              onClick={onReplay}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+            >
+              {replayLabel}
+            </button>
+          )}
         </div>
       </motion.div>
     </div>

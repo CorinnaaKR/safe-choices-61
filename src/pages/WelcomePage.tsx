@@ -36,6 +36,12 @@ const modeOptions: {
   },
 ];
 
+const DIFFICULTY_LABELS: Record<number, string> = {
+  1: 'Introductory',
+  2: 'Intermediate',
+  3: 'Advanced',
+};
+
 const scenarioHooks: Record<string, string> = {
   'jamie-case': 'It wasn\'t the uniform that stayed with you. It was the way Jamie pulled their sleeve down when you came close.',
   'lazlo-case': 'Lazlo used to reply within the hour. Then his uncle died. Then he stopped replying at all. Then his sister called you.',
@@ -161,11 +167,18 @@ export default function WelcomePage() {
                           Coming soon
                         </span>
                       ) : (
-                        scenario.durationMinutes && (
-                          <span className="text-[10px] font-mono text-muted-foreground">
-                            ~{scenario.durationMinutes} min
-                          </span>
-                        )
+                        <>
+                          {scenario.difficulty !== undefined && DIFFICULTY_LABELS[scenario.difficulty] && (
+                            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground border border-border rounded px-2 py-0.5">
+                              {DIFFICULTY_LABELS[scenario.difficulty]}
+                            </span>
+                          )}
+                          {scenario.durationMinutes && (
+                            <span className="text-[10px] font-mono text-muted-foreground">
+                              ~{scenario.durationMinutes} min
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>

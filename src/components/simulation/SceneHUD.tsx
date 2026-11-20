@@ -197,6 +197,7 @@ export function SceneHUD({
         <div className="absolute top-28 md:top-6 inset-x-0 flex flex-col items-center gap-1.5 pointer-events-none">
           <div className="bg-background/55 backdrop-blur-sm px-4 py-1.5 flex flex-col items-center gap-1 rounded-sm">
             <motion.p
+              key={`title-${currentScene.id}`}
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.1 }}
@@ -205,6 +206,7 @@ export function SceneHUD({
               {scenarioTitle}
             </motion.p>
             <motion.p
+              key={`scene-${currentScene.id}`}
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.18 }}
@@ -237,20 +239,20 @@ export function SceneHUD({
               {String(gameState.collectedEvidence.length).padStart(2, '0')}
             </span>
           </button>
-          {mode === 'training' && (
-            <div className="pointer-events-none">
-              <div className="w-16 h-px bg-border/60 relative overflow-hidden">
-                <motion.div
-                  className="absolute inset-y-0 left-0 bg-primary/70"
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                />
-              </div>
+          <div className="pointer-events-none">
+            <div className="w-16 h-px bg-border/60 relative overflow-hidden">
+              <motion.div
+                className="absolute inset-y-0 left-0 bg-primary/70"
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+              />
+            </div>
+            {mode === 'training' && (
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/25 mt-1 hud-float">
                 {String(progress).padStart(3, '0')}%
               </p>
-            </div>
-          )}
+            )}
+          </div>
           <div className="pointer-events-none mt-1 space-y-0.5">
             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-foreground/22 hud-float hidden md:block">
               [drag] look around

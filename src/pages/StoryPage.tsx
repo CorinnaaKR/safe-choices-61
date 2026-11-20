@@ -48,6 +48,7 @@ export default function StoryPage() {
     completeCallScene,
     proceedToNextScene,
     completeFinalScene,
+    resetSimulation,
     getProgress,
   } = useSimulation(scenarioId, mode);
 
@@ -236,6 +237,10 @@ export default function StoryPage() {
         outcome={outcome}
         collectedEvidence={gameState.collectedEvidence}
         onComplete={completeFinalScene}
+        onReplay={() => {
+          resetSimulation();
+          navigate(`/story/${scenarioId}?mode=${mode}`);
+        }}
       />
     );
   }
