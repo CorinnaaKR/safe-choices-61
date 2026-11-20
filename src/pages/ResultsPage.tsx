@@ -12,6 +12,18 @@ import { submitQuickFeedback } from '@/lib/feedback';
 import { useToast } from '@/hooks/use-toast';
 
 const EVIDENCE_MEANINGS: Record<string, string> = {
+  // Jamie's Story
+  'obs-1': 'Withdrawal at the start of term can be easy to put down to tiredness. But a combination — crumpled uniform suggesting disrupted home routines, sleeves kept down in a warm room, avoiding eye contact — often points to something beyond a bad morning. These signals matter most when they represent a change from how someone normally is.',
+  'obs-pe-1': 'Choosing to change separately and wearing long sleeves in the heat are individually easy to explain away. Together, in context, they can be a way of making sure certain parts of the body stay covered. Children experiencing abuse at home often go to these lengths not because they\'ve been told to, but because they\'ve learnt it protects them.',
+  'obs-2': 'Social withdrawal and an exaggerated physical reaction to being touched are both significant. Pulling away sharply when someone grabbed the arm is consistent with protecting a painful or hidden injury. Children in difficult home situations often disconnect from friendships before adults notice anything is wrong.',
+  'vis-1': 'A glimpsed mark isn\'t evidence on its own — but noticing it matters. Children experiencing abuse often show bruising in places that clothing covers. When a mark is glimpsed and quickly hidden, the instinct to look away is natural. The instinct to remember it is more useful.',
+  'vis-2': 'Bruises on their own are rarely conclusive. What\'s significant here is the context: a child keeping sleeves down, changing separately at PE, flinching at contact — and who immediately covered the mark the moment they realised it had been seen. The covering-up response is often more telling than the injury itself.',
+  'obs-3': 'A practised, quick explanation for an injury — especially one that arrives a beat before the question is finished — is a common feature of children who\'ve learnt to explain away marks. What\'s more telling is the look that followed: checking whether you believed it, whether you\'d push back. Children who want someone to know often test whether that person is safe before saying more.',
+  'obs-attendance': 'Missed school days — often timed around deteriorating situations at home — can be an early indicator that something\'s going on. Children sometimes disappear from school before adults understand why. It\'s rarely a reason to act on its own, but it lines up with other signs here.',
+  'obs-control': 'Restricting a child\'s access to friends and social life outside the home is a recognised form of control. It limits the chance of anyone noticing changes, and gradually isolates the child from the people most likely to help. Alongside other signs, it\'s worth noting.',
+  'obs-home': 'Children who linger at school when everyone else has left are sometimes avoiding going home. School can be a safer environment than home — predictable, with adults around — and some children instinctively slow their return to a difficult situation. It\'s easy to miss when you\'re not looking for it.',
+  'obs-4': 'Telling a classmate instead of a trusted adult meant the information spread rather than reaching someone who could act on it. When a child already feels they can\'t trust people, word getting around can confirm that fear — making it harder for them to open up to the right person later.',
+  // Lazlo's Story
   'beh-l1': 'Visible weight loss, poor sleep, and a flat affect are common stress responses in someone undergoing radicalisation. The isolation and intensity of extremist groups can displace normal routines and relationships, with physical deterioration often following.',
   'beh-l0': 'Muting or concealing media consumption can indicate anxiety about being observed — or a shift in what content feels acceptable to share. It\'s a small action, but combined with other signs, it suggests compartmentalisation.',
   'env-l1': 'Displaying extremist material openly — especially in a domestic space — indicates the ideology has become part of someone\'s identity, not just a passing interest. "Sons of Europa" is a fictional stand-in for far-right nationalist movements that use heritage framing to normalise exclusionary beliefs.',
@@ -98,6 +110,22 @@ export default function ResultsPage() {
     poorDecisionCount <= criteria.maxPoorDecisions
   );
   const passed = scorePercentage >= PASS_THRESHOLD && meetsCriteria;
+
+  const getCompletionFeedbackText = (): string | null => {
+    if (!scenario.completionFeedback) return null;
+    if (mode === 'training') {
+      if (passed && scorePercentage === 100) return scenario.completionFeedback.excellent;
+      if (passed) return scenario.completionFeedback.good;
+      return scenario.completionFeedback.poor;
+    }
+    // Learning mode — infer outcome from final scene id
+    if (gameState.currentSceneId.includes('sobering') || gameState.currentSceneId.includes('silence')) {
+      return scenario.completionFeedback.poor;
+    }
+    return scenario.completionFeedback.good;
+  };
+
+  const completionFeedbackText = getCompletionFeedbackText();
 
   const getGrade = () => {
     if (passed && scorePercentage === 100) return { grade: 'Excellent', accent: true };
@@ -317,6 +345,11 @@ export default function ResultsPage() {
               {scenario.title} — {scenario.role}
             </p>
             <div className="warm-divider mt-5" />
+            {completionFeedbackText && (
+              <p className="text-sm text-foreground/75 leading-relaxed italic mt-5">
+                "{completionFeedbackText}"
+              </p>
+            )}
           </div>
 
           {/* Score block — training only */}
@@ -617,9 +650,7 @@ export default function ResultsPage() {
               ) : (
                 <div className="space-y-2">
                   {gameState.collectedEvidence.map((evidence, i) => {
-                    const meaning = scenarioId === 'lazlo-case' && mode === 'training'
-                      ? EVIDENCE_MEANINGS[evidence.id]
-                      : undefined;
+                    const meaning = EVIDENCE_MEANINGS[evidence.id];
                     return (
                       <div
                         key={evidence.id}
