@@ -35,7 +35,8 @@ export function FeedbackPanel({ choice, onContinue, mode = 'training' }: Feedbac
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="case-panel mb-px"
+        className={mode === 'learning' ? 'narrative-panel mb-px' : 'case-panel mb-px'}
+        style={mode === 'learning' ? { borderLeft: '3px solid hsl(var(--primary) / 0.45)' } : undefined}
       >
         {mode === 'training' && (
           <div className="px-6 py-3 border-b border-border">

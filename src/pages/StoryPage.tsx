@@ -58,9 +58,12 @@ export default function StoryPage() {
   const [showEpilogue, setShowEpilogue] = useState(false);
   const [vignettePulse, setVignettePulse] = useState(false);
   const [cameraReturning, setCameraReturning] = useState(false);
+  const [sceneTransitioning, setSceneTransitioning] = useState(false);
   const [doorOpen, setDoorOpen] = useState(false);
   const vignettTimer = useRef<ReturnType<typeof setTimeout>>();
   const cameraReturnTimer = useRef<ReturnType<typeof setTimeout>>();
+  const sceneTransitionTimer = useRef<ReturnType<typeof setTimeout>>();
+  const prevSceneType = useRef<string | null>(null);
   const isLandscapePhone = useLandscapePhone();
 
   const triggerVignette = () => {
@@ -120,6 +123,17 @@ export default function StoryPage() {
   }, [scenarioId, gameState.preVisitComplete, gameState.lazloThreadComplete, gameState.preVisitChoices, completeLazloThread]);
 
   const sceneType = environmentToSceneType(currentScene?.environment);
+
+  // Cross-fade when moving between different scene environments
+  useEffect(() => {
+    if (prevSceneType.current !== null && prevSceneType.current !== sceneType) {
+      setSceneTransitioning(true);
+      clearTimeout(sceneTransitionTimer.current);
+      sceneTransitionTimer.current = setTimeout(() => setSceneTransitioning(false), 450);
+    }
+    prevSceneType.current = sceneType;
+    return () => clearTimeout(sceneTransitionTimer.current);
+  }, [sceneType]);
   const sceneEvidence = currentScene?.evidence || [];
   const collectedIds = gameState.collectedEvidence.map(e => e.id);
 
@@ -378,6 +392,19 @@ export default function StoryPage() {
             initial={{ opacity: 1 }}
             animate={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
+            className="pointer-events-none fixed inset-0 z-20 bg-background"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Cross-fade between different scene environments */}
+      <AnimatePresence>
+        {sceneTransitioning && (
+          <motion.div
+            key="scene-transition"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
             className="pointer-events-none fixed inset-0 z-20 bg-background"
           />
         )}

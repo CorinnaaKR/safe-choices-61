@@ -43,6 +43,17 @@ export default function Certificate({
         position: 'relative',
       }}
     >
+      {/* Inset decorative frame */}
+      <div style={{ position: 'absolute', inset: 14, border: '1px solid hsl(26 14% 30%)', pointerEvents: 'none' }} />
+      {/* Amber corner accents — top-left */}
+      <div style={{ position: 'absolute', top: 10, left: 10, width: 22, height: 22, borderTop: '2px solid hsl(32 85% 58%)', borderLeft: '2px solid hsl(32 85% 58%)' }} />
+      {/* top-right */}
+      <div style={{ position: 'absolute', top: 10, right: 10, width: 22, height: 22, borderTop: '2px solid hsl(32 85% 58%)', borderRight: '2px solid hsl(32 85% 58%)' }} />
+      {/* bottom-left */}
+      <div style={{ position: 'absolute', bottom: 10, left: 10, width: 22, height: 22, borderBottom: '2px solid hsl(32 85% 58%)', borderLeft: '2px solid hsl(32 85% 58%)' }} />
+      {/* bottom-right */}
+      <div style={{ position: 'absolute', bottom: 10, right: 10, width: 22, height: 22, borderBottom: '2px solid hsl(32 85% 58%)', borderRight: '2px solid hsl(32 85% 58%)' }} />
+
       {/* header row: case-id style label + logo badge */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '36px' }}>
         <div>
@@ -96,7 +107,7 @@ export default function Certificate({
             style={{
               background: 'hsl(26 14% 24%)',
               border: '1px solid hsl(26 14% 38%)',
-              borderRadius: '10px',
+              borderRadius: '3px',
               padding: '14px 16px',
             }}
           >
