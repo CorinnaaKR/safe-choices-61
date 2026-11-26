@@ -13,6 +13,8 @@ const ALLOWED_FIELDS = new Set([
   'One Thing to Change',
 ]);
 
+const NUMERIC_FIELDS = new Set(['Engaging Score', 'Realistic Score']);
+
 const MAX_STRING_LENGTH = 5000;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -39,7 +41,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const fields: Record<string, string | number> = {};
   for (const [key, value] of Object.entries(rawFields)) {
     if (!ALLOWED_FIELDS.has(key)) continue;
-    if (typeof value === 'number' && Number.isFinite(value)) {
+    if (NUMERIC_FIELDS.has(key)) {
+      const num = Number(value);
+      if (Number.isFinite(num) && num >= 1 && num <= 5) fields[key] = Math.round(num);
+    } else if (typeof value === 'number' && Number.isFinite(value)) {
       fields[key] = value;
     } else if (typeof value === 'string') {
       fields[key] = value.slice(0, MAX_STRING_LENGTH);
