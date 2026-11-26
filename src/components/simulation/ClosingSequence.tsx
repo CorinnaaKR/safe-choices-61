@@ -151,7 +151,7 @@ function CommonSignsCard({
   onComplete: () => void;
 }) {
   return (
-    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50 px-5 py-10 overflow-y-auto">
+    <div className="fixed inset-0 bg-background flex flex-col items-center z-50 px-5 py-10 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}

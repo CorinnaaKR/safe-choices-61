@@ -82,6 +82,7 @@ export function SceneHUD({
   const prevSceneId = useRef(currentScene.id);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const choicesTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inspectGuardRef = useRef(false);
 
   const dismissOnboarding = () => {
     localStorage.setItem('heli-onboarding-seen', '1');
@@ -144,6 +145,15 @@ export function SceneHUD({
     return () => { if (choicesTimer.current) clearTimeout(choicesTimer.current); };
   }, [choicesReady]);
 
+  // Guard against the backdrop dismiss firing on the same pointer event that opened the inspector
+  useEffect(() => {
+    if (inspectedEvidence) {
+      inspectGuardRef.current = true;
+      const t = setTimeout(() => { inspectGuardRef.current = false; }, 400);
+      return () => clearTimeout(t);
+    }
+  }, [inspectedEvidence]);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (showFeedback) return;
@@ -200,7 +210,7 @@ export function SceneHUD({
               key={`title-${currentScene.id}`}
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.1 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
               className="font-mono text-[9px] uppercase tracking-[0.45em] text-foreground/70"
             >
               {scenarioTitle}
@@ -209,7 +219,7 @@ export function SceneHUD({
               key={`scene-${currentScene.id}`}
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.18 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
               className="font-mono text-[11px] uppercase tracking-[0.3em] text-foreground"
             >
               {currentScene.title}
@@ -441,7 +451,7 @@ export function SceneHUD({
             className="flex justify-center items-center pointer-events-none overflow-y-auto"
             style={{ position: 'fixed', inset: 0, zIndex: 9000, padding: '1rem' }}
           >
-            <div className="absolute inset-0 bg-background/80 pointer-events-auto" onClick={onDismissEvidence} />
+            <div className="absolute inset-0 bg-background/80 pointer-events-auto" onClick={() => { if (!inspectGuardRef.current) onDismissEvidence(); }} />
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}

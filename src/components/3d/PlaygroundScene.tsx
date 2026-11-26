@@ -320,7 +320,7 @@ export function PlaygroundScene({ evidence, collectedIds, focusedEvidenceId, onC
 
       {/* Jamie — sitting alone on the bench, withdrawn */}
       <NPCCharacter
-        position={[-4, 0.45, 2.8]}
+        position={[-4, 0.41, 2.8]}
         rotation={0}
         bodyColor="#6B8CA8"
         skinColor="#e8c4a0"

@@ -125,7 +125,7 @@ export const safeguardingScenario: Scenario = {
         {
           id: 'obs-pe-1',
           type: 'observation',
-          title: 'Changing room, again',
+          title: 'Avoiding the changing room',
           description: 'PE lesson',
           content: "Jamie changed in the toilets instead of with everyone else, then wore long sleeves on a hot, sweaty day when literally no one else did. Could just be self-conscious about changing in front of people — loads of people are like that. But it's the kind of thing that's easy to explain away one at a time, and hard to explain away all together.",
           timestamp: 'Monday, PE lesson'
@@ -366,7 +366,7 @@ export const safeguardingScenario: Scenario = {
         },
         {
           id: 'c4-2',
-          text: 'Leave it for now — maybe your mum\'s right',
+          text: 'Leave it for now — maybe it is a hard adjustment',
           consequence: 'You tell yourself she probably knows best. But you don\'t quite believe it.',
           feedback: 'Doubt is normal. But the feeling that made you bring it up in the first place was there for a reason.',
           isOptimal: false,
@@ -385,7 +385,7 @@ export const safeguardingScenario: Scenario = {
         "You get in early the next morning. Your form tutor is at their desk, marking something.",
         "You hover in the doorway for a second. They look up and smile. \"Morning. You alright?\"",
         "\"Can I — can I talk to you about something? It's about a friend.\"",
-        "They set the pen down. \"Course. Sit down.\""
+        "They set the pen down. \"Of course. Sit down.\""
       ],
       choices: [
         {
@@ -575,7 +575,7 @@ export const safeguardingScenario: Scenario = {
       title: 'The Days That Follow',
       environment: 'classroom',
       narrative: [
-        "You don't hear exactly what happens next — that part isn't really yours to know. But over the next couple of weeks, things shift, quietly.",
+        "You don't hear exactly what happens next. But over the next couple of weeks, things shift.",
         "Jamie's away for a few days. When they come back, something about them is different — lighter, somehow, even if they're still quiet about it.",
         "You don't ask. You just keep being around, the way you always were."
       ],

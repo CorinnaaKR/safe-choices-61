@@ -47,7 +47,7 @@ function StudentNPC({ position, color, name }: { position: [number, number, numb
 function TutorNPC() {
   return (
     <NPCCharacter
-      position={[0, 0.41, -3.1]}
+      position={[0, 0.41, -3.8]}
       rotation={0}
       bodyColor="#4A6080"
       skinColor="#C8A882"
@@ -228,7 +228,12 @@ export function ClassroomScene({ evidence, collectedIds, focusedEvidenceId, onCo
       )}
 
       {/* Tutor-only mode: teacher seated at front desk facing player */}
-      {tutorOnly && <TutorNPC />}
+      {tutorOnly && (
+        <>
+          <Chair position={[0, 0, -3.8]} rotation={0} />
+          <TutorNPC />
+        </>
+      )}
 
       {/* Free-standing evidence items (not on NPCs) */}
       {freeEvidence.map(({ ev, idx }) => {
