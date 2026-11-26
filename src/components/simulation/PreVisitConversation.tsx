@@ -552,16 +552,6 @@ export function PreVisitConversation({ data, onComplete }: Props) {
             </motion.div>
           )}
         </AnimatePresence>
-        {!isChoosing && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="hidden md:block font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground px-0 py-4"
-          >
-            Before you arrive
-          </motion.p>
-        )}
       </div>
 
     </div>

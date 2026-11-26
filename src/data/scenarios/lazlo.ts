@@ -541,7 +541,7 @@ export const lazloScenario: Scenario = {
           title: '"Part of something bigger"',
           description: 'Lazlo mentions belonging to something new',
           content:
-            "When asked how he's doing, Lazlo doesn't mention grief or his job or his relationship. He describes being 'part of something bigger'. The phrase carries warmth — more warmth than anything else he has said. He is not describing a hobby or a social group. He is describing an identity.",
+            "When asked how he's doing, Lazlo's answer centres on a new group he's involved with. He describes it as 'something bigger' and says he's 'part of' it. He doesn't name the group or say how he got involved. It is the first thing he has said that he seems positive about.",
           timestamp: 'Wednesday, 2:18 PM',
           category: 'behavioural',
           importance: 'critical',
@@ -553,7 +553,7 @@ export const lazloScenario: Scenario = {
           title: 'Phone — Turned Face-Down',
           description: 'Lazlo reads a message and immediately turns the phone over',
           content:
-            'When his phone buzzes, Lazlo glances at the screen — long enough to register the message — then turns it face-down in one smooth movement. He does not explain. He does not respond. He brings his attention back to you as if nothing happened. The speed of it suggests habit.',
+            'When his phone buzzes, Lazlo glances at the screen — long enough to register the message — then turns it face-down. He does not explain or respond to it. He brings his attention back to you without comment.',
           timestamp: 'Wednesday, 2:19 PM',
           category: 'behavioural',
           importance: 'major',
@@ -679,7 +679,8 @@ export const lazloScenario: Scenario = {
       environment: 'home',
       isDecisionPoint: true,
       narrative: [
-        '"Joey was the only one who actually knew me." Lazlo is still looking at the TV but he is speaking now.',
+        'The silence stretches. Then Lazlo shifts slightly in his seat, still looking at the TV.',
+        '"Joey was the only one who actually knew me."',
         '"Mum. Lilly." He stops. Starts again. "When he died they just — kept going. Like it was nothing." A pause. "And it wasn\'t just that."',
         'He keeps going. Still not looking at you. "Sienna cheated. Said I was neglecting her." He says it flatly, like a fact rather than a wound. "And the job — I stood up for a colleague. Went to HR. Said what was happening." A short breath. "Two weeks later. Performance issues." He looks at his hands.',
         '"These guys I\'ve been speaking to." He glances at the wall for just a moment. "They don\'t do that. Tell you to move on. They get it."',
@@ -695,7 +696,7 @@ export const lazloScenario: Scenario = {
           title: 'Anger at Old Friends',
           description: 'Lazlo is dismissive and contemptuous about mutual friends',
           content:
-            'Lazlo talks about his family and old friends with contempt he makes no effort to soften. "They just moved on. Like it was nothing." The grief has curdled into something harder — he is sorting people into those who understood Joey and those who didn\'t, and almost everyone is failing the test. The warmth he reserves for the online group is completely absent when he talks about the people who were actually in his life.',
+            'Lazlo talks about his family and old friends with open contempt. "They just moved on. Like it was nothing." He contrasts this with how he describes the online group, which he speaks about with noticeably more warmth. The tone when talking about people from his previous life is flat and dismissive.',
           timestamp: 'Wednesday, 2:24 PM',
           category: 'behavioural',
           importance: 'major',
@@ -707,7 +708,7 @@ export const lazloScenario: Scenario = {
           title: '"The Group" — Mentioned',
           description: 'Lazlo refers to an online group that "gets it"',
           content:
-            'Lazlo refers to the online group with more warmth than he has shown for anyone else in this conversation — including you. He calls them "the only ones who get it." The group found him in his grief and gave him what his family didn\'t: acknowledgement. That is what he is loyal to.',
+            'Lazlo refers to an online group and describes them as "the only ones who get it." His tone when talking about them is noticeably different from when he spoke about family or friends. He doesn\'t name the group or explain how he found them.',
           timestamp: 'Wednesday, 2:25 PM',
           category: 'behavioural',
           importance: 'critical',
@@ -746,7 +747,7 @@ export const lazloScenario: Scenario = {
           title: "Lazlo's Phone — Meet Invitation",
           description: 'Screen glimpse showing an extremist group message thread',
           content:
-            'A brief glimpse of Lazlo\'s phone screen before he puts it face-down. A Telegram group: "EUROPA SONS 🔥". The last message: "When you coming to the meet? We need you, brother." They are calling him in person. Online contact is one level of involvement — an in-person meeting with this group is a significant step further. Groups like this use face-to-face gatherings to deepen loyalty and make it much harder to step back. The fact that they\'re asking suggests he hasn\'t been yet. That may not stay true for long.',
+            'A brief glimpse of Lazlo\'s phone screen before he puts it face-down. A Telegram group named "EUROPA SONS 🔥". The last visible message: "When you coming to the meet? We need you, brother."',
           timestamp: 'Wednesday, 2:26 PM',
           category: 'digital',
           importance: 'critical',
@@ -771,7 +772,7 @@ export const lazloScenario: Scenario = {
           title: 'Three Things — Lazlo\'s Account of the Past Year',
           description: 'Lazlo outlines what has happened since Joey died',
           content:
-            'Lazlo describes three things hitting at once: his uncle\'s death, his girlfriend cheating on him while he was grieving, and losing his job after reporting a manager for bullying a junior colleague. He was the only one who spoke up. Two weeks later he was out. He does not frame this as a complaint — he lists it flatly, like someone who has stopped expecting to be believed. Groups like the one Lazlo has found specifically target this kind of story: someone who did the right thing, was punished for it, and has been told that is normal. The narrative fits perfectly into what they say about systems being rigged against people like him.',
+            'Lazlo describes three things that happened in the same period: his uncle\'s death, his girlfriend ending the relationship, and losing his job after reporting a manager for bullying a colleague. He lists them flatly, without apparent emotion. He says he was the only one who reported and was let go two weeks later.',
           timestamp: 'Wednesday, 2:25 PM',
           category: 'behavioural',
           importance: 'major',
@@ -783,7 +784,7 @@ export const lazloScenario: Scenario = {
           title: 'Something He Said About Priya',
           description: 'Lazlo makes a comment about his sister\'s relationship',
           content:
-            'Lazlo said Lilly\'s relationship with Priya "goes against God\'s will" — and that Priya "doesn\'t belong in this country anyway." He said it without anger, as a statement of fact. This is almost certainly what Lilly heard that alarmed her — and why she, as someone who works with the law, went looking for help. The words aren\'t his in origin. They\'re the group\'s language, absorbed until it sounds like common sense.',
+            'Lazlo said that Lilly\'s relationship with Priya "goes against God\'s will," and that Priya "doesn\'t belong in this country anyway." He said both things in the same tone as the rest of the conversation — without anger, as though stating facts. He moved on without pausing.',
           timestamp: 'Wednesday, 2:27 PM',
           category: 'behavioural',
           importance: 'critical',
