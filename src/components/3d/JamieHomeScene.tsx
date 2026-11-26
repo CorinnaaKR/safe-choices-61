@@ -41,22 +41,32 @@ function MumCharacter() {
         <boxGeometry args={[0.2, 0.18, 0.08]} />
         <meshStandardMaterial color={hairColor} roughness={0.8} />
       </mesh>
-      {/* Left arm reaching toward table (+z) */}
-      <mesh position={[-0.2, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, 0.1]} castShadow>
-        <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
+      {/* Left upper arm — hanging from shoulder, slight forward lean */}
+      <mesh position={[-0.18, 0.69, 0.04]} rotation={[Math.PI * 0.9, 0, 0.08]} castShadow>
+        <cylinderGeometry args={[0.045, 0.04, 0.28, 8]} />
         <meshStandardMaterial color={topColor} roughness={0.7} />
       </mesh>
-      {/* Right arm */}
-      <mesh position={[0.18, 0.82, 0.28]} rotation={[Math.PI * 0.35, 0, -0.1]} castShadow>
-        <cylinderGeometry args={[0.045, 0.04, 0.34, 8]} />
+      {/* Right upper arm */}
+      <mesh position={[0.18, 0.69, 0.04]} rotation={[Math.PI * 0.9, 0, -0.08]} castShadow>
+        <cylinderGeometry args={[0.045, 0.04, 0.28, 8]} />
         <meshStandardMaterial color={topColor} roughness={0.7} />
       </mesh>
-      {/* Hands resting on table */}
-      <mesh position={[-0.22, 0.78, 0.48]} castShadow>
+      {/* Left forearm — angled forward to rest on table */}
+      <mesh position={[-0.18, 0.46, 0.25]} rotation={[Math.PI * 0.65, 0, 0.08]} castShadow>
+        <cylinderGeometry args={[0.04, 0.035, 0.38, 8]} />
+        <meshStandardMaterial color={topColor} roughness={0.7} />
+      </mesh>
+      {/* Right forearm */}
+      <mesh position={[0.18, 0.46, 0.25]} rotation={[Math.PI * 0.65, 0, -0.08]} castShadow>
+        <cylinderGeometry args={[0.04, 0.035, 0.38, 8]} />
+        <meshStandardMaterial color={topColor} roughness={0.7} />
+      </mesh>
+      {/* Hands at table surface */}
+      <mesh position={[-0.19, 0.37, 0.48]} castShadow>
         <sphereGeometry args={[0.042, 8, 6]} />
         <meshStandardMaterial color={skinColor} roughness={0.65} />
       </mesh>
-      <mesh position={[0.2, 0.78, 0.48]} castShadow>
+      <mesh position={[0.19, 0.37, 0.48]} castShadow>
         <sphereGeometry args={[0.042, 8, 6]} />
         <meshStandardMaterial color={skinColor} roughness={0.65} />
       </mesh>
