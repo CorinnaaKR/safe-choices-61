@@ -50,7 +50,6 @@ export function useSimulation(
         if (
           parsed.scenarioId === scenario.id &&
           parsed.mode === mode &&
-          !parsed.isComplete &&
           !isSaveStale(parsed)
         ) {
           return {
@@ -74,7 +73,7 @@ export function useSimulation(
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as GameState & Record<string, unknown>;
-        if (parsed.scenarioId === scenario.id && parsed.mode === mode && !parsed.isComplete && !isSaveStale(parsed)) {
+        if (parsed.scenarioId === scenario.id && parsed.mode === mode && !isSaveStale(parsed)) {
           setGameState({
             ...parsed,
             maxPossiblePoints: scenario.maxPoints ?? parsed.maxPossiblePoints,
