@@ -293,15 +293,15 @@ export default function StoryPage() {
       {currentScene.id === 'scene-l0' && (
         <div className="absolute inset-0 flex flex-col" style={{ zIndex: 1 }}>
           {/* Sky — overcast afternoon */}
-          <div style={{ flex: '0 0 38%', background: 'linear-gradient(to bottom, #9BAFC0 0%, #C0CEDB 100%)' }} />
+          <div style={{ flex: '0 0 25%', background: 'linear-gradient(to bottom, #9BAFC0 0%, #C0CEDB 100%)' }} />
           {/* Exterior wall */}
-          <div style={{ flex: '1', background: 'linear-gradient(to bottom, #7A6E62 0%, #6A5E54 100%)', position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '4%' }}>
+          <div style={{ flex: '1', background: 'linear-gradient(to bottom, #7A6E62 0%, #6A5E54 100%)', position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '3%' }}>
             {/* Porch / frame surround */}
-            <div style={{ position: 'relative', width: 'min(52%, 220px)' }}>
+            <div style={{ position: 'relative', width: 'min(55%, 300px)' }}>
               {/* Door frame */}
               <div style={{ background: '#2A1E12', padding: '8px 8px 0', borderRadius: '3px 3px 0 0', boxShadow: '0 0 0 4px #1A1208, 6px 8px 24px rgba(0,0,0,0.55)', position: 'relative', overflow: 'hidden' }}>
-                {/* Dark hallway interior — always present behind the door */}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, #0A0806 0%, #100C08 100%)' }}>
+                {/* Hallway interior — slightly warm dark so the silhouette reads against it */}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, #1C1410 0%, #241A12 100%)' }}>
                   {/* Lazlo silhouette — fades in as door opens */}
                   <div style={{
                     position: 'absolute', bottom: '2%', left: '50%',
@@ -311,9 +311,9 @@ export default function StoryPage() {
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                   }}>
                     {/* Head */}
-                    <div style={{ width: '22%', aspectRatio: '1', background: '#1A1210', borderRadius: '50%', marginBottom: '1%', boxShadow: '0 0 8px rgba(0,0,0,0.8)' }} />
+                    <div style={{ width: '22%', aspectRatio: '1', background: '#0A0806', borderRadius: '50%', marginBottom: '1%' }} />
                     {/* Shoulders / body */}
-                    <div style={{ width: '44%', height: '45%', background: '#141008', borderRadius: '40% 40% 0 0', boxShadow: '0 0 12px rgba(0,0,0,0.8)' }} />
+                    <div style={{ width: '44%', height: '45%', background: '#080604', borderRadius: '40% 40% 0 0' }} />
                   </div>
                 </div>
                 {/* Door panel — swings open on hinge (left edge) */}

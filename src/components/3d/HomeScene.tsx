@@ -86,8 +86,8 @@ export function HomeScene({
   showLazlo = true,
 }: HomeSceneProps) {
   const floorTex = useTileTexture('#6A5040', '#5A4030', 24, [3, 3]);
-  const wallTex = useWallTexture('#2C2520', [2, 1]);
-  const ceilTex = useWallTexture('#1E1C18', [2, 1]);
+  const wallTex = useWallTexture('#4A3828', [2, 1]);
+  const ceilTex = useWallTexture('#2A2420', [2, 1]);
 
   // Split evidence: NPC-attached hotspots vs free objects
   const npcHotspotIds = new Set(['beh-l1', 'beh-l2', 'beh-l3', 'dig-l2']);
@@ -155,7 +155,7 @@ export function HomeScene({
 
       {/* ── Lighting ──────────────────────────────────────────────────────── */}
       {/* Ambient — curtains drawn but not pitch dark; enough to read the room */}
-      <ambientLight intensity={0.7} color="#5A4A30" />
+      <ambientLight intensity={1.1} color="#6A5A40" />
       {/* Ceiling pendant — main source */}
       <pointLight position={[0, 2.7, -0.5]} intensity={4.5} distance={12} color="#C08840" decay={2} castShadow shadow-mapSize={[512, 512]} />
       {/* Soft overhead fill to lift the whole room */}
