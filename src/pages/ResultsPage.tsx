@@ -286,8 +286,14 @@ export default function ResultsPage() {
                 Play {otherStory.title}
               </button>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => setView('results')}
                 className="border border-border text-foreground/70 font-sans text-sm px-8 py-3.5 rounded-lg hover:border-foreground/50 hover:text-foreground transition-colors"
+              >
+                View my results
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
               >
                 Return home
               </button>

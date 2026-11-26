@@ -177,6 +177,7 @@ export function SceneRenderer({
         <Suspense fallback={null}>
 
           <CameraController
+            key={sceneType}
             target={focusTarget}
             playerPosition={focusTarget ? null : playerPosRef.current}
             onArrived={() => {}}
